@@ -51,11 +51,11 @@ namespace ftgl {
  */
 typedef enum rendermode_t
 {
-    RENDER_NORMAL,
-    RENDER_OUTLINE_EDGE,
-    RENDER_OUTLINE_POSITIVE,
-    RENDER_OUTLINE_NEGATIVE,
-    RENDER_SIGNED_DISTANCE_FIELD
+	RENDER_NORMAL,
+	RENDER_OUTLINE_EDGE,
+	RENDER_OUTLINE_POSITIVE,
+	RENDER_OUTLINE_NEGATIVE,
+	RENDER_SIGNED_DISTANCE_FIELD
 } rendermode_t;
 
 
@@ -64,11 +64,11 @@ typedef enum rendermode_t
  */
 typedef enum rendermode_t
 {
-    RENDER_NORMAL,
-    RENDER_OUTLINE_EDGE,
-    RENDER_OUTLINE_POSITIVE,
-    RENDER_OUTLINE_NEGATIVE,
-    RENDER_SIGNED_DISTANCE_FIELD
+	RENDER_NORMAL,
+	RENDER_OUTLINE_EDGE,
+	RENDER_OUTLINE_POSITIVE,
+	RENDER_OUTLINE_NEGATIVE,
+	RENDER_SIGNED_DISTANCE_FIELD
 } rendermode_t;
 
 /**
@@ -76,69 +76,69 @@ typedef enum rendermode_t
  */
 typedef struct texture_glyph_t
 {
-    /**
-     * Unicode codepoint this glyph represents in UTF-32 LE encoding.
-     */
-    uint32_t codepoint;
+	/**
+	 * Unicode codepoint this glyph represents in UTF-32 LE encoding.
+	 */
+	uint32_t codepoint;
 
-    /**
-     * Glyph's width in pixels.
-     */
-    size_t width;
+	/**
+	 * Glyph's width in pixels.
+	 */
+	size_t width;
 
-    /**
-     * Glyph's height in pixels.
-     */
-    size_t height;
+	/**
+	 * Glyph's height in pixels.
+	 */
+	size_t height;
 
-    /**
-     * Glyph's left bearing expressed in integer pixels.
-     */
-    int offset_x;
+	/**
+	 * Glyph's left bearing expressed in integer pixels.
+	 */
+	int offset_x;
 
-    /**
-     * Glyphs's top bearing expressed in integer pixels.
-     *
-     * Remember that this is the distance from the baseline to the top-most
-     * glyph scanline, upwards y coordinates being positive.
-     */
-    int offset_y;
+	/**
+	 * Glyphs's top bearing expressed in integer pixels.
+	 *
+	 * Remember that this is the distance from the baseline to the top-most
+	 * glyph scanline, upwards y coordinates being positive.
+	 */
+	int offset_y;
 
-    /**
-     * First normalized texture coordinate (x) of top-left corner
-     */
-    float s0;
+	/**
+	 * First normalized texture coordinate (x) of top-left corner
+	 */
+	float s0;
 
-    /**
-     * Second normalized texture coordinate (y) of top-left corner
-     */
-    float t0;
+	/**
+	 * Second normalized texture coordinate (y) of top-left corner
+	 */
+	float t0;
 
-    /**
-     * First normalized texture coordinate (x) of bottom-right corner
-     */
-    float s1;
+	/**
+	 * First normalized texture coordinate (x) of bottom-right corner
+	 */
+	float s1;
 
-    /**
-     * Second normalized texture coordinate (y) of bottom-right corner
-     */
-    float t1;
+	/**
+	 * Second normalized texture coordinate (y) of bottom-right corner
+	 */
+	float t1;
 
-    /**
-     * Mode this glyph was rendered
-     */
-    rendermode_t rendermode;
+	/**
+	 * Mode this glyph was rendered
+	 */
+	rendermode_t rendermode;
 
-    /**
-     * Glyph outline thickness
-     */
-    float outline_thickness;
+	/**
+	 * Glyph outline thickness
+	 */
+	float outline_thickness;
 
 } texture_glyph_t;
 
 typedef enum font_location_t {
-    TEXTURE_FONT_FILE = 0,
-    TEXTURE_FONT_MEMORY,
+	TEXTURE_FONT_FILE = 0,
+	TEXTURE_FONT_MEMORY,
 } font_location_t;
 
 
@@ -147,129 +147,129 @@ typedef enum font_location_t {
  */
 typedef struct texture_font_t
 {
-    /**
-     * Vector of glyphs contained in this font.
-     */
-    vector_t * glyphs;
+	/**
+	 * Vector of glyphs contained in this font.
+	 */
+	vector_t * glyphs;
 
-    /**
-     * Atlas structure to store glyphs data.
-     */
-    texture_atlas_t * atlas;
+	/**
+	 * Atlas structure to store glyphs data.
+	 */
+	texture_atlas_t * atlas;
 
-    /**
-     * font location
-     */
-    font_location_t location;
+	/**
+	 * font location
+	 */
+	font_location_t location;
 
-    union {
-        /**
-         * Font filename, for when location == TEXTURE_FONT_FILE
-         */
-        char *filename;
+	union {
+		/**
+		 * Font filename, for when location == TEXTURE_FONT_FILE
+		 */
+		char *filename;
 
-        /**
-         * Font memory address, for when location == TEXTURE_FONT_MEMORY
-         */
-        struct {
-            const void *base;
-            size_t size;
-        } memory;
-    };
+		/**
+		 * Font memory address, for when location == TEXTURE_FONT_MEMORY
+		 */
+		struct {
+			const void *base;
+			size_t size;
+		} memory;
+	};
 
-    /**
-     * Font size
-     */
-    float size;
+	/**
+	 * Font size
+	 */
+	float size;
 
-    /**
-     * Font hres (vertical hinting trick
-     */
-    float hres;
+	/**
+	 * Font hres (vertical hinting trick
+	 */
+	float hres;
 
-    /**
-     * Whether to use autohint when rendering font
-     */
-    int hinting;
+	/**
+	 * Whether to use autohint when rendering font
+	 */
+	int hinting;
 
-    /**
-     * Mode the font is rendering its next glyph
-     */
-    rendermode_t rendermode;
+	/**
+	 * Mode the font is rendering its next glyph
+	 */
+	rendermode_t rendermode;
 
-    /**
-     * Outline thickness
-     */
-    float outline_thickness;
+	/**
+	 * Outline thickness
+	 */
+	float outline_thickness;
 
-    /**
-     * Whether to use our own lcd filter.
-     */
-    int filtering;
+	/**
+	 * Whether to use our own lcd filter.
+	 */
+	int filtering;
 
-    /**
-     * LCD filter weights
-     */
-    unsigned char lcd_weights[5];
+	/**
+	 * LCD filter weights
+	 */
+	unsigned char lcd_weights[5];
 
-    /**
-     * Freetype face
-     */
-    FT_Face ft_face;
+	/**
+	 * Freetype face
+	 */
+	FT_Face ft_face;
 
-    /**
-     * Harfbuzz font
-     */
-    hb_font_t * hb_ft_font;
+	/**
+	 * Harfbuzz font
+	 */
+	hb_font_t * hb_ft_font;
 
-    /**
-     * This field is simply used to compute a default line spacing (i.e., the
-     * baseline-to-baseline distance) when writing text with this font. Note
-     * that it usually is larger than the sum of the ascender and descender
-     * taken as absolute values. There is also no guarantee that no glyphs
-     * extend above or below subsequent baselines when using this distance.
-     */
-    float height;
+	/**
+	 * This field is simply used to compute a default line spacing (i.e., the
+	 * baseline-to-baseline distance) when writing text with this font. Note
+	 * that it usually is larger than the sum of the ascender and descender
+	 * taken as absolute values. There is also no guarantee that no glyphs
+	 * extend above or below subsequent baselines when using this distance.
+	 */
+	float height;
 
-    /**
-     * This field is the distance that must be placed between two lines of
-     * text. The baseline-to-baseline distance should be computed as:
-     * ascender - descender + linegap
-     */
-    float linegap;
+	/**
+	 * This field is the distance that must be placed between two lines of
+	 * text. The baseline-to-baseline distance should be computed as:
+	 * ascender - descender + linegap
+	 */
+	float linegap;
 
-    /**
-     * The ascender is the vertical distance from the horizontal baseline to
-     * the highest 'character' coordinate in a font face. Unfortunately, font
-     * formats define the ascender differently. For some, it represents the
-     * ascent of all capital latin characters (without accents), for others it
-     * is the ascent of the highest accented character, and finally, other
-     * formats define it as being equal to bbox.yMax.
-     */
-    float ascender;
+	/**
+	 * The ascender is the vertical distance from the horizontal baseline to
+	 * the highest 'character' coordinate in a font face. Unfortunately, font
+	 * formats define the ascender differently. For some, it represents the
+	 * ascent of all capital latin characters (without accents), for others it
+	 * is the ascent of the highest accented character, and finally, other
+	 * formats define it as being equal to bbox.yMax.
+	 */
+	float ascender;
 
-    /**
-     * The descender is the vertical distance from the horizontal baseline to
-     * the lowest 'character' coordinate in a font face. Unfortunately, font
-     * formats define the descender differently. For some, it represents the
-     * descent of all capital latin characters (without accents), for others it
-     * is the ascent of the lowest accented character, and finally, other
-     * formats define it as being equal to bbox.yMin. This field is negative
-     * for values below the baseline.
-     */
-    float descender;
+	/**
+	 * The descender is the vertical distance from the horizontal baseline to
+	 * the lowest 'character' coordinate in a font face. Unfortunately, font
+	 * formats define the descender differently. For some, it represents the
+	 * descent of all capital latin characters (without accents), for others it
+	 * is the ascent of the lowest accented character, and finally, other
+	 * formats define it as being equal to bbox.yMin. This field is negative
+	 * for values below the baseline.
+	 */
+	float descender;
 
-    /**
-     * The position of the underline line for this face. It is the center of
-     * the underlining stem. Only relevant for scalable formats.
-     */
-    float underline_position;
+	/**
+	 * The position of the underline line for this face. It is the center of
+	 * the underlining stem. Only relevant for scalable formats.
+	 */
+	float underline_position;
 
-    /**
-     * The thickness of the underline for this face. Only relevant for scalable
-     * formats.
-     */
-    float underline_thickness;
+	/**
+	 * The thickness of the underline for this face. Only relevant for scalable
+	 * formats.
+	 */
+	float underline_thickness;
 
 } texture_font_t;
 
@@ -291,8 +291,8 @@ typedef struct texture_font_t
  */
   texture_font_t *
   texture_font_new_from_file( texture_atlas_t * atlas,
-                              const float pt_size,
-                              const char * filename );
+							  const float pt_size,
+							  const char * filename );
 
 
 /**
@@ -312,9 +312,9 @@ typedef struct texture_font_t
  */
   texture_font_t *
   texture_font_new_from_memory( texture_atlas_t *atlas,
-                                float pt_size,
-                                const void *memory_base,
-                                size_t memory_size );
+								float pt_size,
+								const void *memory_base,
+								size_t memory_size );
 
 /**
  * Delete a texture font. Note that this does not delete the glyph from the
@@ -339,7 +339,7 @@ typedef struct texture_font_t
  */
   texture_glyph_t *
   texture_font_get_glyph( texture_font_t * self,
-                          uint32_t codepoint );
+						  uint32_t codepoint );
 
 
 /**
@@ -354,8 +354,8 @@ typedef struct texture_font_t
  */
   size_t
   texture_font_load_glyphs( texture_font_t * self,
-                            const char * codepoints,
-                            const char *language );
+							const char * codepoints,
+							const char *language );
 
 /**
  * Creates a new empty glyph
@@ -376,16 +376,16 @@ texture_glyph_delete( texture_glyph_t * );
 /** @} */
  
 #define GLYPHS_ITERATOR1(index, name, glyph) \
-    for( index = 0; index < vector_size ( glyph ); index++ ) { \
-       texture_glyph_t ** __glyphs;
+	for( index = 0; index < vector_size ( glyph ); index++ ) { \
+	   texture_glyph_t ** __glyphs;
 #define GLYPHS_ITERATOR2(index, name, glyph) \
-       if(( __glyphs = *(texture_glyph_t *** ) vector_get ( glyph, index ) )) { \
-           int __i;                                                    \
-           for( __i = 0; __i < 0x100; __i++ ) {                        \
-               if(( name = __glyphs[__i] ))
+	   if(( __glyphs = *(texture_glyph_t *** ) vector_get ( glyph, index ) )) { \
+		   int __i;                                                    \
+		   for( __i = 0; __i < 0x100; __i++ ) {                        \
+			   if(( name = __glyphs[__i] ))
 #define GLYPHS_ITERATOR(index, name, glyph) \
-    GLYPHS_ITERATOR1(index, name, glyph)               \
-       GLYPHS_ITERATOR2(index, name, glyph)
+	GLYPHS_ITERATOR1(index, name, glyph)               \
+	   GLYPHS_ITERATOR2(index, name, glyph)
 
 #define GLYPHS_ITERATOR_END1 }
 #define GLYPHS_ITERATOR_END2 } }

@@ -36,16 +36,16 @@ void freetype_gl_errhook_default(int errno, char* message, char* fmt, ...)
 #endif
 
 extern const struct {
-    int          code;
-    const char*  message;
+	int          code;
+	const char*  message;
 } FT_Errors[];
 
 char* freetype_gl_errstr(int errno)
 {
   if(errno >= FTGL_ERR_BASE)
-    return freetype_gl_errstrs[errno-FTGL_ERR_BASE];
+	return freetype_gl_errstrs[errno-FTGL_ERR_BASE];
   else
-    return (char*)FT_Errors[errno].message;
+	return (char*)FT_Errors[errno].message;
 }
 
 void (*freetype_gl_errhook)(int errno, char* message, char* fmt, ...) = freetype_gl_errhook_default;

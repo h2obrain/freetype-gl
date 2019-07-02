@@ -51,56 +51,56 @@ namespace ftgl {
  * Text buffer structure
  */
 typedef struct  text_buffer_t {
-    /**
-     * Vertex buffer
-     */
-    vertex_buffer_t *buffer;
+	/**
+	 * Vertex buffer
+	 */
+	vertex_buffer_t *buffer;
 
-    /**
-     * Base color for text
-     */
-    vec4 base_color;
+	/**
+	 * Base color for text
+	 */
+	vec4 base_color;
 
 
-    /**
-     * Pen origin
-     */
-    vec2 origin;
+	/**
+	 * Pen origin
+	 */
+	vec2 origin;
 
-    /**
-     * Last pen y location
-     */
-    float last_pen_y;
+	/**
+	 * Last pen y location
+	 */
+	float last_pen_y;
 
-    /**
-     * Total bounds
-     */
-    vec4 bounds;
+	/**
+	 * Total bounds
+	 */
+	vec4 bounds;
 
-    /**
-     * Index (in the vertex buffer) of the current line start
-     */
-    size_t line_start;
+	/**
+	 * Index (in the vertex buffer) of the current line start
+	 */
+	size_t line_start;
 
-    /**
-     * Location of the start of the line
-     */
-    float line_left;
+	/**
+	 * Location of the start of the line
+	 */
+	float line_left;
 
-    /**
-     * Vector of line information
-     */
-    vector_t * lines;
+	/**
+	 * Vector of line information
+	 */
+	vector_t * lines;
 
-    /**
-     * Current line ascender
-     */
-    float line_ascender;
+	/**
+	 * Current line ascender
+	 */
+	float line_ascender;
 
-    /**
-     * Current line decender
-     */
-    float line_descender;
+	/**
+	 * Current line decender
+	 */
+	float line_descender;
 } text_buffer_t;
 
 
@@ -109,60 +109,60 @@ typedef struct  text_buffer_t {
  * Glyph vertex structure
  */
 typedef struct glyph_vertex_t {
-    /**
-     * Vertex x coordinates
-     */
-    float x;
+	/**
+	 * Vertex x coordinates
+	 */
+	float x;
 
-    /**
-     * Vertex y coordinates
-     */
-    float y;
+	/**
+	 * Vertex y coordinates
+	 */
+	float y;
 
-    /**
-     * Vertex z coordinates
-     */
-    float z;
+	/**
+	 * Vertex z coordinates
+	 */
+	float z;
 
-    /**
-     * Texture first coordinate
-     */
-    float u;
+	/**
+	 * Texture first coordinate
+	 */
+	float u;
 
-    /**
-     * Texture second coordinate
-     */
-    float v;
+	/**
+	 * Texture second coordinate
+	 */
+	float v;
 
-    /**
-     * Color red component
-     */
-    float r;
+	/**
+	 * Color red component
+	 */
+	float r;
 
-    /**
-     * Color green component
-     */
-    float g;
+	/**
+	 * Color green component
+	 */
+	float g;
 
-    /**
-     * Color blue component
-     */
-    float b;
+	/**
+	 * Color blue component
+	 */
+	float b;
 
-    /**
-     * Color alpha component
-     */
-    float a;
+	/**
+	 * Color alpha component
+	 */
+	float a;
 
-    /**
-     * Shift along x
-     */
-    float shift;
+	/**
+	 * Shift along x
+	 */
+	float shift;
 
-    /**
-     * Color gamma correction
-     */
-    float gamma;
+	/**
+	 * Color gamma correction
+	 */
+	float gamma;
 
 } glyph_vertex_t;
 
@@ -171,15 +171,15 @@ typedef struct glyph_vertex_t {
  * Line structure
  */
 typedef struct line_info_t {
-    /**
-     * Index (in the vertex buffer) where this line starts
-     */
-    size_t line_start;
+	/**
+	 * Index (in the vertex buffer) where this line starts
+	 */
+	size_t line_start;
 
-    /**
-     * bounds of this line
-     */
-    vec4 bounds;
+	/**
+	 * bounds of this line
+	 */
+	vec4 bounds;
 
 } line_info_t;
 
@@ -188,20 +188,20 @@ typedef struct line_info_t {
  */
 typedef enum Align
 {
-    /**
-     * Align text to the left hand side
-     */
-    ALIGN_LEFT,
+	/**
+	 * Align text to the left hand side
+	 */
+	ALIGN_LEFT,
 
-    /**
-     * Align text to the center
-     */
-    ALIGN_CENTER,
+	/**
+	 * Align text to the center
+	 */
+	ALIGN_CENTER,
 
-    /**
-     * Align text to the right hand side
-     */
-    ALIGN_RIGHT
+	/**
+	 * Align text to the right hand side
+	 */
+	ALIGN_RIGHT
 } Align;
 
 
@@ -247,8 +247,8 @@ typedef enum Align
   */
   void
   text_buffer_add_text( text_buffer_t * self,
-                        vec2 * pen, markup_t * markup,
-                        const char * text, size_t length );
+						vec2 * pen, markup_t * markup,
+						const char * text, size_t length );
 
  /**
   * Add a char to the text buffer
@@ -261,8 +261,8 @@ typedef enum Align
   */
   void
   text_buffer_add_char( text_buffer_t * self,
-                        vec2 * pen, markup_t * markup,
-                        const char * current, const char * previous );
+						vec2 * pen, markup_t * markup,
+						const char * current, const char * previous );
 
  /**
   * Align all the lines of text already added to the buffer
@@ -275,7 +275,7 @@ typedef enum Align
   */
   void
   text_buffer_align( text_buffer_t * self, vec2 * pen,
-                     enum Align alignment );
+					 enum Align alignment );
 
  /**
   * Get the rectangle surrounding the text

@@ -62,90 +62,90 @@ namespace ftgl {
  */
 typedef struct markup_t
 {
-    /**
-     * A font family name such as "normal", "sans", "serif" or "monospace".
-     */
-    char * family;
+	/**
+	 * A font family name such as "normal", "sans", "serif" or "monospace".
+	 */
+	char * family;
 
-    /**
-     * Font size.
-     */
-    float size;
+	/**
+	 * Font size.
+	 */
+	float size;
 
-    /**
-     * Whether text is bold.
-     */
-    int bold;
+	/**
+	 * Whether text is bold.
+	 */
+	int bold;
 
-    /**
-     * Whether text is italic.
-     */
-    int italic;
+	/**
+	 * Whether text is italic.
+	 */
+	int italic;
 
-    /**
-     * Spacing between letters.
-     */
-    float spacing;
+	/**
+	 * Spacing between letters.
+	 */
+	float spacing;
 
-    /**
-     * Gamma correction.
-     */
-    float gamma;
+	/**
+	 * Gamma correction.
+	 */
+	float gamma;
 
-    /**
-     * Text color.
-     */
-    vec4 foreground_color;
+	/**
+	 * Text color.
+	 */
+	vec4 foreground_color;
 
-    /**
-     * Background color.
-     */
-    vec4 background_color;
+	/**
+	 * Background color.
+	 */
+	vec4 background_color;
 
-    /**
-     * Whether outline is active.
-     */
-    int outline;
+	/**
+	 * Whether outline is active.
+	 */
+	int outline;
 
-    /**
-     * Outline color.
-     */
-    vec4 outline_color;
+	/**
+	 * Outline color.
+	 */
+	vec4 outline_color;
 
-    /**
-     * Whether underline is active.
-     */
-    int underline;
+	/**
+	 * Whether underline is active.
+	 */
+	int underline;
 
-    /**
-     * Underline color.
-     */
-    vec4 underline_color;
+	/**
+	 * Underline color.
+	 */
+	vec4 underline_color;
 
-    /**
-     * Whether overline is active.
-     */
-    int overline;
+	/**
+	 * Whether overline is active.
+	 */
+	int overline;
 
-    /**
-     * Overline color.
-     */
-    vec4 overline_color;
+	/**
+	 * Overline color.
+	 */
+	vec4 overline_color;
 
-    /**
-     * Whether strikethrough is active.
-     */
-    int strikethrough;
+	/**
+	 * Whether strikethrough is active.
+	 */
+	int strikethrough;
 
-    /**
-     * Strikethrough color.
-     */
-    vec4 strikethrough_color;
+	/**
+	 * Strikethrough color.
+	 */
+	vec4 strikethrough_color;
 
-    /**
-     * Pointer on the corresponding font (family/size/bold/italic)
-     */
-    texture_font_t * font;
+	/**
+	 * Pointer on the corresponding font (family/size/bold/italic)
+	 */
+	texture_font_t * font;
 
 } markup_t;
 
