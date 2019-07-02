@@ -33,15 +33,12 @@ mat4   model, view, projection;
 
 // --------------------------------------------------------------- add_text ---
 void add_text( vertex_buffer_t * buffer, texture_font_t * font,
-			   char *text, vec2 pen, vec4 fg_color_1, vec4 fg_color_2 )
-{
+			   char *text, vec2 pen, vec4 fg_color_1, vec4 fg_color_2 ) {
 	size_t i;
-	for( i = 0; i < strlen(text); ++i )
-	{
+	for ( i = 0; i < strlen(text); ++i ) {
 		texture_glyph_t *glyph = texture_font_get_glyph( font, text + i );
 		float kerning = 0.0f;
-		if( i > 0)
-		{
+		if ( i > 0) {
 			kerning = texture_glyph_get_kerning( glyph, text + i - 1 );
 		}
 		pen.x += kerning;
@@ -71,8 +68,7 @@ void add_text( vertex_buffer_t * buffer, texture_font_t * font,
 
 
 // ------------------------------------------------------------------- init ---
-void init( void )
-{
+void init( void ) {
 	atlas = texture_atlas_new( 1024, 1024, 1 );
 	buffer = vertex_buffer_new( "vertex:3f,tex_coord:2f,color:4f" );
 	texture_font_t *font =
@@ -118,8 +114,7 @@ void init( void )
 
 
 // ---------------------------------------------------------------- display ---
-void display( GLFWwindow* window )
-{
+void display( GLFWwindow* window ) {
 	glClearColor( 1.0, 1.0, 1.0, 1.0 );
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
@@ -144,38 +139,32 @@ void display( GLFWwindow* window )
 
 
 // ---------------------------------------------------------------- reshape ---
-void reshape( GLFWwindow* window, int width, int height )
-{
+void reshape( GLFWwindow* window, int width, int height ) {
 	glViewport(0, 0, width, height);
 	mat4_set_orthographic( &projection, 0, width, 0, height, -1, 1);
 }
 
 
 // --------------------------------------------------------------- keyboard ---
-void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods )
-{
-	if ( key == GLFW_KEY_ESCAPE && action == GLFW_PRESS )
-	{
+void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods ) {
+	if ( key == GLFW_KEY_ESCAPE && action == GLFW_PRESS ) {
 		glfwSetWindowShouldClose( window, GL_TRUE );
 	}
 }
 
 
 // --------------------------------------------------------- error-callback ---
-void error_callback( int error, const char* description )
-{
+void error_callback( int error, const char* description ) {
 	fputs( description, stderr );
 }
 
 
 // ------------------------------------------------------------------- main ---
-int main( int argc, char **argv )
-{
+int main( int argc, char **argv ) {
 	GLFWwindow* window;
 	char* screenshot_path = NULL;
 
-	if (argc > 1)
-	{
+	if (argc > 1) {
 		if (argc == 3 && 0 == strcmp( "--screenshot", argv[1] ))
 			screenshot_path = argv[2];
 		else
@@ -187,8 +176,7 @@ int main( int argc, char **argv )
 
 	glfwSetErrorCallback( error_callback );
 
-	if (!glfwInit( ))
-	{
+	if (!glfwInit( )) {
 		exit( EXIT_FAILURE );
 	}
 
@@ -197,8 +185,7 @@ int main( int argc, char **argv )
 
 	window = glfwCreateWindow( 850, 200, argv[0], NULL, NULL );
 
-	if (!window)
-	{
+	if (!window) {
 		glfwTerminate( );
 		exit( EXIT_FAILURE );
 	}
@@ -212,8 +199,7 @@ int main( int argc, char **argv )
 
 #ifndef __APPLE__
 	GLenum err = glewInit();
-	if (GLEW_OK != err)
-	{
+	if (GLEW_OK != err) {
 		/* Problem: glewInit failed, something is seriously wrong. */
 		fprintf( stderr, "Error: %s\n", glewGetErrorString(err) );
 		exit( EXIT_FAILURE );
@@ -226,13 +212,11 @@ int main( int argc, char **argv )
 	glfwShowWindow( window );
 	reshape( window, 850, 200 );
 
-	while (!glfwWindowShouldClose( window ))
-	{
+	while (!glfwWindowShouldClose( window )) {
 		display( window );
 		glfwPollEvents( );
 
-		if (screenshot_path)
-		{
+		if (screenshot_path) {
 			screenshot( window, screenshot_path );
 			glfwSetWindowShouldClose( window, 1 );
 		}

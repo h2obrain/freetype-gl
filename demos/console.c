@@ -67,11 +67,9 @@ int control_key_handled;
 
 // ------------------------------------------------------------ console_new ---
 console_t *
-console_new( float font_size )
-{
+console_new( float font_size ) {
 	console_t *self = (console_t *) malloc( sizeof(console_t) );
-	if( !self )
-	{
+	if ( !self ) {
 		return self;
 	}
 	self->lines = vector_new( sizeof(char *) );
@@ -160,8 +158,7 @@ console_new( float font_size )
 
 // -------------------------------------------------------- console_delete ---
 void
-console_delete( console_t *self )
-{
+console_delete( console_t *self ) {
 	glDeleteTextures( 1, &self->atlas->id );
 	self->atlas->id = 0;
 	texture_atlas_delete( self->atlas );
@@ -174,11 +171,9 @@ void
 console_add_glyph( console_t *self,
 				   char* current,
 				   char* previous,
-				   markup_t *markup )
-{
+				   markup_t *markup ) {
 	texture_glyph_t *glyph  = texture_font_get_glyph( markup->font, current );
-	if( previous )
-	{
+	if ( previous ) {
 		self->pen.x += texture_glyph_get_kerning( glyph, previous );
 	}
 	float r = markup->foreground_color.r;
@@ -209,8 +204,7 @@ console_add_glyph( console_t *self,
 
 // -------------------------------------------------------- console_render ---
 void
-console_render( console_t *self )
-{
+console_render( console_t *self ) {
 	char* cur_char;
 	char* prev_char;
 
@@ -231,17 +225,14 @@ console_render( console_t *self )
 	markup = self->markup[MARKUP_FAINT];
 	self->pen.y -= markup.font->height;
 
-	for( i=0; i<self->lines->size; ++i )
-	{
+	for ( i=0; i<self->lines->size; ++i ) {
 		char *text = * (char **) vector_get( self->lines, i ) ;
-		if( strlen(text) > 0 )
-		{
+		if ( strlen(text) > 0 ) {
 			cur_char = text;
 			prev_char = NULL;
 			console_add_glyph( console, cur_char, prev_char, &markup );
 			prev_char = cur_char;
-			for( index=1; index < strlen(text)-1; ++index )
-			{
+			for ( index=1; index < strlen(text)-1; ++index ) {
 				cur_char = text + index;
 				console_add_glyph( console, cur_char, prev_char, &markup );
 				prev_char = cur_char;
@@ -255,14 +246,12 @@ console_render( console_t *self )
 
 	// Prompt
 	markup = self->markup[MARKUP_BOLD];
-	if( strlen( self->prompt ) > 0 )
-	{
+	if ( strlen( self->prompt ) > 0 ) {
 		cur_char = self->prompt;
 		prev_char = NULL;
 		console_add_glyph( console, cur_char, prev_char, &markup );
 		prev_char = cur_char;
-		for( index=1; index < strlen(self->prompt); ++index )
-		{
+		for ( index=1; index < strlen(self->prompt); ++index ) {
 			cur_char = self->prompt + index;
 			console_add_glyph( console, cur_char, prev_char, &markup );
 			prev_char = cur_char;
@@ -272,30 +261,25 @@ console_render( console_t *self )
 
 	// Input
 	markup = self->markup[MARKUP_NORMAL];
-	if( strlen(self->input) > 0 )
-	{
+	if ( strlen(self->input) > 0 ) {
 		cur_char = self->input;
 		prev_char = NULL;
 		console_add_glyph( console, cur_char, prev_char, &markup );
 		prev_char = cur_char;
-		if( self->cursor > 0)
-		{
+		if ( self->cursor > 0) {
 			cursor_x = (int) self->pen.x;
 		}
-		for( index=1; index < strlen(self->input); ++index )
-		{
+		for ( index=1; index < strlen(self->input); ++index ) {
 			cur_char = self->input + index;
 			console_add_glyph( console, cur_char, prev_char, &markup );
 			prev_char = cur_char;
-			if( index < self->cursor )
-			{
+			if ( index < self->cursor ) {
 				cursor_x = (int) self->pen.x;
 			}
 		}
 	}
 
-	if( self->lines->size || self->prompt[0] != '\0' || self->input[0] != '\0' )
-	{
+	if ( self->lines->size || self->prompt[0] != '\0' || self->input[0] != '\0' ) {
 		glBindTexture( GL_TEXTURE_2D, self->atlas->id );
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
@@ -347,22 +331,17 @@ console_render( console_t *self )
 void
 console_connect( console_t *self,
 				  const char *signal,
-				  void (*handler)(console_t *, char *))
-{
-	if( strcmp( signal,"activate" ) == 0 )
-	{
+				  void (*handler)(console_t *, char *)) {
+	if ( strcmp( signal,"activate" ) == 0 ) {
 		self->handlers[__SIGNAL_ACTIVATE__] = handler;
-	}
-	else if( strcmp( signal,"complete" ) == 0 )
-	{
+	} else
+	if ( strcmp( signal,"complete" ) == 0 ) {
 		self->handlers[__SIGNAL_COMPLETE__] = handler;
-	}
-	else if( strcmp( signal,"history-next" ) == 0 )
-	{
+	} else
+	if ( strcmp( signal,"history-next" ) == 0 ) {
 		self->handlers[__SIGNAL_HISTORY_NEXT__] = handler;
-	}
-	else if( strcmp( signal,"history-prev" ) == 0 )
-	{
+	} else
+	if ( strcmp( signal,"history-prev" ) == 0 ) {
 		self->handlers[__SIGNAL_HISTORY_PREV__] = handler;
 	}
 }
@@ -370,21 +349,17 @@ console_connect( console_t *self,
 
 // --------------------------------------------------------- console_print ---
 void
-console_print( console_t *self, char *text )
-{
+console_print( console_t *self, char *text ) {
 	// Make sure there is at least one line
-	if( self->lines->size == 0 )
-	{
+	if ( self->lines->size == 0 ) {
 		char *line = strdup( "" );
 		vector_push_back( self->lines, &line );
 	}
 
 	// Make sure last line does not end with '\n'
 	char *last_line = *(char **) vector_get( self->lines, self->lines->size-1 ) ;
-	if( strlen( last_line ) != 0 )
-	{
-		if( last_line[strlen( last_line ) - 1] == '\n' )
-		{
+	if ( strlen( last_line ) != 0 ) {
+		if ( last_line[strlen( last_line ) - 1] == '\n' ) {
 			char *line = strdup( "" );
 			vector_push_back( self->lines, &line );
 		}
@@ -394,8 +369,7 @@ console_print( console_t *self, char *text )
 	char *start = text;
 	char *end   = strchr(start, '\n');
 	size_t len = strlen( last_line );
-	if( end != NULL)
-	{
+	if ( end != NULL) {
 		char *line = (char *) malloc( (len + end - start + 2)*sizeof( char ) );
 		strncpy( line, last_line, len );
 		strncpy( line + len, text, end-start+1 );
@@ -404,14 +378,11 @@ console_print( console_t *self, char *text )
 
 		vector_set( self->lines, self->lines->size-1, &line );
 		free( last_line );
-		if( (end-start)  < (strlen( text )-1) )
-		{
+		if ( (end-start)  < (strlen( text )-1) ) {
 			console_print(self, end+1 );
 		}
 		return;
-	}
-	else
-	{
+	} else {
 		char *line = (char *) malloc( (len + strlen(text) + 1) * sizeof( char ) );
 		strncpy( line, last_line, len );
 		strcpy( line + len, text );
@@ -426,31 +397,22 @@ console_print( console_t *self, char *text )
 void
 console_process( console_t *self,
 				  const char *action,
-				  const unsigned char key )
-{
+				  const unsigned char key ) {
 	size_t len = strlen(self->input);
 
-	if( strcmp(action, "type") == 0 )
-	{
-		if( len < MAX_LINE_LENGTH )
-		{
+	if ( strcmp(action, "type") == 0 ) {
+		if ( len < MAX_LINE_LENGTH ) {
 			memmove( self->input + self->cursor+1,
 					 self->input + self->cursor,
 					 (len - self->cursor+1)*sizeof(char) );
 			self->input[self->cursor] = key;
 			self->cursor++;
-		}
-		else
-		{
+		} else {
 			fprintf( stderr, "Input buffer is full\n" );
 		}
-	}
-	else
-	{
-		if( strcmp( action, "enter" ) == 0 )
-		{
-			if( console->handlers[__SIGNAL_ACTIVATE__] )
-			{
+	} else {
+		if ( strcmp( action, "enter" ) == 0 ) {
+			if ( console->handlers[__SIGNAL_ACTIVATE__] ) {
 				(*console->handlers[__SIGNAL_ACTIVATE__])(console, console->input);
 			}
 			console_print( self, self->prompt );
@@ -458,52 +420,42 @@ console_process( console_t *self,
 			console_print( self, "\n" );
 			self->input[0] = '\0';
 			self->cursor = 0;
-		}
-		else if( strcmp( action, "right" ) == 0 )
-		{
-			if( self->cursor < strlen(self->input) )
-			{
+		} else
+		if ( strcmp( action, "right" ) == 0 ) {
+			if ( self->cursor < strlen(self->input) ) {
 				self->cursor += 1;
 			}
-		}
-		else if( strcmp( action, "left" ) == 0 )
-		{
-			if( self->cursor > 0 )
-			{
+		} else
+		if ( strcmp( action, "left" ) == 0 ) {
+			if ( self->cursor > 0 ) {
 				self->cursor -= 1;
 			}
-		}
-		else if( strcmp( action, "delete" ) == 0 )
-		{
+		} else
+		if ( strcmp( action, "delete" ) == 0 ) {
 			memmove( self->input + self->cursor,
 					 self->input + self->cursor+1,
 					 (len - self->cursor)*sizeof(char) );
-		}
-		else if( strcmp( action, "backspace" ) == 0 )
-		{
-			if( self->cursor > 0 )
-			{
+		} else
+		if ( strcmp( action, "backspace" ) == 0 ) {
+			if ( self->cursor > 0 ) {
 				memmove( self->input + self->cursor-1,
 						 self->input + self->cursor,
 						 (len - self->cursor+1)*sizeof(char) );
 				self->cursor--;
 			}
-		}
-		else if( strcmp( action, "kill" ) == 0 )
-		{
-			if( self->cursor < len )
-			{
+		} else
+		if ( strcmp( action, "kill" ) == 0 ) {
+			if ( self->cursor < len ) {
 				strcpy(self->killring, self->input);
 				self->input[self->cursor] = '\0';
 				fprintf(stderr, "Kill ring: %s\n", self->killring);
 			}
 
-		}
-		else if( strcmp( action, "yank" ) == 0 )
-		{
+		} else
+
+		if ( strcmp( action, "yank" ) == 0 ) {
 			size_t l = strlen(self->killring);
-			if( (len + l) < MAX_LINE_LENGTH )
-			{
+			if ( (len + l) < MAX_LINE_LENGTH ) {
 				memmove( self->input + self->cursor + l,
 						 self->input + self->cursor,
 						 (len - self->cursor)*sizeof(char) );
@@ -511,36 +463,27 @@ console_process( console_t *self,
 						self->killring, l*sizeof(char));
 				self->cursor += l;
 			}
-		}
-		else if( strcmp( action, "home" ) == 0 )
-		{
+		} else
+		if ( strcmp( action, "home" ) == 0 ) {
 			self->cursor = 0;
-		}
-		else if( strcmp( action, "end" ) == 0 )
-		{
+		} else
+		if ( strcmp( action, "end" ) == 0 ) {
 			self->cursor = strlen( self->input );
-		}
-		else if( strcmp( action, "clear" ) == 0 )
-		{
-		}
-		else if( strcmp( action, "history-prev" ) == 0 )
-		{
-			if( console->handlers[__SIGNAL_HISTORY_PREV__] )
-			{
+		} else
+		if ( strcmp( action, "clear" ) == 0 ) {
+		} else
+		if ( strcmp( action, "history-prev" ) == 0 ) {
+			if ( console->handlers[__SIGNAL_HISTORY_PREV__] ) {
 				(*console->handlers[__SIGNAL_HISTORY_PREV__])( console, console->input );
 			}
-		}
-		else if( strcmp( action, "history-next" ) == 0 )
-		{
-			if( console->handlers[__SIGNAL_HISTORY_NEXT__] )
-			{
+		} else
+		if ( strcmp( action, "history-next" ) == 0 ) {
+			if ( console->handlers[__SIGNAL_HISTORY_NEXT__] ) {
 				(*console->handlers[__SIGNAL_HISTORY_NEXT__])( console, console->input );
 			}
-		}
-		else if( strcmp( action, "complete" ) == 0 )
-		{
-			if( console->handlers[__SIGNAL_COMPLETE__] )
-			{
+		} else
+		if ( strcmp( action, "complete" ) == 0 ) {
+			if ( console->handlers[__SIGNAL_COMPLETE__] ) {
 				(*console->handlers[__SIGNAL_COMPLETE__])( console, console->input );
 			}
 		}
@@ -549,40 +492,35 @@ console_process( console_t *self,
 
 
 // ------------------------------------------------------- console activate ---
-void console_activate( console_t *self, char *input )
-{
+void console_activate( console_t *self, char *input ) {
 	//console_print( self, "Activate callback\n" );
 	fprintf( stderr, "Activate callback : %s\n", input );
 }
 
 
 // ------------------------------------------------------- console complete ---
-void console_complete( console_t *self, char *input )
-{
+void console_complete( console_t *self, char *input ) {
 	// console_print( self, "Complete callback\n" );
 	fprintf( stderr, "Complete callback : %s\n", input );
 }
 
 
 // ----------------------------------------------- console previous history ---
-void console_history_prev( console_t *self, char *input )
-{
+void console_history_prev( console_t *self, char *input ) {
 	// console_print( self, "History prev callback\n" );
 	fprintf( stderr, "History prev callback : %s\n", input );
 }
 
 
 // --------------------------------------------------- console next history ---
-void console_history_next( console_t *self, char *input )
-{
+void console_history_next( console_t *self, char *input ) {
 	// console_print( self, "History next callback\n" );
 	fprintf( stderr, "History next callback : %s\n", input );
 }
 
 
 // ------------------------------------------------------------------- init ---
-void init( float font_size )
-{
+void init( float font_size ) {
 	control_key_handled = 0;
 
 	console = console_new( font_size );
@@ -609,8 +547,7 @@ void init( float font_size )
 
 
 // ---------------------------------------------------------------- display ---
-void display( GLFWwindow* window )
-{
+void display( GLFWwindow* window ) {
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	console_render( console );
 	glfwSwapBuffers( window );
@@ -618,18 +555,15 @@ void display( GLFWwindow* window )
 
 
 // ---------------------------------------------------------------- reshape ---
-void reshape( GLFWwindow* window, int width, int height )
-{
+void reshape( GLFWwindow* window, int width, int height ) {
 	glViewport(0, 0, width, height);
 	mat4_set_orthographic( &projection, 0, width, 0, height, -1, 1);
 }
 
 
 // ----------------------------------------------------------- on char input ---
-void char_input( GLFWwindow* window, unsigned int cp )
-{
-	if( control_key_handled )
-	{
+void char_input( GLFWwindow* window, unsigned int cp ) {
+	if ( control_key_handled ) {
 		control_key_handled = 0;
 		return;
 	}
@@ -639,15 +573,12 @@ void char_input( GLFWwindow* window, unsigned int cp )
 
 
 // --------------------------------------------------------------- keyboard ---
-void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods )
-{
-	if( GLFW_PRESS != action && GLFW_REPEAT != action )
-	{
+void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods ) {
+	if ( GLFW_PRESS != action && GLFW_REPEAT != action ) {
 		return;
 	}
 
-	switch( key )
-	{
+	switch( key ) {
 		case GLFW_KEY_HOME:
 			console_process( console, "home", 0 );
 			break;
@@ -685,13 +616,11 @@ void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods )
 			break;
 	}
 
-	if( ( GLFW_MOD_CONTROL & mods ) == 0 )
-	{
+	if ( ( GLFW_MOD_CONTROL & mods ) == 0 ) {
 		return;
 	}
 
-	switch( key )
-	{
+	switch( key ) {
 		case GLFW_KEY_K:
 			control_key_handled = 1;
 			console_process( console, "kill", 0 );
@@ -711,20 +640,17 @@ void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods )
 
 
 // --------------------------------------------------------- error-callback ---
-void error_callback( int error, const char* description )
-{
+void error_callback( int error, const char* description ) {
 	fputs( description, stderr );
 }
 
 
 // ------------------------------------------------------------------- main ---
-int main( int argc, char **argv )
-{
+int main( int argc, char **argv ) {
 	GLFWwindow* window;
 	char* screenshot_path = NULL;
 
-	if (argc > 1)
-	{
+	if (argc > 1) {
 		if (argc == 3 && 0 == strcmp( "--screenshot", argv[1] ))
 			screenshot_path = argv[2];
 		else
@@ -736,8 +662,7 @@ int main( int argc, char **argv )
 
 	glfwSetErrorCallback( error_callback );
 
-	if (!glfwInit( ))
-	{
+	if (!glfwInit( )) {
 		exit( EXIT_FAILURE );
 	}
 
@@ -746,8 +671,7 @@ int main( int argc, char **argv )
 
 	window = glfwCreateWindow( 600,400, argv[0], NULL, NULL );
 
-	if (!window)
-	{
+	if (!window) {
 		glfwTerminate( );
 		exit( EXIT_FAILURE );
 	}
@@ -763,8 +687,7 @@ int main( int argc, char **argv )
 #ifndef __APPLE__
 	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
-	if (GLEW_OK != err)
-	{
+	if (GLEW_OK != err) {
 		/* Problem: glewInit failed, something is seriously wrong. */
 		fprintf( stderr, "Error: %s\n", glewGetErrorString(err) );
 		exit( EXIT_FAILURE );
@@ -780,13 +703,11 @@ int main( int argc, char **argv )
 
 	reshape( window, pixWidth, pixHeight );
 
-	while (!glfwWindowShouldClose( window ))
-	{
+	while (!glfwWindowShouldClose( window )) {
 		display( window );
 		glfwPollEvents( );
 
-		if (screenshot_path)
-		{
+		if (screenshot_path) {
 			screenshot( window, screenshot_path );
 			glfwSetWindowShouldClose( window, 1 );
 		}

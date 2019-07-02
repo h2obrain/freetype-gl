@@ -44,8 +44,7 @@ GLuint text_shader;
 
 // ------------------------------------------------------ match_description ---
 char *
-match_description( char * description )
-{
+match_description( char * description ) {
 
 #if (defined(_WIN32) || defined(_WIN64)) && !defined(__MINGW32__)
 	fprintf( stderr, "\"font_manager_match_description\" "
@@ -62,21 +61,15 @@ match_description( char * description )
 	FcPattern *match = FcFontMatch( 0, pattern, &result );
 	FcPatternDestroy( pattern );
 
-	if ( !match )
-	{
+	if ( !match ) {
 		fprintf( stderr, "fontconfig error: could not match description '%s'", description );
 		return 0;
-	}
-	else
-	{
+	} else {
 		FcValue value;
 		FcResult result = FcPatternGet( match, FC_FILE, 0, &value );
-		if ( result )
-		{
+		if ( result ) {
 			fprintf( stderr, "fontconfig error: could not match description '%s'", description );
-		}
-		else
-		{
+		} else {
 			filename = strdup( (char *)(value.u.s) );
 		}
 	}
@@ -84,8 +77,7 @@ match_description( char * description )
 	return filename;
 }
 
-void init()
-{
+void init() {
 	text_shader = shader_load( "shaders/text.vert",
 							   "shaders/text.frag" );
 
@@ -200,8 +192,7 @@ void init()
 
 
 // ---------------------------------------------------------------- display ---
-void display( GLFWwindow* window )
-{
+void display( GLFWwindow* window ) {
 	glClearColor(0.40,0.40,0.45,1.00);
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
@@ -252,38 +243,32 @@ void display( GLFWwindow* window )
 
 
 // ---------------------------------------------------------------- reshape ---
-void reshape( GLFWwindow* window, int width, int height )
-{
+void reshape( GLFWwindow* window, int width, int height ) {
 	glViewport(0, 0, width, height);
 	mat4_set_orthographic( &projection, 0, width, 0, height, -1, 1);
 }
 
 
 // --------------------------------------------------------------- keyboard ---
-void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods )
-{
-	if ( key == GLFW_KEY_ESCAPE && action == GLFW_PRESS )
-	{
+void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods ) {
+	if ( key == GLFW_KEY_ESCAPE && action == GLFW_PRESS ) {
 		glfwSetWindowShouldClose( window, GL_TRUE );
 	}
 }
 
 
 // --------------------------------------------------------- error-callback ---
-void error_callback( int error, const char* description )
-{
+void error_callback( int error, const char* description ) {
 	fputs( description, stderr );
 }
 
 
 // ------------------------------------------------------------------- main ---
-int main( int argc, char **argv )
-{
+int main( int argc, char **argv ) {
 	GLFWwindow* window;
 	char* screenshot_path = NULL;
 
-	if (argc > 1)
-	{
+	if (argc > 1) {
 		if (argc == 3 && 0 == strcmp( "--screenshot", argv[1] ))
 			screenshot_path = argv[2];
 		else
@@ -295,8 +280,7 @@ int main( int argc, char **argv )
 
 	glfwSetErrorCallback( error_callback );
 
-	if (!glfwInit( ))
-	{
+	if (!glfwInit( )) {
 		exit( EXIT_FAILURE );
 	}
 
@@ -305,8 +289,7 @@ int main( int argc, char **argv )
 
 	window = glfwCreateWindow( 500, 220, argv[0], NULL, NULL );
 
-	if (!window)
-	{
+	if (!window) {
 		glfwTerminate( );
 		exit( EXIT_FAILURE );
 	}
@@ -320,8 +303,7 @@ int main( int argc, char **argv )
 
 #ifndef __APPLE__
 	GLenum err = glewInit();
-	if (GLEW_OK != err)
-	{
+	if (GLEW_OK != err) {
 		/* Problem: glewInit failed, something is seriously wrong. */
 		fprintf( stderr, "Error: %s\n", glewGetErrorString(err) );
 		exit( EXIT_FAILURE );
@@ -334,13 +316,11 @@ int main( int argc, char **argv )
 	glfwShowWindow( window );
 	reshape( window, 500, 220 );
 
-	while(!glfwWindowShouldClose( window ))
-	{
+	while (!glfwWindowShouldClose( window )) {
 		display( window );
 		glfwPollEvents( );
 
-		if (screenshot_path)
-		{
+		if (screenshot_path) {
 			screenshot( window, screenshot_path );
 			glfwSetWindowShouldClose( window, 1 );
 		}

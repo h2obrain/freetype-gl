@@ -42,14 +42,12 @@ const char *language           = "ar";
 
 
 // ------------------------------------------------------------------- init ---
-void init( void )
-{
+void init( void ) {
 	size_t i, j;
 
 	atlas = texture_atlas_new( 512, 512, 3 );
 	texture_font_t *fonts[20];
-	for ( i=0; i< 20; ++i )
-	{
+	for ( i=0; i< 20; ++i ) {
 		fonts[i] =  texture_font_new_from_file(atlas, 12+i, font_filename),
 		texture_font_load_glyphs(fonts[i], text, language );
 	}
@@ -62,8 +60,7 @@ void init( void )
 	/* Create a buffer for harfbuzz to use */
 	hb_buffer_t *buffer = hb_buffer_create();
 
-	for (i=0; i < 20; ++i)
-	{
+	for (i=0; i < 20; ++i) {
 		hb_buffer_set_language( buffer,
 								hb_language_from_string(language, strlen(language)) );
 		hb_buffer_add_utf8( buffer, text, strlen(text), 0, strlen(text) );
@@ -84,21 +81,19 @@ void init( void )
 		float y = 600 - i * (10+i) - 15;
 		float width = 0.0;
 		float hres = fonts[i]->hres;
-		for (j = 0; j < glyph_count; ++j)
-		{
+		for (j = 0; j < glyph_count; ++j) {
 			int codepoint = glyph_info[j].codepoint;
 			float x_advance = glyph_pos[j].x_advance/(float)(hres*64);
 			float x_offset = glyph_pos[j].x_offset/(float)(hres*64);
 			texture_glyph_t *glyph = texture_font_get_glyph(fonts[i], codepoint);
-			if( i < (glyph_count-1) )
+			if ( i < (glyph_count-1) )
 				width += x_advance + x_offset;
 			else
 				width += glyph->offset_x + glyph->width;
 		}
 
 		x = 800 - width - 10 ;
-		for (j = 0; j < glyph_count; ++j)
-		{
+		for (j = 0; j < glyph_count; ++j) {
 			int codepoint = glyph_info[j].codepoint;
 			// because of vhinting trick we need the extra 64 (hres)
 			float x_advance = glyph_pos[j].x_advance/(float)(hres*64);
@@ -153,8 +148,7 @@ void init( void )
 
 
 // ---------------------------------------------------------------- display ---
-void display( GLFWwindow* window )
-{
+void display( GLFWwindow* window ) {
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 	glUseProgram( shader );
@@ -177,38 +171,32 @@ void display( GLFWwindow* window )
 
 
 // ---------------------------------------------------------------- reshape ---
-void reshape( GLFWwindow* window, int width, int height )
-{
+void reshape( GLFWwindow* window, int width, int height ) {
 	glViewport(0, 0, width, height);
 	mat4_set_orthographic( &projection, 0, width, 0, height, -1, 1);
 }
 
 
 // --------------------------------------------------------------- keyboard ---
-void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods )
-{
-	if ( key == GLFW_KEY_ESCAPE && action == GLFW_PRESS )
-	{
+void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods ) {
+	if ( key == GLFW_KEY_ESCAPE && action == GLFW_PRESS ) {
 		glfwSetWindowShouldClose( window, GL_TRUE );
 	}
 }
 
 
 // --------------------------------------------------------- error-callback ---
-void error_callback( int error, const char* description )
-{
+void error_callback( int error, const char* description ) {
 	fputs( description, stderr );
 }
 
 
 // ------------------------------------------------------------------- main ---
-int main( int argc, char **argv )
-{
+int main( int argc, char **argv ) {
 	GLFWwindow* window;
 	char* screenshot_path = NULL;
 
-	if (argc > 1)
-	{
+	if (argc > 1) {
 		if (argc == 3 && 0 == strcmp( "--screenshot", argv[1] ))
 			screenshot_path = argv[2];
 		else
@@ -220,8 +208,7 @@ int main( int argc, char **argv )
 
 	glfwSetErrorCallback( error_callback );
 
-	if (!glfwInit( ))
-	{
+	if (!glfwInit( )) {
 		exit( EXIT_FAILURE );
 	}
 
@@ -230,8 +217,7 @@ int main( int argc, char **argv )
 
 	window = glfwCreateWindow( 800, 600, argv[0], NULL, NULL );
 
-	if (!window)
-	{
+	if (!window) {
 		glfwTerminate( );
 		exit( EXIT_FAILURE );
 	}
@@ -246,8 +232,7 @@ int main( int argc, char **argv )
 #ifndef __APPLE__
 	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
-	if (GLEW_OK != err)
-	{
+	if (GLEW_OK != err) {
 		/* Problem: glewInit failed, something is seriously wrong. */
 		fprintf( stderr, "Error: %s\n", glewGetErrorString(err) );
 		exit( EXIT_FAILURE );
@@ -260,13 +245,11 @@ int main( int argc, char **argv )
 	glfwShowWindow( window );
 	reshape( window, 800, 600 );
 
-	while(!glfwWindowShouldClose( window ))
-	{
+	while (!glfwWindowShouldClose( window )) {
 		display( window );
 		glfwPollEvents( );
 
-		if (screenshot_path)
-		{
+		if (screenshot_path) {
 			screenshot( window, screenshot_path );
 			glfwSetWindowShouldClose( window, 1 );
 		}

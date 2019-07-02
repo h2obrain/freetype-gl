@@ -9,16 +9,14 @@
 #include "mat4.h"
 
 mat4 *
-mat4_new( void )
-{
+mat4_new( void ) {
 	mat4 *self = (mat4 *) malloc( sizeof(mat4) );
 	return self;
 
 }
 
 void
-mat4_set_zero( mat4 *self )
-{
+mat4_set_zero( mat4 *self ) {
 	if (!self)
 		return;
 
@@ -26,8 +24,7 @@ mat4_set_zero( mat4 *self )
 }
 
 void
-mat4_set_identity( mat4 *self )
-{
+mat4_set_identity( mat4 *self ) {
 	if (!self)
 		return;
 
@@ -39,16 +36,14 @@ mat4_set_identity( mat4 *self )
 }
 
 void
-mat4_multiply( mat4 *self, mat4 *other )
-{
+mat4_multiply( mat4 *self, mat4 *other ) {
 	mat4 m;
 	size_t i;
 
 	if (!self || !other)
 		return;
 
-	for( i=0; i<4; ++i )
-	{
+	for ( i=0; i<4; ++i ) {
 		m.data[i*4+0] =
 			(self->data[i*4+0] * other->data[0*4+0]) +
 			(self->data[i*4+1] * other->data[1*4+0]) +
@@ -82,8 +77,7 @@ void
 mat4_set_orthographic( mat4 *self,
 					   float left,   float right,
 					   float bottom, float top,
-					   float znear,  float zfar )
-{
+					   float znear,  float zfar ) {
 	if (!self)
 		return;
 
@@ -104,8 +98,7 @@ mat4_set_orthographic( mat4 *self,
 void
 mat4_set_perspective( mat4 *self,
 					  float fovy,  float aspect,
-					  float znear, float zfar)
-{
+					  float znear, float zfar) {
 	float h, w;
 
 	if (!self)
@@ -124,8 +117,7 @@ void
 mat4_set_frustum( mat4 *self,
 				  float left,   float right,
 				  float bottom, float top,
-				  float znear,  float zfar )
-{
+				  float znear,  float zfar ) {
 
 	if (!self)
 		return;
@@ -150,8 +142,7 @@ mat4_set_frustum( mat4 *self,
 void
 mat4_set_rotation( mat4 *self,
 				   float angle,
-				   float x, float y, float z)
-{
+				   float x, float y, float z) {
 	float c, s, norm;
 
 	if (!self)
@@ -180,8 +171,7 @@ mat4_set_rotation( mat4 *self,
 
 void
 mat4_set_translation( mat4 *self,
-					  float x, float y, float z)
-{
+					  float x, float y, float z) {
 	if (!self)
 		return;
 
@@ -193,8 +183,7 @@ mat4_set_translation( mat4 *self,
 
 void
 mat4_set_scaling( mat4 *self,
-				  float x, float y, float z)
-{
+				  float x, float y, float z) {
 	if (!self)
 		return;
 
@@ -207,8 +196,7 @@ mat4_set_scaling( mat4 *self,
 void
 mat4_rotate( mat4 *self,
 			 float angle,
-			 float x, float y, float z)
-{
+			 float x, float y, float z) {
 	mat4 m;
 
 	if (!self)
@@ -220,8 +208,7 @@ mat4_rotate( mat4 *self,
 
 void
 mat4_translate( mat4 *self,
-				float x, float y, float z)
-{
+				float x, float y, float z) {
 	mat4 m;
 
 	if (!self)
@@ -233,8 +220,7 @@ mat4_translate( mat4 *self,
 
 void
 mat4_scale( mat4 *self,
-			float x, float y, float z)
-{
+			float x, float y, float z) {
 	mat4 m;
 
 	if (!self)

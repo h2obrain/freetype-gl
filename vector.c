@@ -14,13 +14,11 @@
 
 // ------------------------------------------------------------- vector_new ---
 vector_t *
-vector_new( size_t item_size )
-{
+vector_new( size_t item_size ) {
 	vector_t *self = (vector_t *) malloc( sizeof(vector_t) );
 	assert( item_size );
 
-	if( !self )
-	{
+	if ( !self ) {
 		freetype_gl_error( Out_Of_Memory,
 			   "line %d: No more memory for allocating data\n", __LINE__ );
 	return NULL;
@@ -36,8 +34,7 @@ vector_new( size_t item_size )
 
 // ---------------------------------------------------------- vector_delete ---
 void
-vector_delete( vector_t *self )
-{
+vector_delete( vector_t *self ) {
 	assert( self );
 
 	free( self->items );
@@ -49,8 +46,7 @@ vector_delete( vector_t *self )
 // ------------------------------------------------------------- vector_get ---
 const void *
 vector_get( const vector_t *self,
-			size_t index )
-{
+			size_t index ) {
 	assert( self );
 	assert( self->size );
 	assert( index  < self->size );
@@ -62,8 +58,7 @@ vector_get( const vector_t *self,
 
 // ----------------------------------------------------------- vector_front ---
 const void *
-vector_front( const vector_t *self )
-{
+vector_front( const vector_t *self ) {
 	assert( self );
 	assert( self->size );
 
@@ -73,8 +68,7 @@ vector_front( const vector_t *self )
 
 // ------------------------------------------------------------ vector_back ---
 const void *
-vector_back( const vector_t *self )
-{
+vector_back( const vector_t *self ) {
 	assert( self );
 	assert( self->size );
 
@@ -86,15 +80,12 @@ vector_back( const vector_t *self )
 int
 vector_contains( const vector_t *self,
 				 const void *item,
-				 int (*cmp)(const void *, const void *) )
-{
+				 int (*cmp)(const void *, const void *) ) {
 	size_t i;
 	assert( self );
 
-	for( i=0; i<self->size; ++i )
-	{
-		if( (*cmp)(item, vector_get(self,i) ) == 0 )
-		{
+	for ( i=0; i<self->size; ++i ) {
+		if ( (*cmp)(item, vector_get(self,i) ) == 0 ) {
 			return 1;
 		}
 	}
@@ -104,8 +95,7 @@ vector_contains( const vector_t *self,
 
 // ----------------------------------------------------------- vector_empty ---
 int
-vector_empty( const vector_t *self )
-{
+vector_empty( const vector_t *self ) {
 	assert( self );
 
 	return self->size == 0;
@@ -114,8 +104,7 @@ vector_empty( const vector_t *self )
 
 // ------------------------------------------------------------ vector_size ---
 size_t
-vector_size( const vector_t *self )
-{
+vector_size( const vector_t *self ) {
 	assert( self );
 
 	return self->size;
@@ -125,12 +114,10 @@ vector_size( const vector_t *self )
 // --------------------------------------------------------- vector_reserve ---
 void
 vector_reserve( vector_t *self,
-				const size_t size )
-{
+				const size_t size ) {
 	assert( self );
 
-	if( self->capacity < size)
-	{
+	if ( self->capacity < size) {
 		self->items = realloc( self->items, size * self->item_size );
 	memset( (char *)(self->items) + self->capacity * self->item_size, 0,
 		(size - self->capacity) * self->item_size );
@@ -141,8 +128,7 @@ vector_reserve( vector_t *self,
 
 // -------------------------------------------------------- vector_capacity ---
 size_t
-vector_capacity( const vector_t *self )
-{
+vector_capacity( const vector_t *self ) {
 	assert( self );
 
 	return self->capacity;
@@ -151,12 +137,10 @@ vector_capacity( const vector_t *self )
 
 // ---------------------------------------------------------- vector_shrink ---
 void
-vector_shrink( vector_t *self )
-{
+vector_shrink( vector_t *self ) {
 	assert( self );
 
-	if( self->capacity > self->size )
-	{
+	if ( self->capacity > self->size ) {
 		self->items = realloc( self->items, self->size * self->item_size );
 	}
 	self->capacity = self->size;
@@ -165,8 +149,7 @@ vector_shrink( vector_t *self )
 
 // ----------------------------------------------------------- vector_clear ---
 void
-vector_clear( vector_t *self )
-{
+vector_clear( vector_t *self ) {
 	assert( self );
 
 	memset( (char *)(self->items), 0, self->size * self->item_size);
@@ -178,8 +161,7 @@ vector_clear( vector_t *self )
 void
 vector_set( vector_t *self,
 			const size_t index,
-			const void *item )
-{
+			const void *item ) {
 	assert( self );
 	assert( self->size );
 	assert( index  < self->size );
@@ -193,17 +175,14 @@ vector_set( vector_t *self,
 void
 vector_insert( vector_t *self,
 			   const size_t index,
-			   const void *item )
-{
+			   const void *item ) {
 	assert( self );
 	assert( index <= self->size);
 
-	if( self->capacity <= self->size )
-	{
+	if ( self->capacity <= self->size ) {
 		vector_reserve(self, 2 * self->capacity );
 	}
-	if( index < self->size )
-	{
+	if ( index < self->size ) {
 		memmove( (char *)(self->items) + (index + 1) * self->item_size,
 				 (char *)(self->items) + (index + 0) * self->item_size,
 				 (self->size - index)  * self->item_size);
@@ -217,8 +196,7 @@ vector_insert( vector_t *self,
 void
 vector_erase_range( vector_t *self,
 					const size_t first,
-					const size_t last )
-{
+					const size_t last ) {
 	assert( self );
 	assert( first < self->size );
 	assert( last  < self->size+1 );
@@ -234,8 +212,7 @@ vector_erase_range( vector_t *self,
 // ----------------------------------------------------------- vector_erase ---
 void
 vector_erase( vector_t *self,
-			  const size_t index )
-{
+			  const size_t index ) {
 	assert( self );
 	assert( index < self->size );
 
@@ -246,16 +223,14 @@ vector_erase( vector_t *self,
 // ------------------------------------------------------- vector_push_back ---
 void
 vector_push_back( vector_t *self,
-				  const void *item )
-{
+				  const void *item ) {
 	vector_insert( self, self->size, item );
 }
 
 
 // -------------------------------------------------------- vector_pop_back ---
 void
-vector_pop_back( vector_t *self )
-{
+vector_pop_back( vector_t *self ) {
 	assert( self );
 	assert( self->size );
 
@@ -266,17 +241,13 @@ vector_pop_back( vector_t *self )
 // ---------------------------------------------------------- vector_resize ---
 void
 vector_resize( vector_t *self,
-			   const size_t size )
-{
+			   const size_t size ) {
 	assert( self );
 
-	if( size > self->capacity)
-	{
+	if ( size > self->capacity) {
 		vector_reserve( self, size );
 		self->size = self->capacity;
-	}
-	else
-	{
+	} else {
 		self->size = size;
 	}
 }
@@ -286,14 +257,12 @@ vector_resize( vector_t *self,
 void
 vector_push_back_data( vector_t *self,
 					   const void * data,
-					   const size_t count )
-{
+					   const size_t count ) {
 	assert( self );
 	assert( data );
 	assert( count );
 
-	if( self->capacity < (self->size+count) )
-	{
+	if ( self->capacity < (self->size+count) ) {
 		vector_reserve(self, self->size+count);
 	}
 	memmove( (char *)(self->items) + self->size * self->item_size, data,
@@ -307,15 +276,13 @@ void
 vector_insert_data( vector_t *self,
 					const size_t index,
 					const void * data,
-					const size_t count )
-{
+					const size_t count ) {
 	assert( self );
 	assert( index < self->size );
 	assert( data );
 	assert( count );
 
-	if( self->capacity < (self->size+count) )
-	{
+	if ( self->capacity < (self->size+count) ) {
 		vector_reserve(self, self->size+count);
 	}
 	memmove( (char *)(self->items) + (index + count ) * self->item_size,
@@ -330,8 +297,7 @@ vector_insert_data( vector_t *self,
 // ------------------------------------------------------------ vector_sort ---
 void
 vector_sort( vector_t *self,
-			 int (*cmp)(const void *, const void *) )
-{
+			 int (*cmp)(const void *, const void *) ) {
 	assert( self );
 	assert( self->size );
 

@@ -21,16 +21,14 @@
 
 
 // ------------------------------------------------------------- print help ---
-void print_help()
-{
+void print_help() {
 	fprintf( stderr, "Usage: makefont [--help] --font <font file> "
 			 "--header <header file> --size <font size> "
 			 "--variable <variable name> --texture <texture size>"
 			 "--rendermode <one of 'normal', 'outline_edge', 'outline_positive', 'outline_negative' or 'sdf'>\n" );
 }
 
-void print_glyph(FILE * file, texture_glyph_t * glyph)
-{
+void print_glyph(FILE * file, texture_glyph_t * glyph) {
 	// TextureFont
 	fprintf( file, "  {%u, ", glyph->codepoint );
 	fprintf( file, "%" PRIzu ", %" PRIzu ", ", glyph->width, glyph->height );
@@ -43,15 +41,15 @@ void print_glyph(FILE * file, texture_glyph_t * glyph)
 	} else {
 	int k;
 	fprintf( file, "{ " );
-	for( k=0; k < vector_size(glyph->kerning); ++k ) {
-	    float *kerning = *(float **) vector_get( glyph->kerning, k);
-	    int l;
-	    fprintf( file, "{" );
-	    for( l=0; l<0xff; l++ )
+	for ( k=0; k < vector_size(glyph->kerning); ++k ) {
+		float *kerning = *(float **) vector_get( glyph->kerning, k);
+		int l;
+		fprintf( file, "{" );
+		for ( l=0; l<0xff; l++ )
 		fprintf( file, " %ff,", kerning[l] );
-	    fprintf( file, " %ff }", kerning[0xFF] );
+		fprintf( file, " %ff }", kerning[0xFF] );
 
-	    if( k < (vector_size(glyph->kerning)-1))
+		if ( k < (vector_size(glyph->kerning)-1))
 		fprintf( file, ",\n" );
 	}
 	fprintf( file, " }" );
@@ -59,8 +57,7 @@ void print_glyph(FILE * file, texture_glyph_t * glyph)
 	fprintf( file, " };\n" );
 }
 // ------------------------------------------------------------------- main ---
-int main( int argc, char **argv )
-{
+int main( int argc, char **argv ) {
 	FILE* test;
 	size_t i, j, k;
 	int arg;
@@ -84,21 +81,17 @@ int main( int argc, char **argv )
 	rendermodes[RENDER_OUTLINE_NEGATIVE] = "outline removed";
 	rendermodes[RENDER_SIGNED_DISTANCE_FIELD] = "signed distance field";
 
-	for ( arg = 1; arg < argc; ++arg )
-	{
-		if ( 0 == strcmp( "--font", argv[arg] ) || 0 == strcmp( "-f", argv[arg] ) )
-		{
+	for ( arg = 1; arg < argc; ++arg ) {
+		if ( 0 == strcmp( "--font", argv[arg] ) || 0 == strcmp( "-f", argv[arg] ) ) {
 			++arg;
 
-			if ( font_filename )
-			{
+			if ( font_filename ) {
 				fprintf( stderr, "Multiple --font parameters.\n" );
 				print_help();
 				exit( 1 );
 			}
 
-			if ( arg >= argc )
-			{
+			if ( arg >= argc ) {
 				fprintf( stderr, "No font file given.\n" );
 				print_help();
 				exit( 1 );
@@ -108,19 +101,16 @@ int main( int argc, char **argv )
 			continue;
 		}
 
-		if ( 0 == strcmp( "--header", argv[arg] ) || 0 == strcmp( "-o", argv[arg] )  )
-		{
+		if ( 0 == strcmp( "--header", argv[arg] ) || 0 == strcmp( "-o", argv[arg] )  ) {
 			++arg;
 
-			if ( header_filename )
-			{
+			if ( header_filename ) {
 				fprintf( stderr, "Multiple --header parameters.\n" );
 				print_help();
 				exit( 1 );
 			}
 
-			if ( arg >= argc )
-			{
+			if ( arg >= argc ) {
 				fprintf( stderr, "No header file given.\n" );
 				print_help();
 				exit( 1 );
@@ -130,25 +120,21 @@ int main( int argc, char **argv )
 			continue;
 		}
 
-		if ( 0 == strcmp( "--help", argv[arg] ) || 0 == strcmp( "-h", argv[arg] ) )
-		{
+		if ( 0 == strcmp( "--help", argv[arg] ) || 0 == strcmp( "-h", argv[arg] ) ) {
 			show_help = 1;
 			break;
 		}
 
-		if ( 0 == strcmp( "--size", argv[arg] ) || 0 == strcmp( "-s", argv[arg] ) )
-		{
+		if ( 0 == strcmp( "--size", argv[arg] ) || 0 == strcmp( "-s", argv[arg] ) ) {
 			++arg;
 
-			if ( 0.0 != font_size )
-			{
+			if ( 0.0 != font_size ) {
 				fprintf( stderr, "Multiple --size parameters.\n" );
 				print_help();
 				exit( 1 );
 			}
 
-			if ( arg >= argc )
-			{
+			if ( arg >= argc ) {
 				fprintf( stderr, "No font size given.\n" );
 				print_help();
 				exit( 1 );
@@ -158,8 +144,7 @@ int main( int argc, char **argv )
 
 			font_size = atof( argv[arg] );
 
-			if ( errno )
-			{
+			if ( errno ) {
 				fprintf( stderr, "No valid font size given.\n" );
 				print_help();
 				exit( 1 );
@@ -168,19 +153,16 @@ int main( int argc, char **argv )
 			continue;
 		}
 
-		if ( 0 == strcmp( "--variable", argv[arg] ) || 0 == strcmp( "-a", argv[arg] )  )
-		{
+		if ( 0 == strcmp( "--variable", argv[arg] ) || 0 == strcmp( "-a", argv[arg] )  ) {
 			++arg;
 
-			if ( 0 != strcmp( "font", variable_name ) )
-			{
+			if ( 0 != strcmp( "font", variable_name ) ) {
 				fprintf( stderr, "Multiple --variable parameters.\n" );
 				print_help();
 				exit( 1 );
 			}
 
-			if ( arg >= argc )
-			{
+			if ( arg >= argc ) {
 				fprintf( stderr, "No variable name given.\n" );
 				print_help();
 				exit( 1 );
@@ -190,19 +172,16 @@ int main( int argc, char **argv )
 			continue;
 		}
 
-		if ( 0 == strcmp( "--texture", argv[arg] ) || 0 == strcmp( "-t", argv[arg] ) )
-		{
+		if ( 0 == strcmp( "--texture", argv[arg] ) || 0 == strcmp( "-t", argv[arg] ) ) {
 			++arg;
 
-			if ( 128.0 != texture_width )
-			{
+			if ( 128.0 != texture_width ) {
 				fprintf( stderr, "Multiple --texture parameters.\n" );
 				print_help();
 				exit( 1 );
 			}
 
-			if ( arg >= argc )
-			{
+			if ( arg >= argc ) {
 				fprintf( stderr, "No texture size given.\n" );
 				print_help();
 				exit( 1 );
@@ -212,8 +191,7 @@ int main( int argc, char **argv )
 
 			texture_width = atof( argv[arg] );
 
-			if ( errno )
-			{
+			if ( errno ) {
 				fprintf( stderr, "No valid texture size given.\n" );
 				print_help();
 				exit( 1 );
@@ -222,19 +200,16 @@ int main( int argc, char **argv )
 			continue;
 		}
 
-		if ( 0 == strcmp( "--rendermode", argv[arg] ) || 0 == strcmp( "-r", argv[arg] ) )
-		{
+		if ( 0 == strcmp( "--rendermode", argv[arg] ) || 0 == strcmp( "-r", argv[arg] ) ) {
 			++arg;
 
-			if ( 128.0 != texture_width )
-			{
+			if ( 128.0 != texture_width ) {
 				fprintf( stderr, "Multiple --texture parameters.\n" );
 				print_help();
 				exit( 1 );
 			}
 
-			if ( arg >= argc )
-			{
+			if ( arg >= argc ) {
 				fprintf( stderr, "No texture size given.\n" );
 				print_help();
 				exit( 1 );
@@ -242,28 +217,21 @@ int main( int argc, char **argv )
 
 			errno = 0;
 
-			if( 0 == strcmp( "normal", argv[arg] ) )
-			{
+			if ( 0 == strcmp( "normal", argv[arg] ) ) {
 				rendermode = RENDER_NORMAL;
-			}
-			else if( 0 == strcmp( "outline_edge", argv[arg] ) )
-			{
+			} else
+			if ( 0 == strcmp( "outline_edge", argv[arg] ) ) {
 				rendermode = RENDER_OUTLINE_EDGE;
-			}
-			else if( 0 == strcmp( "outline_positive", argv[arg] ) )
-			{
+			} else
+			if ( 0 == strcmp( "outline_positive", argv[arg] ) ) {
 				rendermode = RENDER_OUTLINE_POSITIVE;
-			}
-			else if( 0 == strcmp( "outline_negative", argv[arg] ) )
-			{
+			} else
+			if ( 0 == strcmp( "outline_negative", argv[arg] ) ) {
 				rendermode = RENDER_OUTLINE_NEGATIVE;
-			}
-			else if( 0 == strcmp( "sdf", argv[arg] ) )
-			{
+			} else
+			if ( 0 == strcmp( "sdf", argv[arg] ) ) {
 				rendermode = RENDER_SIGNED_DISTANCE_FIELD;
-			}
-			else
-			{
+			} else {
 				fprintf( stderr, "No valid render mode given.\n" );
 				print_help();
 				exit( 1 );
@@ -277,35 +245,30 @@ int main( int argc, char **argv )
 		exit( 1 );
 	}
 
-	if ( show_help )
-	{
+	if ( show_help ) {
 		print_help();
 		exit( 1 );
 	}
 
-	if ( !font_filename )
-	{
+	if ( !font_filename ) {
 		fprintf( stderr, "No font file given.\n" );
 		print_help();
 		exit( 1 );
 	}
 
-	if ( !( test = fopen( font_filename, "r" ) ) )
-	{
+	if ( !( test = fopen( font_filename, "r" ) ) ) {
 		fprintf( stderr, "Font file \"%s\" does not exist.\n", font_filename );
 	}
 
 	fclose( test );
 
-	if ( 4.0 > font_size )
-	{
+	if ( 4.0 > font_size ) {
 		fprintf( stderr, "Font size too small, expected at least 4 pt.\n" );
 		print_help();
 		exit( 1 );
 	}
 
-	if ( !header_filename )
-	{
+	if ( !header_filename ) {
 		fprintf( stderr, "No header file given.\n" );
 		print_help();
 		exit( 1 );
@@ -340,18 +303,17 @@ int main( int argc, char **argv )
 	size_t texture_size = atlas->width * atlas->height * atlas->depth;
 	size_t glyph_count = font->glyphs->size;
 	size_t max_kerning_count = 1;
-	for( i=0; i < glyph_count; ++i )
-	{
+	for ( i=0; i < glyph_count; ++i ) {
 		texture_glyph_t **glyph_0x100 = *(texture_glyph_t ***) vector_get( font->glyphs, i );
-	if(glyph_0x100) {
-	    for( j=0; j < 0x100; ++j ) {
+	if (glyph_0x100) {
+		for ( j=0; j < 0x100; ++j ) {
 		texture_glyph_t *glyph;
-		if(( glyph = glyph_0x100[j] )) {
-		    size_t new_max = vector_size(glyph->kerning);
-		    if( new_max > max_kerning_count )
+		if (( glyph = glyph_0x100[j] )) {
+			size_t new_max = vector_size(glyph->kerning);
+			if ( new_max > max_kerning_count )
 			max_kerning_count = new_max;
 		}
-	    }
+		}
 	}
 	}
 
@@ -402,12 +364,12 @@ int main( int argc, char **argv )
 	// Structure declarations
 	// ----------------------
 	fprintf( file,
-	     "#include <stddef.h>\n"
-	     "#include <stdint.h>\n"
-	     "#ifdef __cplusplus\n"
-	     "extern \"C\" {\n"
-	     "#endif\n"
-	     "\n" );
+	 	"#include <stddef.h>\n"
+	 	"#include <stdint.h>\n"
+	 	"#ifdef __cplusplus\n"
+	 	"extern \"C\" {\n"
+	 	"#endif\n"
+	 	"\n" );
 
 	fprintf( file,
 		"typedef struct\n"
@@ -422,10 +384,10 @@ int main( int argc, char **argv )
 		"} texture_glyph_t;\n\n", max_kerning_count );
 
 	fprintf( file,
-	     "typedef struct\n"
-	     "{\n"
-	     "   texture_glyph_t *glyphs[0x100];\n"
-	     "} texture_glyph_0x100_t;\n\n" );
+	 	"typedef struct\n"
+	 	"{\n"
+	 	"   texture_glyph_t *glyphs[0x100];\n"
+	 	"} texture_glyph_0x100_t;\n\n" );
 
 	fprintf( file,
 		"typedef struct\n"
@@ -461,20 +423,15 @@ int main( int argc, char **argv )
 				 glyph->u0, glyph->v0, glyph->u1, glyph->v1 );
 
 		printf( "  kerning    : " );
-		if( glyph->kerning_count )
-		{
-			for( j=0; j < glyph->kerning_count; ++j )
-			{
+		if ( glyph->kerning_count ) {
+			for ( j=0; j < glyph->kerning_count; ++j ) {
 				printf( "('%lc', %ff)",
 						 glyph->kerning[j].codepoint, glyph->kerning[j].kerning );
-				if( j < (glyph->kerning_count-1) )
-				{
+				if ( j < (glyph->kerning_count-1) ) {
 					printf( ", " );
 				}
 			}
-		}
-		else
-		{
+		} else {
 			printf( "None" );
 		}
 		printf( "\n\n" );
@@ -491,21 +448,15 @@ int main( int argc, char **argv )
 	// ------------
 	fprintf( file, " %" PRIzu ", %" PRIzu ", %" PRIzu ",\n", atlas->width, atlas->height, atlas->depth );
 	fprintf( file, " {" );
-	for( i=0; i < texture_size; i+= 32 )
-	{
-		for( j=0; j < 32 && (j+i) < texture_size ; ++ j)
-		{
-			if( (j+i) < (texture_size-1) )
-			{
+	for ( i=0; i < texture_size; i+= 32 ) {
+		for ( j=0; j < 32 && (j+i) < texture_size ; ++ j) {
+			if ( (j+i) < (texture_size-1) ) {
 				fprintf( file, "%d,", atlas->data[i+j] );
-			}
-			else
-			{
+			} else {
 				fprintf( file, "%d", atlas->data[i+j] );
 			}
 		}
-		if( (j+i) < texture_size )
-		{
+		if ( (j+i) < texture_size ) {
 			fprintf( file, "\n" );
 		}
 	}
@@ -527,9 +478,9 @@ int main( int argc, char **argv )
 	GLYPHS_ITERATOR1(i, glyph, font->glyphs) {
 	fprintf( file, " {\n" );
 	GLYPHS_ITERATOR2(i, glyph, font->glyphs) {
-	    fprintf( file, "  &%s_glyph_%08x,\n", variable_name, glyph->codepoint );
+		fprintf( file, "  &%s_glyph_%08x,\n", variable_name, glyph->codepoint );
 	} else {
-	    fprintf( file, "  NULL,\n" );
+		fprintf( file, "  NULL,\n" );
 	}
 	GLYPHS_ITERATOR_END1;
 	fprintf( file, " },\n" );

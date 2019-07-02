@@ -17,11 +17,9 @@
 
 // ------------------------------------------------------------ file_exists ---
 static int
-file_exists( const char * filename )
-{
+file_exists( const char * filename ) {
 	FILE * file = fopen( filename, "r" );
-	if ( file )
-	{
+	if ( file ) {
 		fclose(file);
 		return 1;
 	}
@@ -31,13 +29,11 @@ file_exists( const char * filename )
 
 // ------------------------------------------------------- font_manager_new ---
 font_manager_t *
-font_manager_new( size_t width, size_t height, size_t depth )
-{
+font_manager_new( size_t width, size_t height, size_t depth ) {
 	font_manager_t *self;
 	texture_atlas_t *atlas = texture_atlas_new( width, height, depth );
 	self = (font_manager_t *) malloc( sizeof(font_manager_t) );
-	if( !self )
-	{
+	if ( !self ) {
 		freetype_gl_error( Out_Of_Memory,
 			   "line %d: No more memory for allocating data\n", __LINE__ );
 	return NULL;
@@ -52,21 +48,18 @@ font_manager_new( size_t width, size_t height, size_t depth )
 
 // ---------------------------------------------------- font_manager_delete ---
 void
-font_manager_delete( font_manager_t * self )
-{
+font_manager_delete( font_manager_t * self ) {
 	size_t i;
 	texture_font_t *font;
 	assert( self );
 
-	for( i=0; i<vector_size( self->fonts ); ++i)
-	{
+	for ( i=0; i<vector_size( self->fonts ); ++i) {
 		font = *(texture_font_t **) vector_get( self->fonts, i );
 		texture_font_delete( font );
 	}
 	vector_delete( self->fonts );
 	texture_atlas_delete( self->atlas );
-	if( self->cache )
-	{
+	if ( self->cache ) {
 		free( self->cache );
 	}
 	free( self );
@@ -77,20 +70,17 @@ font_manager_delete( font_manager_t * self )
 // ----------------------------------------------- font_manager_delete_font ---
 void
 font_manager_delete_font( font_manager_t * self,
-						  texture_font_t * font)
-{
+						  texture_font_t * font) {
 	size_t i;
 	texture_font_t *other;
 
 	assert( self );
 	assert( font );
 
-	for( i=0; i<self->fonts->size;++i )
-	{
+	for ( i=0; i<self->fonts->size;++i ) {
 		other = (texture_font_t *) vector_get( self->fonts, i );
 		if ( (strcmp(font->filename, other->filename) == 0)
-			   && ( font->size == other->size) )
-		{
+			   && ( font->size == other->size) ) {
 			vector_erase( self->fonts, i);
 			break;
 		}
@@ -104,29 +94,25 @@ font_manager_delete_font( font_manager_t * self,
 texture_font_t *
 font_manager_get_from_filename( font_manager_t *self,
 								const char * filename,
-								const float size )
-{
+								const float size ) {
 	size_t i;
 	texture_font_t *font;
 
 	assert( self );
-	for( i=0; i<vector_size(self->fonts); ++i )
-	{
+	for ( i=0; i<vector_size(self->fonts); ++i ) {
 		font = * (texture_font_t **) vector_get( self->fonts, i );
-		if( (strcmp(font->filename, filename) == 0) && ( font->size == size) )
-		{
+		if ( (strcmp(font->filename, filename) == 0) && ( font->size == size) ) {
 			return font;
 		}
 	}
 	font = texture_font_new_from_file( self->atlas, size, filename );
-	if( font )
-	{
+	if ( font ) {
 		vector_push_back( self->fonts, &font );
 		texture_font_load_glyphs( font, self->cache );
 		return font;
 	}
 	freetype_gl_error( Cannot_Load_File,
-		       "Unable to load \"%s\" (size=%.1f)\n", filename, size );
+		   	"Unable to load \"%s\" (size=%.1f)\n", filename, size );
 	return 0;
 }
 
@@ -137,29 +123,24 @@ font_manager_get_from_description( font_manager_t *self,
 								   const char * family,
 								   const float size,
 								   const int bold,
-								   const int italic )
-{
+								   const int italic ) {
 	texture_font_t *font;
 	char *filename = 0;
 
 	assert( self );
 
-	if( file_exists( family ) )
-	{
+	if ( file_exists( family ) ) {
 		filename = strdup( family );
-	}
-	else
-	{
+	} else {
 #if defined(_WIN32) || defined(_WIN64)
 		freetype_gl_error( Unimplemented_Function,
 			   "\"font_manager_get_from_description\" not implemented yet.\n" );
 		return 0;
 #endif
 		filename = font_manager_match_description( self, family, size, bold, italic );
-		if( !filename )
-		{
+		if ( !filename ) {
 			freetype_gl_error( Font_Unavailable,
-			       "No \"%s (size=%.1f, bold=%d, italic=%d)\" font available.\n",
+			   	"No \"%s (size=%.1f, bold=%d, italic=%d)\" font available.\n",
 					 family, size, bold, italic );
 			return 0;
 		}
@@ -173,8 +154,7 @@ font_manager_get_from_description( font_manager_t *self,
 // ------------------------------------------- font_manager_get_from_markup ---
 texture_font_t *
 font_manager_get_from_markup( font_manager_t *self,
-							  const markup_t *markup )
-{
+							  const markup_t *markup ) {
 	assert( self );
 	assert( markup );
 
@@ -188,8 +168,7 @@ font_manager_match_description( font_manager_t * self,
 								const char * family,
 								const float size,
 								const int bold,
-								const int italic )
-{
+								const int italic ) {
 // Use of fontconfig is disabled by default.
 #if 1
 	return 0;
@@ -202,12 +181,10 @@ font_manager_match_description( font_manager_t * self,
 	char *filename = 0;
 	int weight = FC_WEIGHT_REGULAR;
 	int slant = FC_SLANT_ROMAN;
-	if ( bold )
-	{
+	if ( bold ) {
 		weight = FC_WEIGHT_BOLD;
 	}
-	if( italic )
-	{
+	if ( italic ) {
 		slant = FC_SLANT_ITALIC;
 	}
 	FcInit();
@@ -222,23 +199,17 @@ font_manager_match_description( font_manager_t * self,
 	FcPattern *match = FcFontMatch( 0, pattern, &result );
 	FcPatternDestroy( pattern );
 
-	if ( !match )
-	{
+	if ( !match ) {
 		freetype_gl_error( Cant_Match_Family,
 			   "fontconfig error: could not match family '%s'", family );
 		return 0;
-	}
-	else
-	{
+	} else {
 		FcValue value;
 		FcResult result = FcPatternGet( match, FC_FILE, 0, &value );
-		if ( result )
-		{
+		if ( result ) {
 			freetype_gl_error( Cant_Match_Family,
-			       "fontconfig error: could not match family '%s'", family );
-		}
-		else
-		{
+			   	"fontconfig error: could not match family '%s'", family );
+		} else {
 			filename = strdup( (char *)(value.u.s) );
 		}
 	}

@@ -83,16 +83,14 @@ static char text[] =
 
 // ----------------------------------------------------------- build_buffer ---
 void
-build_buffer( void )
-{
+build_buffer( void ) {
 	vec2 pen;
 	texture_font_t *font;
 	vec4 black  = {{0.0, 0.0, 0.0, 1.0}};
 	vec4 white  = {{1.0, 1.0, 1.0, 1.0}};
 	vec4 none   = {{1.0, 1.0, 1.0, 0.0}};
 	vec4 color = white;
-	if( p_invert )
-	{
+	if ( p_invert ) {
 		color = black;
 	}
 
@@ -118,36 +116,27 @@ build_buffer( void )
 	texture_atlas_t * atlas = font_manager->atlas;
 	texture_atlas_clear( atlas );
 
-	if( p_family == VERA)
-	{
+	if ( p_family == VERA) {
 		font = texture_font_new_from_file( atlas, p_size, "fonts/Vera.ttf" );
-	}
-	else if( p_family == VERA_MONO)
-	{
+	} else
+	if ( p_family == VERA_MONO) {
 		font = texture_font_new_from_file( atlas, p_size, "fonts/VeraMono.ttf" );
-	}
-	else if( p_family == LUCKIEST_GUY)
-	{
+	} else
+	if ( p_family == LUCKIEST_GUY) {
 		font = texture_font_new_from_file( atlas, p_size, "fonts/LuckiestGuy.ttf" );
-	}
-	else if( p_family == SOURCE_SANS )
-	{
+	} else
+	if ( p_family == SOURCE_SANS ) {
 		font = texture_font_new_from_file( atlas, p_size, "fonts/SourceSansPro-Regular.ttf" );
-	}
-	else if( p_family == SOURCE_CODE )
-	{
+	} else
+	if ( p_family == SOURCE_CODE ) {
 		font = texture_font_new_from_file( atlas, p_size, "fonts/SourceCodePro-Regular.ttf" );
-	}
-	else if( p_family == OLD_STANDARD )
-	{
+	} else
+	if ( p_family == OLD_STANDARD ) {
 		font = texture_font_new_from_file( atlas, p_size, "fonts/OldStandard-Regular.ttf" );
-	}
-	else if( p_family == LOBSTER )
-	{
+	} else
+	if ( p_family == LOBSTER ) {
 		font = texture_font_new_from_file( atlas, p_size, "fonts/Lobster-Regular.ttf" );
-	}
-	else
-	{
+	} else {
 		fprintf( stderr, "Error : Unknown family type\n" );
 		return;
 	}
@@ -172,8 +161,7 @@ build_buffer( void )
 	// Post-processing for width and orientation
 	vertex_buffer_t * vbuffer = text_buffer->buffer;
 	size_t i;
-	for( i=0; i < vector_size( vbuffer->items ); ++i )
-	{
+	for ( i=0; i < vector_size( vbuffer->items ); ++i ) {
 		ivec4 *item = (ivec4 *) vector_get( vbuffer->items, i);
 		glyph_vertex_t * v0 = /* x0,y0 */
 			(glyph_vertex_t *) vector_get( vbuffer->vertices, item->vstart+0 );
@@ -208,8 +196,7 @@ build_buffer( void )
 
 
 // ------------------------------------------------------------------- quit ---
-void reset( void )
-{
+void reset( void ) {
 	p_family    = VERA;
 	p_size      = 12.0;
 	p_invert    = 0;
@@ -237,57 +224,46 @@ void reset( void )
 }
 
 // ------------------------------------------------------------------- quit ---
-void quit( void* client_data )
-{
+void quit( void* client_data ) {
 	GLFWwindow* window = (GLFWwindow*)client_data;
 	glfwSetWindowShouldClose( window, GL_TRUE );
 }
 
 // ------------------------------------------------------------ get/set int ---
-void TW_CALL set_int( const void *value, void *data )
-{
+void TW_CALL set_int( const void *value, void *data ) {
 	*(int *)data = *(const int *) value;
 	build_buffer();
 }
-void TW_CALL get_int( void *value, void *data )
-{
+void TW_CALL get_int( void *value, void *data ) {
 	*(int *)value = *(int *)data;
 }
 
 // ---------------------------------------------------------- get/set float ---
-void TW_CALL set_float( const void *value, void *data )
-{
+void TW_CALL set_float( const void *value, void *data ) {
 	*(float *) data = *(const float *) value;
 	build_buffer();
 }
-void TW_CALL get_float( void *value, void *data )
-{
+void TW_CALL get_float( void *value, void *data ) {
 	*(float *) value = *(const float *) data;
 }
 
 // -------------------------------------------------- get/set lcd_filtering ---
-void TW_CALL set_lcd_filtering( const void *value, void *data )
-{
+void TW_CALL set_lcd_filtering( const void *value, void *data ) {
 	p_lcd_filtering = *(const int *) value;
-	if( p_lcd_filtering )
-	{
+	if ( p_lcd_filtering ) {
 		font_manager = font_manager_rgb;
-	}
-	else
-	{
+	} else {
 		font_manager = font_manager_a;
 	}
 	build_buffer();
 }
-void TW_CALL get_lcd_filtering( void *value, void *data )
-{
+void TW_CALL get_lcd_filtering( void *value, void *data ) {
 	*(int *)value = p_lcd_filtering;
 }
 
 
 // ------------------------------------------------------------------- init ---
-void init( GLFWwindow* window )
-{
+void init( GLFWwindow* window ) {
 	// Create a new tweak bar
 	bar = TwNewBar("TweakBar");
 	TwDefine("GLOBAL "
@@ -446,14 +422,10 @@ void init( GLFWwindow* window )
 
 
 // ---------------------------------------------------------------- display ---
-void display( GLFWwindow* window )
-{
-	if( !p_invert )
-	{
+void display( GLFWwindow* window ) {
+	if ( !p_invert ) {
 		glClearColor( 0, 0, 0, 1 );
-	}
-	else
-	{
+	} else {
 		glClearColor( 1, 1, 1, 1 );
 	}
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -492,8 +464,7 @@ void display( GLFWwindow* window )
 
 
 // ---------------------------------------------------------------- reshape ---
-void reshape( GLFWwindow* window, int width, int height )
-{
+void reshape( GLFWwindow* window, int width, int height ) {
 	glViewport(0, 0, width, height);
 	mat4_set_orthographic( &projection, 0, width, 0, height, -1, 1);
 	TwWindowSize( width, height );
@@ -501,29 +472,23 @@ void reshape( GLFWwindow* window, int width, int height )
 
 
 // ------------------------------------------------------------- cursor_pos ---
-void cursor_pos( GLFWwindow* window, double x, double y )
-{
+void cursor_pos( GLFWwindow* window, double x, double y ) {
 	TwMouseMotion( x, y );
 }
 
 
 // ----------------------------------------------------------- mouse_button ---
-void mouse_button( GLFWwindow* window, int button, int action, int mods)
-{
+void mouse_button( GLFWwindow* window, int button, int action, int mods) {
 	TwMouseAction tw_action;
 	TwMouseButtonID tw_button;
 
-	if ( GLFW_RELEASE == action )
-	{
+	if ( GLFW_RELEASE == action ) {
 		tw_action = TW_MOUSE_RELEASED;
-	}
-	else
-	{
+	} else {
 		tw_action = TW_MOUSE_PRESSED;
 	}
 
-	switch (button)
-	{
+	switch (button) {
 		case GLFW_MOUSE_BUTTON_LEFT:
 			tw_button = TW_MOUSE_LEFT;
 			break;
@@ -542,80 +507,65 @@ void mouse_button( GLFWwindow* window, int button, int action, int mods)
 
 
 // --------------------------------------------------------------- keyboard ---
-void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods )
-{
+void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods ) {
 	int tw_key = 0;
 	int tw_mods = TW_KMOD_NONE;
 
-	if( action != GLFW_PRESS )
-	{
+	if ( action != GLFW_PRESS ) {
 		return;
 	}
 
 	// those map to the corresponding number ascii code
-	if ( GLFW_KEY_0 <= key && key <= GLFW_KEY_9 )
-	{
+	if ( GLFW_KEY_0 <= key && key <= GLFW_KEY_9 ) {
 		tw_key = key;
 	}
 
 	// those map to the corresponding upper case ascii code
-	if ( GLFW_KEY_A <= key && key <= GLFW_KEY_Z )
-	{
+	if ( GLFW_KEY_A <= key && key <= GLFW_KEY_Z ) {
 		tw_key = key;
 	}
 
-	if ( GLFW_KEY_PERIOD == key )
-	{
+	if ( GLFW_KEY_PERIOD == key ) {
 		tw_key = '.';
 	}
 
-	if ( GLFW_KEY_BACKSPACE == key )
-	{
+	if ( GLFW_KEY_BACKSPACE == key ) {
 		tw_key = TW_KEY_BACKSPACE;
 	}
 
-	if ( GLFW_KEY_DELETE == key )
-	{
+	if ( GLFW_KEY_DELETE == key ) {
 		tw_key = TW_KEY_DELETE;
 	}
 
-	if ( GLFW_KEY_LEFT == key )
-	{
+	if ( GLFW_KEY_LEFT == key ) {
 		tw_key = TW_KEY_LEFT;
 	}
 
-	if ( GLFW_KEY_RIGHT == key )
-	{
+	if ( GLFW_KEY_RIGHT == key ) {
 		tw_key = TW_KEY_RIGHT;
 	}
 
-	if ( GLFW_KEY_UP == key )
-	{
+	if ( GLFW_KEY_UP == key ) {
 		tw_key = TW_KEY_UP;
 	}
 
-	if ( GLFW_KEY_DOWN == key )
-	{
+	if ( GLFW_KEY_DOWN == key ) {
 		tw_key = TW_KEY_DOWN;
 	}
 
-	if ( GLFW_KEY_ENTER == key )
-	{
+	if ( GLFW_KEY_ENTER == key ) {
 		tw_key = TW_KEY_RETURN;
 	}
 
-	if( GLFW_MOD_SHIFT & mods )
-	{
+	if ( GLFW_MOD_SHIFT & mods ) {
 		tw_mods |= TW_KMOD_SHIFT;
 	}
 
-	if( GLFW_MOD_CONTROL & mods )
-	{
+	if ( GLFW_MOD_CONTROL & mods ) {
 		tw_mods |= TW_KMOD_CTRL;
 	}
 
-	if( GLFW_MOD_ALT & mods )
-	{
+	if ( GLFW_MOD_ALT & mods ) {
 		tw_mods |= TW_KMOD_ALT;
 	}
 
@@ -624,20 +574,17 @@ void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods )
 
 
 // --------------------------------------------------------- error-callback ---
-void error_callback( int error, const char* description )
-{
+void error_callback( int error, const char* description ) {
 	fputs( description, stderr );
 }
 
 
 // ------------------------------------------------------------------- main ---
-int main( int argc, char **argv )
-{
+int main( int argc, char **argv ) {
 	GLFWwindow* window;
 	char* screenshot_path = NULL;
 
-	if (argc > 1)
-	{
+	if (argc > 1) {
 		if (argc == 3 && 0 == strcmp( "--screenshot", argv[1] ))
 			screenshot_path = argv[2];
 		else
@@ -649,8 +596,7 @@ int main( int argc, char **argv )
 
 	glfwSetErrorCallback( error_callback );
 
-	if (!glfwInit( ))
-	{
+	if (!glfwInit( )) {
 		exit( EXIT_FAILURE );
 	}
 
@@ -659,8 +605,7 @@ int main( int argc, char **argv )
 
 	window = glfwCreateWindow( 800, 600, argv[0], NULL, NULL );
 
-	if (!window)
-	{
+	if (!window) {
 		glfwTerminate( );
 		exit( EXIT_FAILURE );
 	}
@@ -678,8 +623,7 @@ int main( int argc, char **argv )
 
 #ifndef __APPLE__
 	GLenum err = glewInit();
-	if (GLEW_OK != err)
-	{
+	if (GLEW_OK != err) {
 		/* Problem: glewInit failed, something is seriously wrong. */
 		fprintf( stderr, "Error: %s\n", glewGetErrorString(err) );
 		exit( EXIT_FAILURE );
@@ -692,13 +636,11 @@ int main( int argc, char **argv )
 	glfwShowWindow( window );
 	reshape( window, 800, 600 );
 
-	while(!glfwWindowShouldClose( window ))
-	{
+	while (!glfwWindowShouldClose( window )) {
 		display( window );
 		glfwPollEvents( );
 
-		if (screenshot_path)
-		{
+		if (screenshot_path) {
 			screenshot( window, screenshot_path );
 			glfwSetWindowShouldClose( window, 1 );
 		}

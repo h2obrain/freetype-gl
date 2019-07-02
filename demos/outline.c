@@ -33,8 +33,7 @@ mat4 model, view, projection;
 
 
 // --------------------------------------------------------------- add_text ---
-void add_text( vertex_buffer_t * buffer, vec2 * pen, ... )
-{
+void add_text( vertex_buffer_t * buffer, vec2 * pen, ... ) {
 	markup_t *markup;
 	char *text;
 	va_list args;
@@ -42,8 +41,7 @@ void add_text( vertex_buffer_t * buffer, vec2 * pen, ... )
 
 	do {
 		markup = va_arg( args, markup_t * );
-		if( markup == NULL )
-		{
+		if ( markup == NULL ) {
 			break;
 		}
 		text = va_arg( args, char * );
@@ -55,15 +53,12 @@ void add_text( vertex_buffer_t * buffer, vec2 * pen, ... )
 		float b = markup->foreground_color.blue;
 		float a = markup->foreground_color.alpha;
 
-		for( i = 0; i < strlen(text); ++i )
-		{
+		for ( i = 0; i < strlen(text); ++i ) {
 			texture_glyph_t *glyph = texture_font_get_glyph( font, text + i );
 
-			if( glyph != NULL )
-			{
+			if ( glyph != NULL ) {
 				float kerning = 0.0f;
-				if( i > 0)
-				{
+				if ( i > 0) {
 					kerning = texture_glyph_get_kerning( glyph, text + i - 1 );
 				}
 				pen->x += kerning;
@@ -91,14 +86,13 @@ void add_text( vertex_buffer_t * buffer, vec2 * pen, ... )
 			}
 
 		}
-	} while( markup != 0 );
+	} while ( markup != 0 );
 	va_end ( args );
 }
 
 
 // ------------------------------------------------------------------- init ---
-void init( void )
-{
+void init( void ) {
 	size_t i;
 
 	atlas = texture_atlas_new( 512, 512, 1 );
@@ -131,8 +125,7 @@ void init( void )
 	vec2 pen;
 	pen.x = 40;
 	pen.y = 190;
-	for( i=0; i< 10; ++i)
-	{
+	for ( i=0; i< 10; ++i) {
 		markup.font->outline_thickness = 2*((i+1)/10.0);
 		add_text( buffer, &pen, &markup, "g", NULL );
 	}
@@ -140,8 +133,7 @@ void init( void )
 	pen.x = 40;
 	pen.y  = 110;
 	markup.font->rendermode = RENDER_OUTLINE_POSITIVE;
-	for( i=0; i< 10; ++i)
-	{
+	for ( i=0; i< 10; ++i) {
 		markup.font->outline_thickness = 2*((i+1)/10.0);
 		add_text( buffer, &pen, &markup, "g", NULL );
 	}
@@ -149,8 +141,7 @@ void init( void )
 	pen.x = 40;
 	pen.y  = 30;
 	markup.font->rendermode = RENDER_OUTLINE_NEGATIVE;
-	for( i=0; i< 10; ++i)
-	{
+	for ( i=0; i< 10; ++i) {
 		markup.font->outline_thickness = 1*((i+1)/10.0);
 		add_text( buffer, &pen, &markup, "g", NULL );
 	}
@@ -173,11 +164,9 @@ void init( void )
 
 
 // ---------------------------------------------------------------- display ---
-void display( GLFWwindow* window )
-{
+void display( GLFWwindow* window ) {
 	static GLuint texture = 0;
-	if( !texture )
-	{
+	if ( !texture ) {
 		texture = glGetUniformLocation( shader, "texture" );
 	}
 
@@ -207,38 +196,32 @@ void display( GLFWwindow* window )
 
 
 // ---------------------------------------------------------------- reshape ---
-void reshape( GLFWwindow* window, int width, int height )
-{
+void reshape( GLFWwindow* window, int width, int height ) {
 	glViewport(0, 0, width, height);
 	mat4_set_orthographic( &projection, 0, width, 0, height, -1, 1);
 }
 
 
 // --------------------------------------------------------------- keyboard ---
-void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods )
-{
-	if ( key == GLFW_KEY_ESCAPE && action == GLFW_PRESS )
-	{
+void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods ) {
+	if ( key == GLFW_KEY_ESCAPE && action == GLFW_PRESS ) {
 		glfwSetWindowShouldClose( window, GL_TRUE );
 	}
 }
 
 
 // --------------------------------------------------------- error-callback ---
-void error_callback( int error, const char* description )
-{
+void error_callback( int error, const char* description ) {
 	fputs( description, stderr );
 }
 
 
 // ------------------------------------------------------------------- main ---
-int main( int argc, char **argv )
-{
+int main( int argc, char **argv ) {
 	GLFWwindow* window;
 	char* screenshot_path = NULL;
 
-	if (argc > 1)
-	{
+	if (argc > 1) {
 		if (argc == 3 && 0 == strcmp( "--screenshot", argv[1] ))
 			screenshot_path = argv[2];
 		else
@@ -250,8 +233,7 @@ int main( int argc, char **argv )
 
 	glfwSetErrorCallback( error_callback );
 
-	if (!glfwInit( ))
-	{
+	if (!glfwInit( )) {
 		exit( EXIT_FAILURE );
 	}
 
@@ -260,8 +242,7 @@ int main( int argc, char **argv )
 
 	window = glfwCreateWindow( 600, 250, argv[0], NULL, NULL );
 
-	if (!window)
-	{
+	if (!window) {
 		glfwTerminate( );
 		exit( EXIT_FAILURE );
 	}
@@ -276,8 +257,7 @@ int main( int argc, char **argv )
 #ifndef __APPLE__
 	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
-	if (GLEW_OK != err)
-	{
+	if (GLEW_OK != err) {
 		/* Problem: glewInit failed, something is seriously wrong. */
 		fprintf( stderr, "Error: %s\n", glewGetErrorString(err) );
 		exit( EXIT_FAILURE );
@@ -290,13 +270,11 @@ int main( int argc, char **argv )
 	glfwShowWindow( window );
 	reshape( window, 600, 250 );
 
-	while (!glfwWindowShouldClose( window ))
-	{
+	while (!glfwWindowShouldClose( window )) {
 		display( window );
 		glfwPollEvents( );
 
-		if (screenshot_path)
-		{
+		if (screenshot_path) {
 			screenshot( window, screenshot_path );
 			glfwSetWindowShouldClose( window, 1 );
 		}

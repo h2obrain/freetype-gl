@@ -24,8 +24,7 @@
 // ----------------------------------------------------------------------------
 
 text_buffer_t *
-text_buffer_new( )
-{
+text_buffer_new( ) {
 	text_buffer_t *self = (text_buffer_t *) malloc (sizeof(text_buffer_t));
 	self->buffer = vertex_buffer_new(
 									 "vertex:3f,tex_coord:2f,color:4f,ashift:1f,agamma:1f" );
@@ -46,8 +45,7 @@ text_buffer_new( )
 
 // ----------------------------------------------------------------------------
 void
-text_buffer_delete( text_buffer_t * self )
-{
+text_buffer_delete( text_buffer_t * self ) {
 	vector_delete( self->lines );
 	vertex_buffer_delete( self->buffer );
 	free( self );
@@ -55,8 +53,7 @@ text_buffer_delete( text_buffer_t * self )
 
 // ----------------------------------------------------------------------------
 void
-text_buffer_clear( text_buffer_t * self )
-{
+text_buffer_clear( text_buffer_t * self ) {
 	assert( self );
 
 	vertex_buffer_clear( self->buffer );
@@ -72,41 +69,35 @@ text_buffer_clear( text_buffer_t * self )
 
 // ----------------------------------------------------------------------------
 void
-text_buffer_printf( text_buffer_t * self, vec2 *pen, ... )
-{
+text_buffer_printf( text_buffer_t * self, vec2 *pen, ... ) {
 	markup_t *markup;
 	char *text;
 	va_list args;
 
-	if( vertex_buffer_size( self->buffer ) == 0 )
-	{
+	if ( vertex_buffer_size( self->buffer ) == 0 ) {
 		self->origin = *pen;
 	}
 
 	va_start ( args, pen );
 	do {
 		markup = va_arg( args, markup_t * );
-		if( markup == NULL )
-		{
+		if ( markup == NULL ) {
 			return;
 		}
 		text = va_arg( args, char * );
 		text_buffer_add_text( self, pen, markup, text, 0 );
-	} while( markup != 0 );
+	} while ( markup != 0 );
 	va_end ( args );
 }
 
 // ----------------------------------------------------------------------------
 void
-text_buffer_move_last_line( text_buffer_t * self, float dy )
-{
+text_buffer_move_last_line( text_buffer_t * self, float dy ) {
 	size_t i;
 	int j;
-	for( i=self->line_start; i < vector_size( self->buffer->items ); ++i )
-	{
+	for ( i=self->line_start; i < vector_size( self->buffer->items ); ++i ) {
 		ivec4 *item = (ivec4 *) vector_get( self->buffer->items, i);
-		for( j=item->vstart; j<item->vstart+item->vcount; ++j)
-		{
+		for ( j=item->vstart; j<item->vstart+item->vcount; ++j) {
 			glyph_vertex_t * vertex =
 				(glyph_vertex_t *)  vector_get( self->buffer->vertices, j );
 			vertex->y -= dy;
@@ -124,8 +115,7 @@ text_buffer_move_last_line( text_buffer_t * self, float dy )
 // advancePen: if true, advance the pen to the next line
 //
 static void
-text_buffer_finish_line( text_buffer_t * self, vec2 * pen, bool advancePen )
-{
+text_buffer_finish_line( text_buffer_t * self, vec2 * pen, bool advancePen ) {
 	float line_left = self->line_left;
 	float line_right = pen->x;
 	float line_width  = line_right - line_left;
@@ -143,29 +133,24 @@ text_buffer_finish_line( text_buffer_t * self, vec2 * pen, bool advancePen )
 	vector_push_back( self->lines,  &line_info);
 
 
-	if (line_left < self->bounds.left)
-	{
+	if (line_left < self->bounds.left) {
 		self->bounds.left = line_left;
 	}
-	if (line_top > self->bounds.top)
-	{
+	if (line_top > self->bounds.top) {
 		self->bounds.top = line_top;
 	}
 
 	float self_right = self->bounds.left + self->bounds.width;
 	float self_bottom = self->bounds.top - self->bounds.height;
 
-	if (line_right > self_right)
-	{
+	if (line_right > self_right) {
 		self->bounds.width = line_right - self->bounds.left;
 	}
-	if (line_bottom < self_bottom)
-	{
+	if (line_bottom < self_bottom) {
 		self->bounds.height = self->bounds.top - line_bottom;
 	}
 
-	if ( advancePen )
-	{
+	if ( advancePen ) {
 		pen->x = self->origin.x;
 		pen->y += (int)(self->line_descender);
 	}
@@ -180,48 +165,38 @@ text_buffer_finish_line( text_buffer_t * self, vec2 * pen, bool advancePen )
 void
 text_buffer_add_text( text_buffer_t * self,
 					  vec2 * pen, markup_t * markup,
-					  const char * text, size_t length )
-{
+					  const char * text, size_t length ) {
 	size_t i;
 	const char * prev_character = NULL;
 
-	if( markup == NULL )
-	{
+	if ( markup == NULL ) {
 		return;
 	}
 
-	if( !markup->font )
-	{
+	if ( !markup->font ) {
 		freetype_gl_error( No_Font_In_Markup,
 			   "Houston, we've got a problem !\n" );
 		return;
 	}
 
-	if( length == 0 )
-	{
+	if ( length == 0 ) {
 		length = utf8_strlen(text);
 	}
-	if( vertex_buffer_size( self->buffer ) == 0 )
-	{
+	if ( vertex_buffer_size( self->buffer ) == 0 ) {
 		self->origin = *pen;
 		self->line_left = pen->x;
 		self->bounds.left = pen->x;
 		self->bounds.top = pen->y;
-	}
-	else
-	{
-		if (pen->x < self->origin.x)
-		{
+	} else {
+		if (pen->x < self->origin.x) {
 			self->origin.x = pen->x;
 		}
-		if (pen->y != self->last_pen_y)
-		{
+		if (pen->y != self->last_pen_y) {
 			text_buffer_finish_line(self, pen, false);
 		}
 	}
 
-	for( i = 0; length; i += utf8_surrogate_len( text + i ) )
-	{
+	for ( i = 0; length; i += utf8_surrogate_len( text + i ) ) {
 		text_buffer_add_char( self, pen, markup, text + i, prev_character );
 		prev_character = text + i;
 		length--;
@@ -234,8 +209,7 @@ text_buffer_add_text( text_buffer_t * self,
 void
 text_buffer_add_char( text_buffer_t * self,
 					  vec2 * pen, markup_t * markup,
-					  const char * current, const char * previous )
-{
+					  const char * current, const char * previous ) {
 	size_t vcount = 0;
 	size_t icount = 0;
 	vertex_buffer_t * buffer = self->buffer;
@@ -254,20 +228,17 @@ text_buffer_add_char( text_buffer_t * self,
 	texture_glyph_t *black;
 	float kerning = 0.0f;
 
-	if( markup->font->ascender > self->line_ascender )
-	{
+	if ( markup->font->ascender > self->line_ascender ) {
 		float y = pen->y;
 		pen->y -= (markup->font->ascender - self->line_ascender);
 		text_buffer_move_last_line( self, (float)(int)(y-pen->y) );
 		self->line_ascender = markup->font->ascender;
 	}
-	if( markup->font->descender < self->line_descender )
-	{
+	if ( markup->font->descender < self->line_descender ) {
 		self->line_descender = markup->font->descender;
 	}
 
-	if( *current == '\n' )
-	{
+	if ( *current == '\n' ) {
 		text_buffer_finish_line(self, pen, true);
 		return;
 	}
@@ -275,20 +246,17 @@ text_buffer_add_char( text_buffer_t * self,
 	glyph = texture_font_get_glyph( font, current );
 	black = texture_font_get_glyph( font, NULL );
 
-	if( glyph == NULL )
-	{
+	if ( glyph == NULL ) {
 		return;
 	}
 
-	if( previous && markup->font->kerning )
-	{
+	if ( previous && markup->font->kerning ) {
 		kerning = texture_glyph_get_kerning( glyph, previous );
 	}
 	pen->x += kerning;
 
 	// Background
-	if( markup->background_color.alpha > 0 )
-	{
+	if ( markup->background_color.alpha > 0 ) {
 		float r = markup->background_color.r;
 		float g = markup->background_color.g;
 		float b = markup->background_color.b;
@@ -321,8 +289,7 @@ text_buffer_add_char( text_buffer_t * self,
 	}
 
 	// Underline
-	if( markup->underline )
-	{
+	if ( markup->underline ) {
 		float r = markup->underline_color.r;
 		float g = markup->underline_color.g;
 		float b = markup->underline_color.b;
@@ -355,8 +322,7 @@ text_buffer_add_char( text_buffer_t * self,
 	}
 
 	// Overline
-	if( markup->overline )
-	{
+	if ( markup->overline ) {
 		float r = markup->overline_color.r;
 		float g = markup->overline_color.g;
 		float b = markup->overline_color.b;
@@ -388,8 +354,7 @@ text_buffer_add_char( text_buffer_t * self,
 	}
 
 	/* Strikethrough */
-	if( markup->strikethrough )
-	{
+	if ( markup->strikethrough ) {
 		float r = markup->strikethrough_color.r;
 		float g = markup->strikethrough_color.g;
 		float b = markup->strikethrough_color.b;
@@ -459,16 +424,13 @@ text_buffer_add_char( text_buffer_t * self,
 // ----------------------------------------------------------------------------
 void
 text_buffer_align( text_buffer_t * self, vec2 * pen,
-				   enum Align alignment )
-{
-	if (ALIGN_LEFT == alignment)
-	{
+				   enum Align alignment ) {
+	if (ALIGN_LEFT == alignment) {
 		return;
 	}
 
 	size_t total_items = vector_size( self->buffer->items );
-	if ( self->line_start != total_items )
-	{
+	if ( self->line_start != total_items ) {
 		text_buffer_finish_line( self, pen, false );
 	}
 
@@ -487,26 +449,20 @@ text_buffer_align( text_buffer_t * self, vec2 * pen,
 	size_t lines_count, line_end;
 
 	lines_count = vector_size( self->lines );
-	for ( i = 0; i < lines_count; ++i )
-	{
+	for ( i = 0; i < lines_count; ++i ) {
 		line_info = (line_info_t*)vector_get( self->lines, i );
 
-		if ( i + 1 < lines_count )
-		{
+		if ( i + 1 < lines_count ) {
 			line_end = ((line_info_t*)vector_get( self->lines, i + 1 ))->line_start;
-		}
-		else
-		{
+		} else {
 			line_end = vector_size( self->buffer->items );
 		}
 
 		line_right = line_info->bounds.left + line_info->bounds.width;
 
-		if ( ALIGN_RIGHT == alignment )
-		{
+		if ( ALIGN_RIGHT == alignment ) {
 			dx = self_right - line_right;
-		}
-		else // ALIGN_CENTER
+		} else // ALIGN_CENTER
 		{
 			line_left = line_info->bounds.left;
 			line_center = (line_left + line_right) / 2;
@@ -515,11 +471,9 @@ text_buffer_align( text_buffer_t * self, vec2 * pen,
 
 		dx = roundf( dx );
 
-		for( j=line_info->line_start; j < line_end; ++j )
-		{
+		for ( j=line_info->line_start; j < line_end; ++j ) {
 			ivec4 *item = (ivec4 *) vector_get( self->buffer->items, j);
-			for( k=item->vstart; k<item->vstart+item->vcount; ++k)
-			{
+			for ( k=item->vstart; k<item->vstart+item->vcount; ++k) {
 				glyph_vertex_t * vertex =
 								   (glyph_vertex_t *)vector_get( self->buffer->vertices, k );
 				vertex->x += dx;
@@ -529,11 +483,9 @@ text_buffer_align( text_buffer_t * self, vec2 * pen,
 }
 
 vec4
-text_buffer_get_bounds( text_buffer_t * self, vec2 * pen )
-{
+text_buffer_get_bounds( text_buffer_t * self, vec2 * pen ) {
 	size_t total_items = vector_size( self->buffer->items );
-	if ( self->line_start != total_items )
-	{
+	if ( self->line_start != total_items ) {
 		text_buffer_finish_line( self, pen, false );
 	}
 

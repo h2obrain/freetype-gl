@@ -47,21 +47,17 @@ mat4  model, view, projection;
 // --------------------------------------------------------------- add_text ---
 vec4
 add_text( vertex_buffer_t * buffer, texture_font_t * font,
-		  char *text, vec4 * color, vec2 * pen )
-{
+		  char *text, vec4 * color, vec2 * pen ) {
 	vec4 bbox = {{0,0,0,0}};
 	size_t i;
 	float r = color->red, g = color->green, b = color->blue, a = color->alpha;
-	for( i = 0; i < strlen(text); ++i )
-	{
+	for ( i = 0; i < strlen(text); ++i ) {
 		double start_time = glfwGetTime();
 		texture_glyph_t *glyph = texture_font_get_glyph( font, text + i );
 		total_time += glfwGetTime()-start_time;
-		if( glyph != NULL )
-		{
+		if ( glyph != NULL ) {
 			float kerning = 0.0f;
-			if( i > 0)
-			{
+			if ( i > 0) {
 				kerning = texture_glyph_get_kerning( glyph, text + i - 1 );
 			}
 			pen->x += kerning;
@@ -81,8 +77,8 @@ add_text( vertex_buffer_t * buffer, texture_font_t * font,
 			vertex_buffer_push_back( buffer, vertices, 4, indices, 6 );
 			pen->x += glyph->advance_x;
 
-			if  (x0 < bbox.x)                bbox.x = x0;
-			if  (y1 < bbox.y)                bbox.y = y1;
+			if (x0 < bbox.x)                bbox.x = x0;
+			if (y1 < bbox.y)                bbox.y = y1;
 			if ((x1 - bbox.x) > bbox.width)  bbox.width  = x1-bbox.x;
 			if ((y0 - bbox.y) > bbox.height) bbox.height = y0-bbox.y;
 		}
@@ -92,8 +88,7 @@ add_text( vertex_buffer_t * buffer, texture_font_t * font,
 
 
 // ------------------------------------------------------------------- init ---
-void init( void )
-{
+void init( void ) {
 	texture_font_t *font = 0;
 	atlas = texture_atlas_new( 512, 512, 1 );
 	const char * filename = "fonts/Vera.ttf";
@@ -106,8 +101,7 @@ void init( void )
 	vec4 bbox = add_text( buffer, font, text, &black, &pen );
 	size_t i;
 	vector_t * vertices = buffer->vertices;
-	for( i=0; i< vector_size(vertices); ++i )
-	{
+	for ( i=0; i< vector_size(vertices); ++i ) {
 		vertex_t * vertex = (vertex_t *) vector_get(vertices,i);
 		vertex->x -= (int)(bbox.x + bbox.width/2);
 		vertex->y -= (int)(bbox.y + bbox.height/2);
@@ -131,8 +125,7 @@ void init( void )
 
 
 // ---------------------------------------------------------------- display ---
-void display( GLFWwindow* window )
-{
+void display( GLFWwindow* window ) {
 	glClearColor( 1, 1, 1, 1 );
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
@@ -147,8 +140,7 @@ void display( GLFWwindow* window )
 	srand(4);
 	vec4 color = {{0.067,0.333, 0.486, 1.0}};
 	size_t i;
-	for( i=0; i<40; ++i)
-	{
+	for ( i=0; i<40; ++i) {
 		float scale = .25 + 4.75 * pow(rand()/(float)(RAND_MAX),2);
 		float angle = 90*(rand()%2);
 		float x = (.05 + .9*(rand()/(float)(RAND_MAX)))*width;
@@ -181,38 +173,32 @@ void display( GLFWwindow* window )
 
 
 // ---------------------------------------------------------------- reshape ---
-void reshape( GLFWwindow* window, int width, int height )
-{
+void reshape( GLFWwindow* window, int width, int height ) {
 	glViewport(0, 0, width, height);
 	mat4_set_orthographic( &projection, 0, width, 0, height, -1, 1);
 }
 
 
 // --------------------------------------------------------------- keyboard ---
-void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods )
-{
-	if ( key == GLFW_KEY_ESCAPE && action == GLFW_PRESS )
-	{
+void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods ) {
+	if ( key == GLFW_KEY_ESCAPE && action == GLFW_PRESS ) {
 		glfwSetWindowShouldClose( window, GL_TRUE );
 	}
 }
 
 
 // --------------------------------------------------------- error-callback ---
-void error_callback( int error, const char* description )
-{
+void error_callback( int error, const char* description ) {
 	fputs( description, stderr );
 }
 
 
 // ------------------------------------------------------------------- main ---
-int main( int argc, char **argv )
-{
+int main( int argc, char **argv ) {
 	GLFWwindow* window;
 	char* screenshot_path = NULL;
 
-	if (argc > 1)
-	{
+	if (argc > 1) {
 		if (argc == 3 && 0 == strcmp( "--screenshot", argv[1] ))
 			screenshot_path = argv[2];
 		else
@@ -224,8 +210,7 @@ int main( int argc, char **argv )
 
 	glfwSetErrorCallback( error_callback );
 
-	if (!glfwInit( ))
-	{
+	if (!glfwInit( )) {
 		exit( EXIT_FAILURE );
 	}
 
@@ -234,8 +219,7 @@ int main( int argc, char **argv )
 
 	window = glfwCreateWindow( 800, 600, argv[0], NULL, NULL );
 
-	if (!window)
-	{
+	if (!window) {
 		glfwTerminate( );
 		exit( EXIT_FAILURE );
 	}
@@ -250,8 +234,7 @@ int main( int argc, char **argv )
 #ifndef __APPLE__
 	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
-	if (GLEW_OK != err)
-	{
+	if (GLEW_OK != err) {
 		/* Problem: glewInit failed, something is seriously wrong. */
 		fprintf( stderr, "Error: %s\n", glewGetErrorString(err) );
 		exit( EXIT_FAILURE );
@@ -272,13 +255,11 @@ int main( int argc, char **argv )
 
 	glfwSetTime(0.0);
 
-	while (!glfwWindowShouldClose( window ))
-	{
+	while (!glfwWindowShouldClose( window )) {
 		display( window );
 		glfwPollEvents( );
 
-		if (screenshot_path)
-		{
+		if (screenshot_path) {
 			screenshot( window, screenshot_path );
 			glfwSetWindowShouldClose( window, 1 );
 		}

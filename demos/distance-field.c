@@ -49,8 +49,7 @@ viewport_t viewport = {0,0,1};
 
 
 // ------------------------------------------------------------------- init ---
-void init( void )
-{
+void init( void ) {
 	texture_font_t * font;
 	const char *filename = "fonts/Vera.ttf";
 	const char * cache = " !\"#$%&'()*+,-./0123456789:;<=>?"
@@ -93,8 +92,7 @@ void init( void )
 
 
 // ---------------------------------------------------------------- display ---
-void display( GLFWwindow* window )
-{
+void display( GLFWwindow* window ) {
 	glClearColor(0.5,0.5,0.5,1.00);
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
@@ -136,25 +134,19 @@ void display( GLFWwindow* window )
 
 
 // ---------------------------------------------------------- cursor_motion ---
-void cursor_motion( GLFWwindow* window, double x, double y )
-{
+void cursor_motion( GLFWwindow* window, double x, double y ) {
 	int v[4];
 	static int _x=-1, _y=-1;
 
-	if( GLFW_PRESS == glfwGetMouseButton( window, GLFW_MOUSE_BUTTON_LEFT ) )
-	{
-		if( (_x == -1) && (_y == -1) )
-		{
+	if ( GLFW_PRESS == glfwGetMouseButton( window, GLFW_MOUSE_BUTTON_LEFT ) ) {
+		if ( (_x == -1) && (_y == -1) ) {
 			_x = x; _y = y;
 			return;
 		}
 		int dy = y - _y;
-		if (dy < 0)
-		{
+		if (dy < 0) {
 			viewport.zoom *= 1.05;
-		}
-		else
-		{
+		} else {
 			viewport.zoom /= 1.05;
 		}
 		_x = x; _y = y;
@@ -170,38 +162,32 @@ void cursor_motion( GLFWwindow* window, double x, double y )
 
 
 // ---------------------------------------------------------------- reshape ---
-void reshape( GLFWwindow* window, int width, int height )
-{
+void reshape( GLFWwindow* window, int width, int height ) {
 	glViewport(0, 0, width, height);
 	mat4_set_orthographic( &projection, 0, width, 0, height, -1, 1);
 }
 
 
 // --------------------------------------------------------------- keyboard ---
-void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods )
-{
-	if ( key == GLFW_KEY_ESCAPE && action == GLFW_PRESS )
-	{
+void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods ) {
+	if ( key == GLFW_KEY_ESCAPE && action == GLFW_PRESS ) {
 		glfwSetWindowShouldClose( window, GL_TRUE );
 	}
 }
 
 
 // --------------------------------------------------------- error-callback ---
-void error_callback( int error, const char* description )
-{
+void error_callback( int error, const char* description ) {
 	fputs( description, stderr );
 }
 
 
 // ------------------------------------------------------------------- main ---
-int main( int argc, char **argv )
-{
+int main( int argc, char **argv ) {
 	GLFWwindow* window;
 	char* screenshot_path = NULL;
 
-	if (argc > 1)
-	{
+	if (argc > 1) {
 		if (argc == 3 && 0 == strcmp( "--screenshot", argv[1] ))
 			screenshot_path = argv[2];
 		else
@@ -213,8 +199,7 @@ int main( int argc, char **argv )
 
 	glfwSetErrorCallback( error_callback );
 
-	if (!glfwInit( ))
-	{
+	if (!glfwInit( )) {
 		exit( EXIT_FAILURE );
 	}
 
@@ -223,8 +208,7 @@ int main( int argc, char **argv )
 
 	window = glfwCreateWindow( 512, 512, argv[0], NULL, NULL );
 
-	if (!window)
-	{
+	if (!window) {
 		glfwTerminate( );
 		exit( EXIT_FAILURE );
 	}
@@ -240,8 +224,7 @@ int main( int argc, char **argv )
 #ifndef __APPLE__
 	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
-	if (GLEW_OK != err)
-	{
+	if (GLEW_OK != err) {
 		/* Problem: glewInit failed, something is seriously wrong. */
 		fprintf( stderr, "Error: %s\n", glewGetErrorString(err) );
 		exit( EXIT_FAILURE );
@@ -260,13 +243,11 @@ int main( int argc, char **argv )
 		reshape( window, pixWidth, pixHeight );
 	}
 
-	while (!glfwWindowShouldClose( window ))
-	{
+	while (!glfwWindowShouldClose( window )) {
 		display( window );
 		glfwPollEvents( );
 
-		if (screenshot_path)
-		{
+		if (screenshot_path) {
 			screenshot( window, screenshot_path );
 			glfwSetWindowShouldClose( window, 1 );
 		}

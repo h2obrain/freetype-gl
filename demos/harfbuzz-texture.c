@@ -72,10 +72,9 @@ mat4 model, view, projection;
 
 
 // ---------------------------------------------------------------- ftfdump ---
-void ftfdump( FT_Face face )
-{
+void ftfdump( FT_Face face ) {
 	int i;
-	for(i=0; i<face->num_charmaps; i++) {
+	for (i=0; i<face->num_charmaps; i++) {
 		printf("%d: %s %s %c%c%c%c plat=%hu id=%hu\n", i,
 			face->family_name,
 			face->style_name,
@@ -95,11 +94,10 @@ void ftfdump( FT_Face face )
 	broken or irrelevant font. What exactly Freetype will select on face load
 	(it promises most wide unicode, and if that will be slower that UCS-2 -
 	left as an excercise to check. */
-int force_ucs2_charmap( FT_Face face )
-{
+int force_ucs2_charmap( FT_Face face ) {
 	int i;
-	for(i = 0; i < face->num_charmaps; i++)
-		if( ((face->charmaps[i]->platform_id == 0) && (face->charmaps[i]->encoding_id == 3))
+	for (i = 0; i < face->num_charmaps; i++)
+		if ( ((face->charmaps[i]->platform_id == 0) && (face->charmaps[i]->encoding_id == 3))
 		 || ((face->charmaps[i]->platform_id == 3) && (face->charmaps[i]->encoding_id == 1)) )
 			return FT_Set_Charmap( face, face->charmaps[i] );
 	return -1;
@@ -107,8 +105,7 @@ int force_ucs2_charmap( FT_Face face )
 
 
 // ------------------------------------------------------------------- init ---
-void init( void )
-{
+void init( void ) {
 	size_t i, j;
 	int ptSize = 50*64;
 	int device_hdpi = 72;
@@ -146,8 +143,7 @@ void init( void )
 	/* Create a buffer for harfbuzz to use */
 	hb_buffer_t *buf = hb_buffer_create();
 
-	for (i=0; i < NUM_EXAMPLES; ++i)
-	{
+	for (i=0; i < NUM_EXAMPLES; ++i) {
 		hb_buffer_set_direction( buf, text_directions[i] ); /* or LTR */
 		hb_buffer_set_script( buf, scripts[i] ); /* see hb-unicode.h */
 		hb_buffer_set_language( buf,
@@ -177,8 +173,7 @@ void init( void )
 							 (int)((1.0)      * 0x10000L) };
 		/* Set char size */
 		error = FT_Set_Char_Size( ft_face[i], (int)(ptSize), 0, 72*hres, 72 );
-		if( error )
-		{
+		if ( error ) {
 			//fprintf( stderr, "FT_Error (line %d, code 0x%02x) : %s\n",
 			//         __LINE__, FT_Errors[error].code, FT_Errors[error].message );
 			FT_Done_Face( ft_face[i] );
@@ -188,12 +183,10 @@ void init( void )
 		/* Set transform matrix */
 		FT_Set_Transform( ft_face[i], &matrix, NULL );
 
-		for (j = 0; j < glyph_count; ++j)
-		{
+		for (j = 0; j < glyph_count; ++j) {
 			/* Load glyph */
 			error = FT_Load_Glyph( ft_face[i], glyph_info[j].codepoint, flags );
-			if( error )
-			{
+			if ( error ) {
 				//fprintf( stderr, "FT_Error (line %d, code 0x%02x) : %s\n",
 				//         __LINE__, FT_Errors[error].code, FT_Errors[error].message );
 				FT_Done_Face( ft_face[i] );
@@ -212,8 +205,7 @@ void init( void )
 			int h = ft_bitmap_rows;
 
 			ivec4 region = texture_atlas_get_region( atlas, w+1, h+1 );
-			if ( region.x < 0 )
-			{
+			if ( region.x < 0 ) {
 		fprintf( stderr, "Texture atlas is full (%s:%d)\n", __FILE__, __LINE__ );
 				continue;
 			}
@@ -235,7 +227,7 @@ void init( void )
 
 	/* Cleanup */
 	hb_buffer_destroy( buf );
-	for( i=0; i < NUM_EXAMPLES; ++i )
+	for ( i=0; i < NUM_EXAMPLES; ++i )
 		hb_font_destroy( hb_ft_font[i] );
 	FT_Done_FreeType( ft_library );
 
@@ -274,8 +266,7 @@ void init( void )
 
 
 // ---------------------------------------------------------------- display ---
-void display( GLFWwindow* window )
-{
+void display( GLFWwindow* window ) {
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	glUseProgram( shader );
 	{
@@ -297,38 +288,32 @@ void display( GLFWwindow* window )
 
 
 // ---------------------------------------------------------------- reshape ---
-void reshape( GLFWwindow* window, int width, int height )
-{
+void reshape( GLFWwindow* window, int width, int height ) {
 	glViewport(0, 0, width, height);
 	mat4_set_orthographic( &projection, 0, width, 0, height, -1, 1);
 }
 
 
 // --------------------------------------------------------------- keyboard ---
-void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods )
-{
-	if ( key == GLFW_KEY_ESCAPE && action == GLFW_PRESS )
-	{
+void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods ) {
+	if ( key == GLFW_KEY_ESCAPE && action == GLFW_PRESS ) {
 		glfwSetWindowShouldClose( window, GL_TRUE );
 	}
 }
 
 
 // --------------------------------------------------------- error-callback ---
-void error_callback( int error, const char* description )
-{
+void error_callback( int error, const char* description ) {
 	fputs( description, stderr );
 }
 
 
 // ------------------------------------------------------------------- main ---
-int main( int argc, char **argv )
-{
+int main( int argc, char **argv ) {
 	GLFWwindow* window;
 	char* screenshot_path = NULL;
 
-	if (argc > 1)
-	{
+	if (argc > 1) {
 		if (argc == 3 && 0 == strcmp( "--screenshot", argv[1] ))
 			screenshot_path = argv[2];
 		else
@@ -340,8 +325,7 @@ int main( int argc, char **argv )
 
 	glfwSetErrorCallback( error_callback );
 
-	if (!glfwInit( ))
-	{
+	if (!glfwInit( )) {
 		exit( EXIT_FAILURE );
 	}
 
@@ -350,8 +334,7 @@ int main( int argc, char **argv )
 
 	window = glfwCreateWindow( 512, 512, argv[0], NULL, NULL );
 
-	if (!window)
-	{
+	if (!window) {
 		glfwTerminate( );
 		exit( EXIT_FAILURE );
 	}
@@ -366,8 +349,7 @@ int main( int argc, char **argv )
 #ifndef __APPLE__
 	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
-	if (GLEW_OK != err)
-	{
+	if (GLEW_OK != err) {
 		/* Problem: glewInit failed, something is seriously wrong. */
 		fprintf( stderr, "Error: %s\n", glewGetErrorString(err) );
 		exit( EXIT_FAILURE );
@@ -380,13 +362,11 @@ int main( int argc, char **argv )
 	glfwShowWindow( window );
 	reshape( window, 512, 512 );
 
-	while (!glfwWindowShouldClose( window ))
-	{
+	while (!glfwWindowShouldClose( window )) {
 		display( window );
 		glfwPollEvents( );
 
-		if (screenshot_path)
-		{
+		if (screenshot_path) {
 			screenshot( window, screenshot_path );
 			glfwSetWindowShouldClose( window, 1 );
 		}

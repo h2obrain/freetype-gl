@@ -10,8 +10,7 @@
 
 
 // ------------------------------------------------------------- screenshot ---
-void screenshot( GLFWwindow* window, const char* path )
-{
+void screenshot( GLFWwindow* window, const char* path ) {
 	int width, height;
 
 	FILE* out = fopen( path, "wb" );

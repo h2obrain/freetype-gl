@@ -466,7 +466,7 @@ typedef struct texture_font_t
  */
   texture_font_t *
   texture_font_clone( texture_font_t *old,
-		      float pt_size);
+		  	float pt_size);
 
 /**
  * Close the freetype structures from a font and the associated library
@@ -566,22 +566,22 @@ texture_font_index_glyph( texture_font_t * self,
   texture_font_load_glyphs( texture_font_t * self,
 							const char * codepoints );
 /**
-   *Increases the size of a fonts texture atlas
-   *Invalidates all pointers to font->atlas->data
-   *Changes the UV Coordinates of existing glyphs in the font
-   *
-   *@param self A valid texture font
-   *@param width_new Width of the texture atlas after resizing (must be bigger or equal to current width)
-   *@param height_new Height of the texture atlas after resizing (must be bigger or equal to current height)
-   */
-  void
-  texture_font_enlarge_atlas( texture_font_t * self, size_t width_new,
-			      size_t height_new);
-  void
-  texture_font_enlarge_glyphs( texture_font_t * self, float mulw, float mulh);
-  
-  void
-  texture_font_enlarge_texture( texture_font_t * self, size_t width_new,
+ * Increases the size of a fonts texture atlas
+ * Invalidates all pointers to font->atlas->data
+ * Changes the UV Coordinates of existing glyphs in the font
+ *
+ * @param self A valid texture font
+ * @param width_new Width of the texture atlas after resizing (must be bigger or equal to current width)
+ * @param height_new Height of the texture atlas after resizing (must be bigger or equal to current height)
+ */
+void
+texture_font_enlarge_atlas( texture_font_t * self, size_t width_new,
+			size_t height_new);
+void
+texture_font_enlarge_glyphs( texture_font_t * self, float mulw, float mulh);
+
+void
+texture_font_enlarge_texture( texture_font_t * self, size_t width_new,
 				size_t height_new);
 /**
  * Get the kerning between two horizontal glyphs.
@@ -615,13 +615,13 @@ texture_glyph_delete( texture_glyph_t * );
 /** @} */
 
 #define GLYPHS_ITERATOR1(index, name, glyph) \
-	for( index = 0; index < vector_size ( glyph ); index++ ) { \
-	texture_glyph_t ** __glyphs;
+	for ( index = 0; index < vector_size ( glyph ); index++ ) { \
+		texture_glyph_t ** __glyphs;
 #define GLYPHS_ITERATOR2(index, name, glyph) \
-	if(( __glyphs = *(texture_glyph_t *** ) vector_get ( glyph, index ) )) { \
-	    int __i;							\
-	    for( __i = 0; __i < 0x100; __i++ ) {			\
-		if(( name = __glyphs[__i] ))
+	if (( __glyphs = *(texture_glyph_t *** ) vector_get ( glyph, index ) )) { \
+		int __i;							\
+		for ( __i = 0; __i < 0x100; __i++ ) {			\
+			if (( name = __glyphs[__i] ))
 #define GLYPHS_ITERATOR(index, name, glyph) \
 	GLYPHS_ITERATOR1(index, name, glyph)		\
 	GLYPHS_ITERATOR2(index, name, glyph)

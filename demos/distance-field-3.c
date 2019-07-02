@@ -5,7 +5,13 @@
  */
 #include <math.h>
 
+
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
 #include "freetype-gl.h"
+#include <GLFW/glfw3.h>
+
 #include "distance-field.h"
 #include "vertex-buffer.h"
 #include "shader.h"
@@ -15,12 +21,6 @@
 #include "platform.h"
 #include "utf8-utils.h"
 #include "screenshot-util.h"
-
-#include <ft2build.h>
-#include FT_FREETYPE_H
-
-#include <GLFW/glfw3.h>
-
 
 #ifndef max
 #define max(a,b) ((a) > (b) ? (a) : (b))
@@ -53,17 +53,17 @@ mat4  model, view, projection;
 // ------------------------------------------------------ MitchellNetravali ---
 // Mitchell Netravali reconstruction filter
 float
-MitchellNetravali( float x )
-{
+MitchellNetravali( float x ) {
 	const float B = 1/3.0, C = 1/3.0; // Recommended
 	// const float B =   1.0, C =   0.0; // Cubic B-spline (smoother results)
 	// const float B =   0.0, C = 1/2.0; // Catmull-Rom spline (sharper results)
 	x = fabs(x);
-	if( x < 1 )
+	if ( x < 1 )
 		 return ( ( 12 -  9 * B - 6 * C) * x * x * x
 				+ (-18 + 12 * B + 6 * C) * x * x
 				+ (  6 -  2 * B) ) / 6;
-	else if( x < 2 )
+	else
+	if ( x < 2 )
 		return ( (     -B -  6 * C) * x * x * x
 			   + (  6 * B + 30 * C) * x * x
 			   + (-12 * B - 48 * C) * x
@@ -75,8 +75,7 @@ MitchellNetravali( float x )
 
 // ------------------------------------------------------------ interpolate ---
 float
-interpolate( float x, float y0, float y1, float y2, float y3 )
-{
+interpolate( float x, float y0, float y1, float y2, float y3 ) {
 	float c0 = MitchellNetravali(x-1);
 	float c1 = MitchellNetravali(x  );
 	float c2 = MitchellNetravali(x+1);
@@ -89,20 +88,16 @@ interpolate( float x, float y0, float y1, float y2, float y3 )
 // ------------------------------------------------------------------ scale ---
 int
 resize( double *src_data, size_t src_width, size_t src_height,
-		double *dst_data, size_t dst_width, size_t dst_height )
-{
-	if( (src_width == dst_width) && (src_height == dst_height) )
-	{
+		double *dst_data, size_t dst_width, size_t dst_height ) {
+	if ( (src_width == dst_width) && (src_height == dst_height) ) {
 		memcpy( dst_data, src_data, src_width*src_height*sizeof(double));
 		return 0;
 	}
 	size_t i,j;
 	float xscale = src_width / (float) dst_width;
 	float yscale = src_height / (float) dst_height;
-	for( j=0; j < dst_height; ++j )
-	{
-		for( i=0; i < dst_width; ++i )
-		{
+	for ( j=0; j < dst_height; ++j ) {
+		for ( i=0; i < dst_width; ++i ) {
 			int src_i = (int) floor( i * xscale );
 			int src_j = (int) floor( j * yscale );
 			int i0 = min( max( 0, src_i-1 ), src_width-1 );
@@ -145,8 +140,7 @@ resize( double *src_data, size_t src_width, size_t src_height,
 texture_glyph_t *
 load_glyph( const char *  filename,     const char* codepoint,
 			const float   highres_size, const float   lowres_size,
-			const float   padding )
-{
+			const float   padding ) {
 	size_t i, j;
 	FT_Library library;
 	FT_Face face;
@@ -170,10 +164,8 @@ load_glyph( const char *  filename,     const char* codepoint,
 	memset( highres_data, 0, highres_width*highres_height*sizeof(double) );
 
 	// Copy high resolution bitmap with padding and normalize values
-	for( j=0; j < bitmap.rows; ++j )
-	{
-		for( i=0; i < bitmap.width; ++i )
-		{
+	for ( j=0; j < bitmap.rows; ++j ) {
+		for ( i=0; i < bitmap.width; ++i ) {
 			int x = i + padding;
 			int y = j + padding;
 			highres_data[y*highres_width+x] = bitmap.buffer[j*bitmap.width+i]/255.0;
@@ -199,10 +191,8 @@ load_glyph( const char *  filename,     const char* codepoint,
 	// rescale values between 0 and 255.
 	unsigned char * data =
 		(unsigned char *) malloc( lowres_width*lowres_height*sizeof(unsigned char) );
-	for( j=0; j < lowres_height; ++j )
-	{
-		for( i=0; i < lowres_width; ++i )
-		{
+	for ( j=0; j < lowres_height; ++j ) {
+		for ( i=0; i < lowres_width; ++i ) {
 			double v = lowres_data[j*lowres_width+i];
 			data[j*lowres_width+i] = (int) (255*(1-v));
 		}
@@ -255,8 +245,7 @@ load_glyph( const char *  filename,     const char* codepoint,
 
 
 // ------------------------------------------------------------------- init ---
-void init( void )
-{
+void init( void ) {
 	atlas = texture_atlas_new( 512, 512, 1 );
 	font = texture_font_new_from_file( atlas, 32, "fonts/Vera.ttf" );
 
@@ -297,8 +286,7 @@ void init( void )
 
 
 // ---------------------------------------------------------------- display ---
-void display( GLFWwindow* window )
-{
+void display( GLFWwindow* window ) {
 	glClearColor(1.0,1.0,1.0,1.0);
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
@@ -345,38 +333,32 @@ void display( GLFWwindow* window )
 
 
 // ---------------------------------------------------------------- reshape ---
-void reshape( GLFWwindow* window, int width, int height )
-{
+void reshape( GLFWwindow* window, int width, int height ) {
 	glViewport(0, 0, width, height);
 	mat4_set_orthographic( &projection, 0, width, 0, height, -1, 1);
 }
 
 
 // --------------------------------------------------------------- keyboard ---
-void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods )
-{
-	if ( key == GLFW_KEY_ESCAPE && action == GLFW_PRESS )
-	{
+void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods ) {
+	if ( key == GLFW_KEY_ESCAPE && action == GLFW_PRESS ) {
 		glfwSetWindowShouldClose( window, GL_TRUE );
 	}
 }
 
 
 // --------------------------------------------------------- error-callback ---
-void error_callback( int error, const char* description )
-{
+void error_callback( int error, const char* description ) {
 	fputs( description, stderr );
 }
 
 
 // ------------------------------------------------------------------- main ---
-int main( int argc, char **argv )
-{
+int main( int argc, char **argv ) {
 	GLFWwindow* window;
 	char* screenshot_path = NULL;
 
-	if (argc > 1)
-	{
+	if (argc > 1) {
 		if (argc == 3 && 0 == strcmp( "--screenshot", argv[1] ))
 			screenshot_path = argv[2];
 		else
@@ -388,8 +370,7 @@ int main( int argc, char **argv )
 
 	glfwSetErrorCallback( error_callback );
 
-	if (!glfwInit( ))
-	{
+	if (!glfwInit( )) {
 		exit( EXIT_FAILURE );
 	}
 
@@ -398,8 +379,7 @@ int main( int argc, char **argv )
 
 	window = glfwCreateWindow( 512, 512, argv[0], NULL, NULL );
 
-	if (!window)
-	{
+	if (!window) {
 		glfwTerminate( );
 		exit( EXIT_FAILURE );
 	}
@@ -414,8 +394,7 @@ int main( int argc, char **argv )
 #ifndef __APPLE__
 	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
-	if (GLEW_OK != err)
-	{
+	if (GLEW_OK != err) {
 		/* Problem: glewInit failed, something is seriously wrong. */
 		fprintf( stderr, "Error: %s\n", glewGetErrorString(err) );
 		exit( EXIT_FAILURE );
@@ -436,8 +415,7 @@ int main( int argc, char **argv )
 
 	glfwSetTime(1.0);
 
-	while (!glfwWindowShouldClose( window ))
-	{
+	while (!glfwWindowShouldClose( window )) {
 		display( window );
 
 		angle += 30 * glfwGetTime();
@@ -445,8 +423,7 @@ int main( int argc, char **argv )
 
 		glfwPollEvents( );
 
-		if (screenshot_path)
-		{
+		if (screenshot_path) {
 			screenshot( window, screenshot_path );
 			glfwSetWindowShouldClose( window, 1 );
 		}
