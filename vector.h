@@ -56,17 +56,17 @@ namespace ftgl {
  */
 typedef struct vector_t
  {
-     /** Pointer to dynamically allocated items. */
-     void * items;
+	 /** Pointer to dynamically allocated items. */
+	 void * items;
 
-     /** Number of items that can be held in currently allocated storage. */
-     size_t capacity;
+	 /** Number of items that can be held in currently allocated storage. */
+	 size_t capacity;
 
-     /** Number of items. */
-     size_t size;
+	 /** Number of items. */
+	 size_t size;
 
-     /** Size (in bytes) of a single item. */
-     size_t item_size;
+	 /** Size (in bytes) of a single item. */
+	 size_t item_size;
 } vector_t;
 
 
@@ -100,7 +100,7 @@ typedef struct vector_t
  */
   const void *
   vector_get( const vector_t *self,
-              size_t index );
+			  size_t index );
 
 
 /**
@@ -133,8 +133,8 @@ typedef struct vector_t
  */
   int
   vector_contains( const vector_t *self,
-                   const void *item,
-                   int (*cmp)(const void *, const void *) );
+				   const void *item,
+				   int (*cmp)(const void *, const void *) );
 
 
 /**
@@ -165,7 +165,7 @@ typedef struct vector_t
  */
   void
   vector_reserve( vector_t *self,
-                  const size_t size );
+				  const size_t size );
 
 
 /**
@@ -205,8 +205,8 @@ typedef struct vector_t
  */
   void
   vector_set( vector_t *self,
-              const size_t index,
-              const void *item );
+			  const size_t index,
+			  const void *item );
 
 
 /**
@@ -217,7 +217,7 @@ typedef struct vector_t
  */
   void
   vector_erase( vector_t *self,
-                const size_t index );
+				const size_t index );
 
 
 /**
@@ -229,8 +229,8 @@ typedef struct vector_t
  */
   void
   vector_erase_range( vector_t *self,
-                      const size_t first,
-                      const size_t last );
+					  const size_t first,
+					  const size_t last );
 
 
 /**
@@ -241,7 +241,7 @@ typedef struct vector_t
  */
   void
   vector_push_back( vector_t *self,
-                    const void *item );
+					const void *item );
 
 
 /**
@@ -265,7 +265,7 @@ typedef struct vector_t
  */
   void
   vector_resize( vector_t *self,
-                 const size_t size );
+				 const size_t size );
 
 
 /**
@@ -277,8 +277,8 @@ typedef struct vector_t
  */
   void
   vector_insert( vector_t *self,
-                 const size_t index,
-                 const void *item );
+				 const size_t index,
+				 const void *item );
 
 
 /**
@@ -291,9 +291,9 @@ typedef struct vector_t
  */
   void
   vector_insert_data( vector_t *self,
-                      const size_t index,
-                      const void * data,
-                      const size_t count );
+					  const size_t index,
+					  const void * data,
+					  const size_t count );
 
 
 /**
@@ -305,8 +305,8 @@ typedef struct vector_t
  */
   void
   vector_push_back_data( vector_t *self,
-                         const void * data,
-                         const size_t count );
+						 const void * data,
+						 const size_t count );
 
 
 /**
@@ -317,7 +317,7 @@ typedef struct vector_t
  */
   void
   vector_sort( vector_t *self,
-               int (*cmp)(const void *, const void *) );
+			   int (*cmp)(const void *, const void *) );
 
 
 /** @} */

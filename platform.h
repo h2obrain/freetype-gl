@@ -14,11 +14,11 @@ namespace ftgl {
 #endif
 
 #ifdef __APPLE__
-    /* strndup() was only added in OSX lion */
-    char * strndup( const char *s1, size_t n);
+	/* strndup() was only added in OSX lion */
+	char * strndup( const char *s1, size_t n);
 #elif defined(_WIN32) || defined(_WIN64)
-    /* does not exist on windows */
-    char * strndup( const char *s1, size_t n);
+	/* does not exist on windows */
+	char * strndup( const char *s1, size_t n);
 #    pragma warning (disable: 4244) // suspend warnings
 #endif // _WIN32 || _WIN64
 

@@ -48,20 +48,20 @@ namespace ftgl {
  * Structure in charge of caching fonts.
  */
 typedef struct font_manager_t {
-    /**
-     * Texture atlas to hold font glyphs.
-     */
-    texture_atlas_t * atlas;
+	/**
+	 * Texture atlas to hold font glyphs.
+	 */
+	texture_atlas_t * atlas;
 
-    /**
-     * Cached textures.
-     */
-    vector_t * fonts;
+	/**
+	 * Cached textures.
+	 */
+	vector_t * fonts;
 
-    /**
-     * Default glyphs to be loaded when loading a new font.
-     */
-    char * cache;
+	/**
+	 * Default glyphs to be loaded when loading a new font.
+	 */
+	char * cache;
 
 } font_manager_t;
 
@@ -79,8 +79,8 @@ typedef struct font_manager_t {
  */
   font_manager_t *
   font_manager_new( size_t width,
-                    size_t height,
-                    size_t depth );
+					size_t height,
+					size_t depth );
 
 
 /**
@@ -103,7 +103,7 @@ typedef struct font_manager_t {
  */
   void
   font_manager_delete_font( font_manager_t * self,
-                            texture_font_t * font );
+							texture_font_t * font );
 
 
 /**
@@ -117,8 +117,8 @@ typedef struct font_manager_t {
  */
   texture_font_t *
   font_manager_get_from_filename( font_manager_t * self,
-                                  const char * filename,
-                                  const float size );
+								  const char * filename,
+								  const float size );
 
 
 /**
@@ -134,10 +134,10 @@ typedef struct font_manager_t {
  */
   texture_font_t *
   font_manager_get_from_description( font_manager_t * self,
-                                     const char * family,
-                                     const float size,
-                                     const int bold,
-                                     const int italic );
+									 const char * family,
+									 const float size,
+									 const int bold,
+									 const int italic );
 
 
 /**
@@ -150,7 +150,7 @@ typedef struct font_manager_t {
  */
   texture_font_t *
   font_manager_get_from_markup( font_manager_t *self,
-                                const markup_t *markup );
+								const markup_t *markup );
 
 
 /**
@@ -166,10 +166,10 @@ typedef struct font_manager_t {
  */
   char *
   font_manager_match_description( font_manager_t * self,
-                                  const char * family,
-                                  const float size,
-                                  const int bold,
-                                  const int italic );
+								  const char * family,
+								  const float size,
+								  const int bold,
+								  const int italic );
 
 /** @} */
 

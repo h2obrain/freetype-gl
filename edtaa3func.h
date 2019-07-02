@@ -64,7 +64,7 @@ extern "C" {
 
 
 #ifdef __cplusplus
-namespace ftgl {
+	namespace ftgl {
 #endif
 
 /*
@@ -95,7 +95,7 @@ void edtaa3(double *img, double *gx, double *gy, int w, int h, short *distx, sho
 
 
 #ifdef __cplusplus
-}
+	}
 }
 #endif
 

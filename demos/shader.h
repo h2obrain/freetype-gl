@@ -59,7 +59,7 @@ namespace ftgl {
  */
   GLuint
   shader_compile( const char* source,
-                  const GLenum type );
+				  const GLenum type );
 
 
 /**
@@ -73,7 +73,7 @@ namespace ftgl {
  */
   GLuint
   shader_load( const char * vert_filename,
-               const char * frag_filename );
+			   const char * frag_filename );
 
 
 /** @} */

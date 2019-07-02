@@ -75,51 +75,51 @@ namespace ftgl {
  */
 typedef struct texture_atlas_t
 {
-    /**
-     * Allocated nodes
-     */
-    vector_t * nodes;
+	/**
+	 * Allocated nodes
+	 */
+	vector_t * nodes;
 
-    /**
-     *  Width (in pixels) of the underlying texture
-     */
-    size_t width;
+	/**
+	 *  Width (in pixels) of the underlying texture
+	 */
+	size_t width;
 
-    /**
-     * Height (in pixels) of the underlying texture
-     */
-    size_t height;
+	/**
+	 * Height (in pixels) of the underlying texture
+	 */
+	size_t height;
 
-    /**
-     * Depth (in bytes) of the underlying texture
-     */
-    size_t depth;
+	/**
+	 * Depth (in bytes) of the underlying texture
+	 */
+	size_t depth;
 
-    /**
-     * Allocated surface size
-     */
-    size_t used;
+	/**
+	 * Allocated surface size
+	 */
+	size_t used;
 
-    /**
-     * Texture identity (OpenGL)
-     */
-    unsigned int id;
+	/**
+	 * Texture identity (OpenGL)
+	 */
+	unsigned int id;
 
-    /**
-     * Atlas data
-     */
-    unsigned char * data;
+	/**
+	 * Atlas data
+	 */
+	unsigned char * data;
 
-    /**
-     * Atlas has been modified
-     */
-    unsigned char modified;
+	/**
+	 * Atlas has been modified
+	 */
+	unsigned char modified;
 
-    /**
-     * Atlas special glyph, this is a void*, and will be typecasted as necessary
-     */
+	/**
+	 * Atlas special glyph, this is a void*, and will be typecasted as necessary
+	 */
 
-    void * special;
+	void * special;
 
 } texture_atlas_t;
 
@@ -136,8 +136,8 @@ typedef struct texture_atlas_t
  */
   texture_atlas_t *
   texture_atlas_new( const size_t width,
-                     const size_t height,
-                     const size_t depth );
+					 const size_t height,
+					 const size_t depth );
 
 
 /**
@@ -161,8 +161,8 @@ typedef struct texture_atlas_t
  */
   ivec4
   texture_atlas_get_region( texture_atlas_t * self,
-                            const size_t width,
-                            const size_t height );
+							const size_t width,
+							const size_t height );
 
 
 /**
@@ -179,12 +179,12 @@ typedef struct texture_atlas_t
  */
   void
   texture_atlas_set_region( texture_atlas_t * self,
-                            const size_t x,
-                            const size_t y,
-                            const size_t width,
-                            const size_t height,
-                            const unsigned char *data,
-                            const size_t stride );
+							const size_t x,
+							const size_t y,
+							const size_t width,
+							const size_t height,
+							const unsigned char *data,
+							const size_t stride );
 
 /**
  *  Remove all allocated regions from the atlas.

@@ -173,57 +173,57 @@ namespace ftgl {
  */
 typedef struct vertex_attribute_t
 {
-    /**
-     *  atribute name
-     */
-    GLchar * name;
+	/**
+	 *  atribute name
+	 */
+	GLchar * name;
 
-    /**
-     * index of the generic vertex attribute to be modified.
-     */
-    GLuint index;
+	/**
+	 * index of the generic vertex attribute to be modified.
+	 */
+	GLuint index;
 
-    /**
-     * Number of components per generic vertex attribute.
-     *
-     * Must be 1, 2, 3, or 4. The initial value is 4.
-     */
-    GLint size;
+	/**
+	 * Number of components per generic vertex attribute.
+	 *
+	 * Must be 1, 2, 3, or 4. The initial value is 4.
+	 */
+	GLint size;
 
-    /**
-     *  data type of each component in the array.
-     *
-     *  Symbolic constants GL_BYTE, GL_UNSIGNED_BYTE, GL_SHORT,
-     *  GL_UNSIGNED_SHORT, GL_INT, GL_UNSIGNED_INT, GL_FLOAT, or GL_DOUBLE are
-     *  accepted. The initial value is GL_FLOAT.
-     */
-    GLenum type;
+	/**
+	 *  data type of each component in the array.
+	 *
+	 *  Symbolic constants GL_BYTE, GL_UNSIGNED_BYTE, GL_SHORT,
+	 *  GL_UNSIGNED_SHORT, GL_INT, GL_UNSIGNED_INT, GL_FLOAT, or GL_DOUBLE are
+	 *  accepted. The initial value is GL_FLOAT.
+	 */
+	GLenum type;
 
-    /**
-     *  whether fixed-point data values should be normalized (GL_TRUE) or
-     *  converted directly as fixed-point values (GL_FALSE) when they are
-     *  accessed.
-     */
-    GLboolean normalized;
+	/**
+	 *  whether fixed-point data values should be normalized (GL_TRUE) or
+	 *  converted directly as fixed-point values (GL_FALSE) when they are
+	 *  accessed.
+	 */
+	GLboolean normalized;
 
-    /**
-     *  byte offset between consecutive generic vertex attributes.
-     *
-     *  If stride is 0, the generic vertex attributes are understood to be
-     *  tightly packed in the array. The initial value is 0.
-     */
-    GLsizei stride;
+	/**
+	 *  byte offset between consecutive generic vertex attributes.
+	 *
+	 *  If stride is 0, the generic vertex attributes are understood to be
+	 *  tightly packed in the array. The initial value is 0.
+	 */
+	GLsizei stride;
 
-    /**
-     *  pointer to the first component of the first attribute element in the
-     *  array.
-     */
-    GLvoid * pointer;
+	/**
+	 *  pointer to the first component of the first attribute element in the
+	 *  array.
+	 */
+	GLvoid * pointer;
 
-    /**
-     * pointer to the function that enable this attribute.
-     */
-    void ( * enable )(void *);
+	/**
+	 * pointer to the function that enable this attribute.
+	 */
+	void ( * enable )(void *);
 
 } vertex_attribute_t;
 
@@ -235,8 +235,8 @@ typedef struct vertex_attribute_t
  * @param size       number of component
  * @param type       data type
  * @param normalized Whether fixed-point data values should be normalized
-                     (GL_TRUE) or converted directly as fixed-point values
-                     (GL_FALSE) when they are  accessed.
+					 (GL_TRUE) or converted directly as fixed-point values
+					 (GL_FALSE) when they are  accessed.
  * @param stride     byte offset between consecutive attributes.
  * @param pointer    pointer to the first component of the first attribute
  *                   element in the array.
@@ -246,11 +246,11 @@ typedef struct vertex_attribute_t
  */
 vertex_attribute_t *
 vertex_attribute_new( GLchar * name,
-                      GLint size,
-                      GLenum type,
-                      GLboolean normalized,
-                      GLsizei stride,
-                      GLvoid *pointer );
+					  GLint size,
+					  GLenum type,
+					  GLboolean normalized,
+					  GLsizei stride,
+					  GLvoid *pointer );
 
 
 

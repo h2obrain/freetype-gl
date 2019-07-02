@@ -34,43 +34,43 @@ namespace ftgl {
  */
 typedef struct vertex_buffer_t
 {
-    /** Format of the vertex buffer. */
-    char * format;
+	/** Format of the vertex buffer. */
+	char * format;
 
-    /** Vector of vertices. */
-    vector_t * vertices;
+	/** Vector of vertices. */
+	vector_t * vertices;
 
 #ifdef FREETYPE_GL_USE_VAO
-    /** GL identity of the Vertex Array Object */
-    GLuint VAO_id;
+	/** GL identity of the Vertex Array Object */
+	GLuint VAO_id;
 #endif
 
-    /** GL identity of the vertices buffer. */
-    GLuint vertices_id;
+	/** GL identity of the vertices buffer. */
+	GLuint vertices_id;
 
-    /** Vector of indices. */
-    vector_t * indices;
+	/** Vector of indices. */
+	vector_t * indices;
 
-    /** GL identity of the indices buffer. */
-    GLuint indices_id;
+	/** GL identity of the indices buffer. */
+	GLuint indices_id;
 
-    /** Current size of the vertices buffer in GPU */
-    size_t GPU_vsize;
+	/** Current size of the vertices buffer in GPU */
+	size_t GPU_vsize;
 
-    /** Current size of the indices buffer in GPU*/
-    size_t GPU_isize;
+	/** Current size of the indices buffer in GPU*/
+	size_t GPU_isize;
 
-    /** GL primitives to render. */
-    GLenum mode;
+	/** GL primitives to render. */
+	GLenum mode;
 
-    /** Whether the vertex buffer needs to be uploaded to GPU memory. */
-    char state;
+	/** Whether the vertex buffer needs to be uploaded to GPU memory. */
+	char state;
 
-    /** Individual items */
-    vector_t * items;
+	/** Individual items */
+	vector_t * items;
 
-    /** Array of attributes. */
-    vertex_attribute_t *attributes[MAX_VERTEX_ATTRIBUTE];
+	/** Array of attributes. */
+	vertex_attribute_t *attributes[MAX_VERTEX_ATTRIBUTE];
 } vertex_buffer_t;
 
 
@@ -130,7 +130,7 @@ typedef struct vertex_buffer_t
  */
   void
   vertex_buffer_render_setup ( vertex_buffer_t *self,
-                               GLenum mode );
+							   GLenum mode );
 
 
 /**
@@ -150,7 +150,7 @@ typedef struct vertex_buffer_t
  */
   void
   vertex_buffer_render ( vertex_buffer_t *self,
-                         GLenum mode );
+						 GLenum mode );
 
 
 /**
@@ -161,7 +161,7 @@ typedef struct vertex_buffer_t
  */
   void
   vertex_buffer_render_item ( vertex_buffer_t *self,
-                              size_t index );
+							  size_t index );
 
 
 /**
@@ -193,8 +193,8 @@ typedef struct vertex_buffer_t
  */
   void
   vertex_buffer_push_back_indices ( vertex_buffer_t *self,
-                                    const GLuint * indices,
-                                    const size_t icount );
+									const GLuint * indices,
+									const size_t icount );
 
 
 /**
@@ -210,8 +210,8 @@ typedef struct vertex_buffer_t
  */
   void
   vertex_buffer_push_back_vertices ( vertex_buffer_t *self,
-                                     const void * vertices,
-                                     const size_t vcount );
+									 const void * vertices,
+									 const size_t vcount );
 
 
 /**
@@ -226,9 +226,9 @@ typedef struct vertex_buffer_t
  */
   void
   vertex_buffer_insert_indices ( vertex_buffer_t *self,
-                                 const size_t index,
-                                 const GLuint *indices,
-                                 const size_t icount );
+								 const size_t index,
+								 const GLuint *indices,
+								 const size_t icount );
 
 
 /**
@@ -243,9 +243,9 @@ typedef struct vertex_buffer_t
  */
   void
   vertex_buffer_insert_vertices ( vertex_buffer_t *self,
-                                  const size_t index,
-                                  const void *vertices,
-                                  const size_t vcount );
+								  const size_t index,
+								  const void *vertices,
+								  const size_t vcount );
 
 /**
  * Erase indices in the buffer.
@@ -258,8 +258,8 @@ typedef struct vertex_buffer_t
  */
   void
   vertex_buffer_erase_indices ( vertex_buffer_t *self,
-                                const size_t first,
-                                const size_t last );
+								const size_t first,
+								const size_t last );
 
 /**
  * Erase vertices in the buffer.
@@ -272,8 +272,8 @@ typedef struct vertex_buffer_t
  */
   void
   vertex_buffer_erase_vertices ( vertex_buffer_t *self,
-                                 const size_t first,
-                                 const size_t last );
+								 const size_t first,
+								 const size_t last );
 
 
 /**
@@ -287,8 +287,8 @@ typedef struct vertex_buffer_t
  */
   size_t
   vertex_buffer_push_back( vertex_buffer_t * self,
-                           const void * vertices, const size_t vcount,
-                           const GLuint * indices, const size_t icount );
+						   const void * vertices, const size_t vcount,
+						   const GLuint * indices, const size_t icount );
 
 
 /**
@@ -303,9 +303,9 @@ typedef struct vertex_buffer_t
  */
   size_t
   vertex_buffer_insert( vertex_buffer_t * self,
-                        const size_t index,
-                        const void * vertices, const size_t vcount,
-                        const GLuint * indices, const size_t icount );
+						const size_t index,
+						const void * vertices, const size_t vcount,
+						const GLuint * indices, const size_t icount );
 
 /**
  * Erase an item from the vertex buffer.
@@ -315,7 +315,7 @@ typedef struct vertex_buffer_t
  */
   void
   vertex_buffer_erase( vertex_buffer_t * self,
-                       const size_t index );
+					   const size_t index );
 
 /** @} */
 

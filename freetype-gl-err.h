@@ -52,20 +52,20 @@ extern char* freetype_gl_errstr(int errno);
 # define FTGL_ERR_CAT( x, y )   FTGL_ERR_XCAT( x, y )
 #endif
 #define FTGL_ERR_BASE  0x100 /* Freetype GL errors start at 0x100 */
-    
+	
 extern char* freetype_gl_errstrs[];
 
 #define freetype_gl_error(errno, ...) {			     \
 	freetype_gl_errno = FTGL_ERR_CAT( FTGL_ERR_PREFIX, errno);	\
 	freetype_gl_message = freetype_gl_errstrs[FTGL_ERR_CAT( FTGL_ERR_PREFIX, errno)-FTGL_ERR_BASE]; \
 	freetype_gl_errhook(freetype_gl_errno, freetype_gl_message, __VA_ARGS__); \
-    }
+	}
 
 #define freetype_error(error, ...) {	     \
 	freetype_gl_errno = FT_Errors[error].code;			\
 	freetype_gl_message = (char*)FT_Errors[error].message;		\
 	freetype_gl_errhook(freetype_gl_errno, freetype_gl_message, __VA_ARGS__); \
-    }
+	}
 
 #define FTGL_ERRSTR_MAX 0x100
 
@@ -80,16 +80,16 @@ extern char* freetype_gl_errstrs[];
 #   define FTGL_NEED_EXTERN_C
   extern "C" {
 #  endif
-    
+	
 # endif /* !FTGL_ERRORDEF */
 
-    /* this macro is used to define an error */
+	/* this macro is used to define an error */
 # define FTGL_ERRORDEF_( e, v, s )						\
-          FTGL_ERRORDEF( FTGL_ERR_CAT( FTGL_ERR_PREFIX, e ), v + FTGL_ERR_BASE, s )
+		  FTGL_ERRORDEF( FTGL_ERR_CAT( FTGL_ERR_PREFIX, e ), v + FTGL_ERR_BASE, s )
 # endif /* !FTGL_ERRORDEF_ */
 
 #include <freetype-gl-errdef.h>
-    
+	
 #ifdef __cplusplus
 }
 }
