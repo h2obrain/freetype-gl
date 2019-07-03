@@ -17,6 +17,8 @@ set(CMAKE_MODULE_PATH
 string(LENGTH "${CMAKE_SOURCE_DIR}/" SOURCE_PATH_SIZE)
 add_definitions("-DSOURCE_PATH_SIZE=${SOURCE_PATH_SIZE}")
 
+add_definitions(-DFREETYPEGL_OPENGL_OUTPUT)
+
 message(STATUS "Building for ${CMAKE_SYSTEM_NAME} target system")
 message(STATUS "Building with ${CMAKE_C_COMPILER_ID} compiler")
 
@@ -127,8 +129,8 @@ set(FREETYPE_GL_HDR
     utf8-utils.h
     vec234.h
     vector.h
-    vertex-attribute.h
-    vertex-buffer.h
+    vertex-attribute-gl.h
+    vertex-buffer-gl.h
     freetype-gl-err.h
     freetype-gl-errdef.h
 )
@@ -143,8 +145,8 @@ set(FREETYPE_GL_SRC
     texture-font.c
     utf8-utils.c
     vector.c
-    vertex-attribute.c
-    vertex-buffer.c
+    vertex-attribute-gl.c
+    vertex-buffer-gl.c
     freetype-gl-err.c
 )
 

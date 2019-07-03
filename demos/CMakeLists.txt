@@ -3,7 +3,14 @@
 # Distributed under the OSI-approved BSD 2-Clause License.  See accompanying
 # file `LICENSE` for more details.
 
+#if(NOT CMAKE_BUILD_TYPE)
+#  set(CMAKE_BUILD_TYPE Release)
+#endif()
+
 macro(CREATE_DEMO _target _sources)
+	add_compile_options(-Wall -Wextra -ggdb3 -O0)
+	#set(CMAKE_CXX_FLAGS_DEBUG "-ggdb3 -O0")
+	#set(CMAKE_CXX_FLAGS_RELEASE "-ggdb3 -O3")
     add_executable(${_target} ${_sources} $<TARGET_OBJECTS:demo-utils>)
     if(${_target} MATCHES "^harfbuzz")
         target_link_libraries(${_target}
@@ -118,6 +125,15 @@ if(TARGET freetype-gl-hb)
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../harfbuzz
         PRIVATE ${HARFBUZZ_INCLUDE_DIRS}
     )
+	if(FONTCONFIG_FOUND)
+	    create_demo(harfbuzz-markup harfbuzz-markup.c)
+	    target_link_libraries(harfbuzz-markup ${FONTCONFIG_LIBRARY})
+	    target_include_directories(harfbuzz-markup
+	        BEFORE
+	        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../harfbuzz
+	        PRIVATE ${HARFBUZZ_INCLUDE_DIRS}
+	    )
+	endif()
 endif()
 
 # Copy font and shaders into build directory for in-place testing

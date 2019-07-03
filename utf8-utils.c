@@ -70,3 +70,51 @@ utf8_to_utf32( const char * character ) {
 
 	return 0xFFFD; // invalid character
 }
+
+char *utf32_to_utf8( uint32_t codepoint, char *character ) {
+	if (codepoint & ~((1<<23)-1)) {
+		character[0] = '\0';
+		return NULL;
+	} else
+	if (codepoint & ~((1<<21)-1)) {
+		character[5] = '\0';
+		character[4] = 0x80 | (codepoint & 0x3f);
+		codepoint >>= 6;
+		character[3] = 0x80 | (codepoint & 0x3f);
+		codepoint >>= 6;
+		character[2] = 0x80 | (codepoint & 0x3f);
+		codepoint >>= 6;
+		character[1] = 0x80 | (codepoint & 0x3f);
+		codepoint >>= 6;
+		character[0] = 0xF8 | (codepoint & 0x7);
+	} else
+	if (codepoint & ~((1<<16)-1)) {
+		character[4] = '\0';
+		character[3] = 0x80 | (codepoint & 0x3f);
+		codepoint >>= 6;
+		character[2] = 0x80 | (codepoint & 0x3f);
+		codepoint >>= 6;
+		character[1] = 0x80 | (codepoint & 0x3f);
+		codepoint >>= 6;
+		character[0] = 0xF0 | (codepoint & 0x7);
+	} else
+	if (codepoint & ~((1<<11)-1)) {
+		character[3] = '\0';
+		character[2] = 0x80 | (codepoint & 0x3f);
+		codepoint >>= 6;
+		character[1] = 0x80 | (codepoint & 0x3f);
+		codepoint >>= 6;
+		character[0] = 0xE0 | (codepoint & 0x7);
+	} else
+	if (codepoint & ~((1<<7)-1)) {
+		character[2] = '\0';
+		character[1] = 0x80 | (codepoint & 0x3f);
+		codepoint >>= 6;
+		character[0] = 0xC0 | (codepoint & 0x7);
+	} else {
+		character[1] = '\0';
+		character[0] = codepoint;
+	}
+	return character;
+}
+

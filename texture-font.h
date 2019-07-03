@@ -289,7 +289,6 @@ typedef struct texture_font_t
 	/**
 	 * Texture font library
 	 */
-
 	texture_font_library_t * library;
   
 	/**
@@ -536,7 +535,7 @@ typedef struct texture_font_t
  * @return          1 if glyph was copied, 0 if it was inserted
  */
 int
-texture_font_index_glyph( texture_font_t * self,
+texture_font_index_glyph32( texture_font_t * self,
 			  texture_glyph_t * glyph,
 			  uint32_t codepoint );
 	

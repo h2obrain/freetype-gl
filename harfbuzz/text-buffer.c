@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <math.h>
+
 //#include "opengl.h"
 #include "text-buffer.h"
 #include "utf8-utils.h"
@@ -105,6 +106,36 @@ text_buffer_move_last_line( text_buffer_t * self, float dy ) {
 	}
 }
 
+// ----------------------------------------------------------------------------
+void text_buffer_set_line_direction( text_buffer_t * self, hb_direction_t direction) {
+//	switch (self->direction) {
+//		case HB_DIRECTION_LTR:
+//		case HB_DIRECTION_RTL:
+//			switch (direction) {
+//				case HB_DIRECTION_LTR:
+//				case HB_DIRECTION_RTL:
+//					break;
+//				case HB_DIRECTION_TTB:
+//				case HB_DIRECTION_BTT:
+//					self->origin.y = self->last_pen_y;
+//					break;
+//			}
+//			break;
+//		case HB_DIRECTION_TTB:
+//		case HB_DIRECTION_BTT:
+//			switch (direction) {
+//				case HB_DIRECTION_LTR:
+//				case HB_DIRECTION_RTL:
+////					self->origin.y = self->last_pen_y;
+//					break;
+//				case HB_DIRECTION_TTB:
+//				case HB_DIRECTION_BTT:
+//					break;
+//			}
+//			break;
+//	}
+	self->direction = direction;
+}
 
 // ----------------------------------------------------------------------------
 // text_buffer_finish_line (internal use only)
@@ -150,10 +181,20 @@ text_buffer_finish_line( text_buffer_t * self, vec2 * pen, bool advancePen ) {
 		self->bounds.height = self->bounds.top - line_bottom;
 	}
 
-	if ( advancePen ) {
-		pen->x = self->origin.x;
-		pen->y += (int)(self->line_descender);
-	}
+//	if ( advancePen ) {
+//		switch (self->direction) {
+//			case HB_DIRECTION_LTR:
+//			case HB_DIRECTION_RTL:
+				pen->x  = self->origin.x;
+				pen->y += (int)(self->line_descender);
+//				break;
+//			case HB_DIRECTION_TTB:
+//			case HB_DIRECTION_BTT:
+//				pen->x += (int)(self->line_descender);
+//				pen->y  = self->origin.y;
+//				break;
+//		}
+//	}
 
 	self->line_descender = 0;
 	self->line_ascender = 0;
@@ -196,11 +237,60 @@ text_buffer_add_text( text_buffer_t * self,
 		}
 	}
 
-	for ( i = 0; length; i += utf8_surrogate_len( text + i ) ) {
-		text_buffer_add_char( self, pen, markup, text + i, prev_character );
-		prev_character = text + i;
-		length--;
+	text_buffer_set_line_direction(self, markup->direction);
+
+	/* Create a buffer for harfbuzz to use (TODO use markup->font->buffer) */
+	hb_buffer_t *buffer = hb_buffer_create();
+	while (1) {
+		const char *end = strchr(text, '\n');
+
+        hb_buffer_set_direction(buffer, markup->direction);
+        hb_buffer_set_script(buffer, markup->script); /* see hb-unicode.h */
+		hb_buffer_set_language( buffer, markup->font->language );
+		if (end) {
+			hb_buffer_add_utf8( buffer, text, end-text, 0, end-text );
+		} else {
+			hb_buffer_add_utf8( buffer, text, strlen(text), 0, strlen(text) );
+		}
+		hb_buffer_guess_segment_properties( buffer );
+		hb_shape( markup->font->hb_ft_font, buffer, NULL, 0 );
+
+		unsigned int         glyph_count;
+		hb_glyph_info_t     *glyph_info;
+		hb_glyph_position_t *glyph_pos;
+		glyph_info = hb_buffer_get_glyph_infos(buffer, &glyph_count);
+		glyph_pos  = hb_buffer_get_glyph_positions(buffer, &glyph_count);
+
+		/* load not existing glyphs */
+		texture_font_load_glyphs( markup->font, text );
+
+		/* layout width.. */
+//		float width = 0.0;
+//		float hres = markup->font->hres;
+//		for (i = 0; i < glyph_count; ++i) {
+//			int codepoint = glyph_info[i].codepoint;
+//			float x_advance = glyph_pos[i].x_advance/(float)(hres*64);
+//			float x_offset = glyph_pos[i].x_offset/(float)(hres*64);
+//			texture_glyph_t *glyph = texture_font_get_glyph32(fonts[i], codepoint);
+//			if ( i < (glyph_count-1) )
+//				width += x_advance + x_offset;
+//			else
+//				width += glyph->offset_x + glyph->width;
+//		}
+
+		for (i = 0; i < glyph_count; ++i) {
+			text_buffer_add_char( self, pen, markup, &glyph_info[i], &glyph_pos[i] );
+		}
+
+		if (!end) break;
+		text = end+1;
+
+		/* newline */
+		text_buffer_finish_line(self, pen, true);
+
+		hb_buffer_reset(buffer);
 	}
+
 
 	self->last_pen_y = pen->y;
 }
@@ -209,7 +299,9 @@ text_buffer_add_text( text_buffer_t * self,
 void
 text_buffer_add_char( text_buffer_t * self,
 					  vec2 * pen, markup_t * markup,
-					  const char * current, const char * previous ) {
+					  hb_glyph_info_t     *glyph_info,
+					  hb_glyph_position_t *glyph_pos
+) {
 	size_t vcount = 0;
 	size_t icount = 0;
 	vertex_buffer_t * buffer = self->buffer;
@@ -238,22 +330,35 @@ text_buffer_add_char( text_buffer_t * self,
 		self->line_descender = markup->font->descender;
 	}
 
-	if ( *current == '\n' ) {
-		text_buffer_finish_line(self, pen, true);
-		return;
-	}
+//	if ( glyph_info->codepoint == '\n' ) {
+//		text_buffer_finish_line(self, pen, true);
+//		return;
+//	}
 
-	glyph = texture_font_get_glyph( font, current );
+	glyph = texture_font_get_glyph32( font, glyph_info->codepoint );
 	black = texture_font_get_glyph( font, NULL );
 
 	if ( glyph == NULL ) {
 		return;
 	}
 
-	if ( previous && markup->font->kerning ) {
-		kerning = texture_glyph_get_kerning( glyph, previous );
-	}
-	pen->x += kerning;
+//	if ( previous && markup->font->kerning ) {
+//		kerning = texture_glyph_get_kerning( glyph, previous );
+//	}
+//	pen->x += kerning;
+
+	printf("pen(%4.1f,%4.1f)\n",pen->x,pen->y);
+
+	float hres = markup->font->hres;
+
+	// ..
+
+	int codepoint = glyph_info->codepoint;
+	// because of vhinting trick we need the extra 64 (hres)
+	float x_advance = glyph_pos->x_advance/(float)(hres*64);
+	float x_offset  = glyph_pos->x_offset/(float)(hres*64);
+	float y_advance = glyph_pos->y_advance/(float)(64);
+	float y_offset  = glyph_pos->y_offset/(float)(64);
 
 	// Background
 	if ( markup->background_color.alpha > 0 ) {
@@ -261,10 +366,10 @@ text_buffer_add_char( text_buffer_t * self,
 		float g = markup->background_color.g;
 		float b = markup->background_color.b;
 		float a = markup->background_color.a;
-		float x0 = ( pen->x -kerning );
+		float x0 = pen->x;
 		float y0 = (float)(int)( pen->y + font->descender );
-		float x1 = ( x0 + glyph->advance_x );
-		float y1 = (float)(int)( y0 + font->height + font->linegap );
+		float x1 = x0 + x_advance;
+		float y1 = (float)(int)( pen->y + font->ascender );
 		float s0 = black->s0;
 		float t0 = black->t0;
 		float s1 = black->s1;
@@ -294,9 +399,9 @@ text_buffer_add_char( text_buffer_t * self,
 		float g = markup->underline_color.g;
 		float b = markup->underline_color.b;
 		float a = markup->underline_color.a;
-		float x0 = ( pen->x - kerning );
+		float x0 = pen->x;
 		float y0 = (float)(int)( pen->y + font->underline_position );
-		float x1 = ( x0 + glyph->advance_x );
+		float x1 = x0 + x_advance;
 		float y1 = (float)(int)( y0 + font->underline_thickness );
 		float s0 = black->s0;
 		float t0 = black->t0;
@@ -327,9 +432,9 @@ text_buffer_add_char( text_buffer_t * self,
 		float g = markup->overline_color.g;
 		float b = markup->overline_color.b;
 		float a = markup->overline_color.a;
-		float x0 = ( pen->x -kerning );
+		float x0 = pen->x;
 		float y0 = (float)(int)( pen->y + (int)font->ascender );
-		float x1 = ( x0 + glyph->advance_x );
+		float x1 = x0 + x_advance;
 		float y1 = (float)(int)( y0 + (int)font->underline_thickness );
 		float s0 = black->s0;
 		float t0 = black->t0;
@@ -359,9 +464,9 @@ text_buffer_add_char( text_buffer_t * self,
 		float g = markup->strikethrough_color.g;
 		float b = markup->strikethrough_color.b;
 		float a = markup->strikethrough_color.a;
-		float x0  = ( pen->x -kerning );
-		float y0  = (float)(int)( pen->y + (int)font->ascender*.33f);
-		float x1  = ( x0 + glyph->advance_x );
+		float x0  = pen->x;
+		float y0  = (float)(int)( pen->y + (float)font->ascender/3);
+		float x1  = x0 + x_advance;
 		float y1  = (float)(int)( y0 + (int)font->underline_thickness );
 		float s0 = black->s0;
 		float t0 = black->t0;
@@ -390,10 +495,14 @@ text_buffer_add_char( text_buffer_t * self,
 		float g = markup->foreground_color.green;
 		float b = markup->foreground_color.blue;
 		float a = markup->foreground_color.alpha;
-		float x0 = ( pen->x + glyph->offset_x );
-		float y0 = (float)(int)( pen->y + glyph->offset_y );
-		float x1 = ( x0 + glyph->width );
-		float y1 = (float)(int)( y0 - glyph->height );
+		float x0 = pen->x + x_offset + glyph->offset_x;
+		float x1 = x0 + glyph->width;
+		float y0 = floor(pen->y + y_offset + glyph->offset_y);
+		float y1 = floor(y0 - glyph->height);
+//		float x0 = ( pen->x + glyph->offset_x );
+//		float y0 = (float)(int)( pen->y + glyph->offset_y );
+//		float x1 = ( x0 + glyph->width );
+//		float y1 = (float)(int)( y0 - glyph->height );
 		float s0 = glyph->s0;
 		float t0 = glyph->t0;
 		float s1 = glyph->s1;
@@ -417,7 +526,9 @@ text_buffer_add_char( text_buffer_t * self,
 		icount += 6;
 
 		vertex_buffer_push_back( buffer, vertices, vcount, indices, icount );
-		pen->x += glyph->advance_x * (1.0f + markup->spacing);
+//		pen->x += glyph->advance_x * (1.0f + markup->spacing);
+		pen->x += x_advance * (1.0f + markup->spacing);
+		pen->y += y_advance * (1.0f + markup->spacing);
 	}
 }
 

@@ -11,6 +11,10 @@
  */
 #include <math.h>
 #include <string.h>
+#include <stdio.h>
+
+#include <hb.h>
+#include <hb-ft.h>
 
 #include "freetype-gl.h"
 #include "mat4.h"
@@ -27,6 +31,9 @@
 #define unlikely
 #endif
 
+
+#define WIDTH  1600
+#define HEIGHT 1200
 
 // ------------------------------------------------------- global variables ---
 GLuint shader;
@@ -48,8 +55,9 @@ void init( void ) {
 	atlas = texture_atlas_new( 512, 512, 3 );
 	texture_font_t *fonts[20];
 	for ( i=0; i< 20; ++i ) {
-		fonts[i] =  texture_font_new_from_file(atlas, 12+i, font_filename),
-		texture_font_load_glyphs(fonts[i], text, language );
+		printf("Creating font size: %d\n", 12+i);
+		fonts[i] =  texture_font_new_from_file(atlas, 12+i, font_filename, language),
+		texture_font_load_glyphs(fonts[i], text );
 	}
 
 
@@ -60,39 +68,65 @@ void init( void ) {
 	/* Create a buffer for harfbuzz to use */
 	hb_buffer_t *buffer = hb_buffer_create();
 
+
+	float gamma = 1.0;
+	float shift = 0.0;
+	float r = 0.0;
+	float g = 0.0;
+	float b = 0.0;
+	float a = 1.0;
+	float x0 = 0;
+	float x1 = atlas->width;
+	float y0 = HEIGHT;
+	float y1 = HEIGHT-atlas->height;
+	float s0 = 0;
+	float t0 = 0;
+	float s1 = 1;
+	float t1 = 1;
+	vertex_t vertices[4] =  {
+		{x0,y0,0, s0,t0, r,g,b,a, shift, gamma},
+		{x0,y1,0, s0,t1, r,g,b,a, shift, gamma},
+		{x1,y1,0, s1,t1, r,g,b,a, shift, gamma},
+		{x1,y0,0, s1,t0, r,g,b,a, shift, gamma} };
+	GLuint indices[6] = { 0,1,2, 0,2,3 };
+	vertex_buffer_push_back( vbuffer, vertices, 4, indices, 6 );
+
+
+	float x,y;
+	y = HEIGHT;
 	for (i=0; i < 20; ++i) {
-		hb_buffer_set_language( buffer,
-								hb_language_from_string(language, strlen(language)) );
+		hb_buffer_set_language( buffer, fonts[i]->language );
 		hb_buffer_add_utf8( buffer, text, strlen(text), 0, strlen(text) );
 		hb_buffer_guess_segment_properties( buffer );
 		hb_shape( fonts[i]->hb_ft_font, buffer, NULL, 0 );
 
 		unsigned int         glyph_count;
-		hb_glyph_info_t     *glyph_info =
-			hb_buffer_get_glyph_infos(buffer, &glyph_count);
-		hb_glyph_position_t *glyph_pos =
-			hb_buffer_get_glyph_positions(buffer, &glyph_count);
+		hb_glyph_info_t     *glyph_info;
+		hb_glyph_position_t *glyph_pos;
+		glyph_info = hb_buffer_get_glyph_infos(buffer, &glyph_count);
+		glyph_pos  = hb_buffer_get_glyph_positions(buffer, &glyph_count);
 
-		texture_font_load_glyphs( fonts[i], text, language );
+		texture_font_load_glyphs( fonts[i], text );
 
 		float gamma = 1.0;
 		float shift = 0.0;
-		float x = 0;
-		float y = 600 - i * (10+i) - 15;
 		float width = 0.0;
 		float hres = fonts[i]->hres;
 		for (j = 0; j < glyph_count; ++j) {
 			int codepoint = glyph_info[j].codepoint;
 			float x_advance = glyph_pos[j].x_advance/(float)(hres*64);
 			float x_offset = glyph_pos[j].x_offset/(float)(hres*64);
-			texture_glyph_t *glyph = texture_font_get_glyph(fonts[i], codepoint);
+			texture_glyph_t *glyph = texture_font_get_glyph32(fonts[i], codepoint);
 			if ( i < (glyph_count-1) )
 				width += x_advance + x_offset;
 			else
 				width += glyph->offset_x + glyph->width;
 		}
+		x = WIDTH - width - 10 ;
+//		y = HEIGHT - i * (10+i) - 15;
+		printf("asc=%.3f desc=%.3f\n",fonts[i]->ascender,fonts[i]->descender);
+		y -= fonts[i]->ascender;
 
-		x = 800 - width - 10 ;
 		for (j = 0; j < glyph_count; ++j) {
 			int codepoint = glyph_info[j].codepoint;
 			// because of vhinting trick we need the extra 64 (hres)
@@ -100,7 +134,7 @@ void init( void ) {
 			float x_offset = glyph_pos[j].x_offset/(float)(hres*64);
 			float y_advance = glyph_pos[j].y_advance/(float)(64);
 			float y_offset = glyph_pos[j].y_offset/(float)(64);
-			texture_glyph_t *glyph = texture_font_get_glyph(fonts[i], codepoint);
+			texture_glyph_t *glyph = texture_font_get_glyph32(fonts[i], codepoint);
 
 			float r = 0.0;
 			float g = 0.0;
@@ -121,9 +155,13 @@ void init( void ) {
 				{x1,y0,0, s1,t0, r,g,b,a, shift, gamma} };
 			GLuint indices[6] = { 0,1,2, 0,2,3 };
 			vertex_buffer_push_back( vbuffer, vertices, 4, indices, 6 );
+
 			x += x_advance;
 			y += y_advance;
 		}
+
+		y += fonts[i]->descender;
+
 		/* clean up the buffer, but don't kill it just yet */
 		hb_buffer_reset(buffer);
 	}
@@ -215,7 +253,7 @@ int main( int argc, char **argv ) {
 	glfwWindowHint( GLFW_VISIBLE, GL_TRUE );
 	glfwWindowHint( GLFW_RESIZABLE, GL_FALSE );
 
-	window = glfwCreateWindow( 800, 600, argv[0], NULL, NULL );
+	window = glfwCreateWindow( WIDTH, HEIGHT, argv[0], NULL, NULL );
 
 	if (!window) {
 		glfwTerminate( );
@@ -243,7 +281,7 @@ int main( int argc, char **argv ) {
 	init();
 
 	glfwShowWindow( window );
-	reshape( window, 800, 600 );
+	reshape( window, WIDTH, HEIGHT );
 
 	while (!glfwWindowShouldClose( window )) {
 		display( window );

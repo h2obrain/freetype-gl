@@ -14,6 +14,7 @@ __THREAD char * freetype_gl_message=NULL;
 #ifdef __ANDROID__
 #include <android/log.h>
 #define  LOG_TAG    "freetype-gl"
+static
 void freetype_gl_errhook_default(int errno, char* message, char* fmt, ...) {
   va_list myargs;
   va_start(myargs, fmt);
@@ -24,6 +25,7 @@ void freetype_gl_errhook_default(int errno, char* message, char* fmt, ...) {
   va_end(myargs);
 }
 #else
+static
 void freetype_gl_errhook_default(int errno, char* message, char* fmt, ...) {
   va_list myargs;
   va_start(myargs, fmt);

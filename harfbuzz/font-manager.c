@@ -94,7 +94,8 @@ font_manager_delete_font( font_manager_t * self,
 texture_font_t *
 font_manager_get_from_filename( font_manager_t *self,
 								const char * filename,
-								const float size ) {
+								const float size,
+								const char *language) {
 	size_t i;
 	texture_font_t *font;
 
@@ -105,7 +106,7 @@ font_manager_get_from_filename( font_manager_t *self,
 			return font;
 		}
 	}
-	font = texture_font_new_from_file( self->atlas, size, filename );
+	font = texture_font_new_from_file( self->atlas, size, filename, language );
 	if ( font ) {
 		vector_push_back( self->fonts, &font );
 		texture_font_load_glyphs( font, self->cache );
@@ -123,7 +124,9 @@ font_manager_get_from_description( font_manager_t *self,
 								   const char * family,
 								   const float size,
 								   const int bold,
-								   const int italic ) {
+								   const int italic,
+								   const char *language
+) {
 	texture_font_t *font;
 	char *filename = 0;
 
@@ -145,7 +148,7 @@ font_manager_get_from_description( font_manager_t *self,
 			return 0;
 		}
 	}
-	font = font_manager_get_from_filename( self, filename, size );
+	font = font_manager_get_from_filename( self, filename, size, language );
 
 	free( filename );
 	return font;
@@ -158,8 +161,12 @@ font_manager_get_from_markup( font_manager_t *self,
 	assert( self );
 	assert( markup );
 
-	return font_manager_get_from_description( self, markup->family, markup->size,
-											  markup->bold,   markup->italic );
+	return font_manager_get_from_description(
+				self,
+				markup->family, markup->size,
+				markup->bold, markup->italic,
+				markup->language
+			);
 }
 
 // ----------------------------------------- font_manager_match_description ---

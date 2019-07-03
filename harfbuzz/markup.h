@@ -13,6 +13,8 @@ extern "C" {
 #include "texture-font.h"
 #include "vec234.h"
 
+#include <hb.h>
+
 #ifdef __cplusplus
 namespace ftgl {
 #endif
@@ -62,10 +64,14 @@ namespace ftgl {
  */
 typedef struct markup_t
 {
+	char *language;
+	hb_direction_t direction;
+	hb_script_t    script;
+
 	/**
 	 * A font family name such as "normal", "sans", "serif" or "monospace".
 	 */
-	char * family;
+	char *family;
 
 	/**
 	 * Font size.

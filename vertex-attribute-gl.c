@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include "vec234.h"
 #include "platform.h"
-#include "vertex-attribute.h"
+#include "vertex-attribute-gl.h"
 #include "freetype-gl-err.h"
 
 

@@ -294,8 +294,9 @@ texture_font_init(texture_font_t *self) {
 	self->lcd_weights[3] = 0x40;
 	self->lcd_weights[4] = 0x10;
 
-	if (!texture_font_load_face(self, self->size * 100.f))
+	if (!texture_font_load_face(self, self->size * 100.f)) {
 		return -1;
+	}
 
 	texture_font_init_size( self );
 
@@ -398,25 +399,27 @@ texture_font_clone( texture_font_t *old, float pt_size) {
 
 	error = FT_New_Size( self->face, &self->ft_size );
 	if (error) {
-	freetype_error( error, "FT_Error (%s:%d, code 0x%02x) : %s\n",
-			__FILENAME__, __LINE__, FT_Errors[error].code, FT_Errors[error].message);
-	return NULL;
+		freetype_error( error, "FT_Error (%s:%d, code 0x%02x) : %s\n",
+				__FILENAME__, __LINE__, FT_Errors[error].code, FT_Errors[error].message);
+		return NULL;
 	}
 
 	error = FT_Activate_Size( self->ft_size );
 	if (error) {
-	freetype_error( error, "FT_Error (%s:%d, code 0x%02x) : %s\n",
-			__FILENAME__, __LINE__, FT_Errors[error].code, FT_Errors[error].message);
-	return NULL;
+		freetype_error( error, "FT_Error (%s:%d, code 0x%02x) : %s\n",
+				__FILENAME__, __LINE__, FT_Errors[error].code, FT_Errors[error].message);
+		return NULL;
 	}
 	
-	if (!texture_font_set_size ( self, pt_size * 100.f ))
-	return NULL;
+	if (!texture_font_set_size ( self, pt_size * 100.f )) {
+		return NULL;
+	}
 
 	texture_font_init_size( self );
 	
-	if (!texture_font_set_size ( self, pt_size ))
-	return NULL;
+	if (!texture_font_set_size ( self, pt_size )) {
+		return NULL;
+	}
 
 	return self;
 }
@@ -425,15 +428,15 @@ texture_font_clone( texture_font_t *old, float pt_size) {
 void
 texture_font_close( texture_font_t *self, font_mode_t face_mode, font_mode_t library_mode ) {
 	if ( self->face && self->mode <= face_mode ) {
-	FT_Done_Face( self->face );
-	self->face = NULL;
+		FT_Done_Face( self->face );
+		self->face = NULL;
 	} else {
-	return; // never close the library when the face stays open
+		return; // never close the library when the face stays open
 	}
 
 	if ( self->library && self->library->library && self->library->mode <= library_mode ) {
-	FT_Done_FreeType( self->library->library );
-	self->library->library = NULL;
+		FT_Done_FreeType( self->library->library );
+		self->library->library = NULL;
 	}
 }
 
@@ -542,7 +545,7 @@ texture_font_delete( texture_font_t *self ) {
 		texture_glyph_delete( glyph );
 	} GLYPHS_ITERATOR_END1
 	free( __glyphs );
-	GLYPHS_ITERATOR_END2;
+	GLYPHS_ITERATOR_END2
 
 	vector_delete( self->glyphs );
 	free( self );
@@ -556,16 +559,21 @@ texture_font_find_glyph( texture_font_t * self,
 	uint32_t j = ucodepoint & 0xFF;
 	texture_glyph_t **glyph_index1, *glyph;
 
-	if (ucodepoint == -1) return (texture_glyph_t *)self->atlas->special;
+	if (ucodepoint == UINT32_MAX) {
+		return (texture_glyph_t *)self->atlas->special;
+	}
 
-	if (self->glyphs->size <= i) return NULL;
+	if (self->glyphs->size <= i) {
+		return NULL;
+	}
 
 	glyph_index1 = *(texture_glyph_t ***) vector_get( self->glyphs, i );
 
-	if (!glyph_index1)
-	return NULL;
-	else
-	glyph = glyph_index1[j];
+	if (!glyph_index1) {
+		return NULL;
+	} else {
+		glyph = glyph_index1[j];
+	}
 
 	while ( glyph && // if no glyph is there, we are done here
 			(glyph->rendermode != self->rendermode ||
@@ -577,7 +585,7 @@ texture_font_find_glyph( texture_font_t * self,
 }
 
 int
-texture_font_index_glyph( texture_font_t * self,
+texture_font_index_glyph32( texture_font_t * self,
 			  texture_glyph_t *glyph,
 			  uint32_t codepoint) {
 	uint32_t i = codepoint >> 8;
@@ -595,13 +603,13 @@ texture_font_index_glyph( texture_font_t * self,
 	}
 
 	if (( glyph_insert = (*glyph_index1)[j] )) {
-		int i = 0;
+		int c = 0;
 		// fprintf(stderr, "glyph already there\n");
-		while (glyph_insert[i].glyphmode != GLYPH_END) i++;
+		while (glyph_insert[c].glyphmode != GLYPH_END) c++;
 		// fprintf(stderr, "Insert a glyph after position %d\n", i);
-		glyph_insert[i].glyphmode = GLYPH_CONT;
-		(*glyph_index1)[j] = glyph_insert = realloc( glyph_insert, sizeof(texture_glyph_t)*(i+2) );
-		memcpy( glyph_insert+(i+1), glyph, sizeof(texture_glyph_t) );
+		glyph_insert[c].glyphmode = GLYPH_CONT;
+		(*glyph_index1)[j] = glyph_insert = realloc( glyph_insert, sizeof(texture_glyph_t)*(c+2) );
+		memcpy( glyph_insert+(c+1), glyph, sizeof(texture_glyph_t) );
 		return 1;
 	} else {
 		(*glyph_index1)[j] = glyph;
@@ -629,7 +637,6 @@ texture_font_load_glyph( texture_font_t * self,
 	FT_ULong ucodepoint;
 
 	ivec4 region;
-	size_t missed = 0;
 
 	/* Check if codepoint has been already loaded */
 	if (texture_font_find_glyph(self, codepoint)) {
@@ -655,7 +662,7 @@ texture_font_load_glyph( texture_font_t * self,
 	if (!glyph_index) {
 		texture_glyph_t * glyph;
 		if ((glyph = texture_font_find_glyph(self, "\0"))) {
-			texture_font_index_glyph( self, glyph, ucodepoint );
+			texture_font_index_glyph32( self, glyph, ucodepoint );
 			texture_font_close( self, MODE_AUTO_CLOSE, MODE_AUTO_CLOSE );
 			return 1;
 		}
@@ -873,14 +880,14 @@ cleanup_stroker:
 		glyph->advance_y = slot->advance.y * self->scale / HRESf;
 	}
 
-	int free_glyph = texture_font_index_glyph(self, glyph, ucodepoint);
+	int free_glyph = texture_font_index_glyph32(self, glyph, ucodepoint);
 	if (!glyph_index) {
 		if (!free_glyph) {
 			texture_glyph_t *new_glyph = malloc(sizeof(texture_glyph_t));
 			memcpy(new_glyph, glyph, sizeof(texture_glyph_t));
 			glyph=new_glyph;
 		}
-		free_glyph = texture_font_index_glyph(self, glyph, 0);
+		free_glyph = texture_font_index_glyph32(self, glyph, 0);
 	}
 	if (free_glyph) {
 		// fprintf(stderr, "Free glyph\n");
@@ -921,7 +928,6 @@ texture_font_load_glyphs( texture_font_t * self,
 
 	return 0;
 }
-
 
 // ------------------------------------------------- texture_font_get_glyph ---
 texture_glyph_t *

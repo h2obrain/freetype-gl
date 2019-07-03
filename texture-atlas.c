@@ -13,7 +13,7 @@
 #include "freetype-gl-err.h"
 
 // -------------------------------------------------- texture_atlas_special ---
-
+static
 void texture_atlas_special ( texture_atlas_t * self ) {
 	ivec4 region = texture_atlas_get_region( self, 5, 5 );
 	texture_glyph_t * glyph = texture_glyph_new( );
@@ -127,8 +127,8 @@ texture_atlas_set_region( texture_atlas_t * self,
 
 
 // ------------------------------------------------------ texture_atlas_fit ---
-int
-texture_atlas_fit( texture_atlas_t * self,
+static
+int texture_atlas_fit( texture_atlas_t * self,
 				   const size_t index,
 				   const size_t width,
 				   const size_t height ) {
@@ -164,8 +164,8 @@ texture_atlas_fit( texture_atlas_t * self,
 
 
 // ---------------------------------------------------- texture_atlas_merge ---
-void
-texture_atlas_merge( texture_atlas_t * self ) {
+static
+void texture_atlas_merge( texture_atlas_t * self ) {
 	ivec3 *node, *next;
 	size_t i;
 
