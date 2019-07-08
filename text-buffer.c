@@ -28,7 +28,7 @@ text_buffer_new( ) {
 	text_buffer_t *self = (text_buffer_t *) malloc (sizeof(text_buffer_t));
 	self->buffer = vertex_buffer_new(
 									 "vertex:3f,tex_coord:2f,color:4f,ashift:1f,agamma:1f" );
-	self->line_start = 0;
+	self->line_start_index = 0;
 	self->line_ascender = 0;
 	self->base_color.r = 0.0;
 	self->base_color.g = 0.0;
@@ -57,7 +57,7 @@ text_buffer_clear( text_buffer_t * self ) {
 	assert( self );
 
 	vertex_buffer_clear( self->buffer );
-	self->line_start = 0;
+	self->line_start_index = 0;
 	self->line_ascender = 0;
 	self->line_descender = 0;
 	vector_clear( self->lines );
@@ -95,7 +95,7 @@ void
 text_buffer_move_last_line( text_buffer_t * self, float dy ) {
 	size_t i;
 	int j;
-	for ( i=self->line_start; i < vector_size( self->buffer->items ); ++i ) {
+	for ( i=self->line_start_index; i < vector_size( self->buffer->items ); ++i ) {
 		ivec4 *item = (ivec4 *) vector_get( self->buffer->items, i);
 		for ( j=item->vstart; j<item->vstart+item->vcount; ++j) {
 			glyph_vertex_t * vertex =
@@ -116,7 +116,7 @@ text_buffer_move_last_line( text_buffer_t * self, float dy ) {
 //
 static void
 text_buffer_finish_line( text_buffer_t * self, vec2 * pen, bool advancePen ) {
-	float line_left = self->line_left;
+	float line_left = self->line_start;
 	float line_right = pen->x;
 	float line_width  = line_right - line_left;
 	float line_top = pen->y + self->line_ascender;
@@ -124,7 +124,7 @@ text_buffer_finish_line( text_buffer_t * self, vec2 * pen, bool advancePen ) {
 	float line_bottom = line_top - line_height;
 
 	line_info_t line_info;
-	line_info.line_start = self->line_start;
+	line_info.line_start_index = self->line_start_index;
 	line_info.bounds.left = line_left;
 	line_info.bounds.top = line_top;
 	line_info.bounds.width = line_width;
@@ -157,8 +157,8 @@ text_buffer_finish_line( text_buffer_t * self, vec2 * pen, bool advancePen ) {
 
 	self->line_descender = 0;
 	self->line_ascender = 0;
-	self->line_start = vector_size( self->buffer->items );
-	self->line_left = pen->x;
+	self->line_start_index = vector_size( self->buffer->items );
+	self->line_start = pen->x;
 }
 
 // ----------------------------------------------------------------------------
@@ -184,7 +184,7 @@ text_buffer_add_text( text_buffer_t * self,
 	}
 	if ( vertex_buffer_size( self->buffer ) == 0 ) {
 		self->origin = *pen;
-		self->line_left = pen->x;
+		self->line_start = pen->x;
 		self->bounds.left = pen->x;
 		self->bounds.top = pen->y;
 	} else {
@@ -430,7 +430,7 @@ text_buffer_align( text_buffer_t * self, vec2 * pen,
 	}
 
 	size_t total_items = vector_size( self->buffer->items );
-	if ( self->line_start != total_items ) {
+	if ( self->line_start_index != total_items ) {
 		text_buffer_finish_line( self, pen, false );
 	}
 
@@ -453,7 +453,7 @@ text_buffer_align( text_buffer_t * self, vec2 * pen,
 		line_info = (line_info_t*)vector_get( self->lines, i );
 
 		if ( i + 1 < lines_count ) {
-			line_end = ((line_info_t*)vector_get( self->lines, i + 1 ))->line_start;
+			line_end = ((line_info_t*)vector_get( self->lines, i + 1 ))->line_start_index;
 		} else {
 			line_end = vector_size( self->buffer->items );
 		}
@@ -471,7 +471,7 @@ text_buffer_align( text_buffer_t * self, vec2 * pen,
 
 		dx = roundf( dx );
 
-		for ( j=line_info->line_start; j < line_end; ++j ) {
+		for ( j=line_info->line_start_index; j < line_end; ++j ) {
 			ivec4 *item = (ivec4 *) vector_get( self->buffer->items, j);
 			for ( k=item->vstart; k<item->vstart+item->vcount; ++k) {
 				glyph_vertex_t * vertex =
@@ -485,7 +485,7 @@ text_buffer_align( text_buffer_t * self, vec2 * pen,
 vec4
 text_buffer_get_bounds( text_buffer_t * self, vec2 * pen ) {
 	size_t total_items = vector_size( self->buffer->items );
-	if ( self->line_start != total_items ) {
+	if ( self->line_start_index != total_items ) {
 		text_buffer_finish_line( self, pen, false );
 	}
 

@@ -148,8 +148,6 @@ void
 texture_font_init_size( texture_font_t * self) {
 	FT_Size_Metrics metrics;
 	
-	printf("hres=%.3f\n",self->hres);
-
 	self->underline_position = self->face->underline_position / (float)(self->hres*self->hres) * self->size;
 	self->underline_position = roundf( self->underline_position );
 	if ( self->underline_position > -2 ) {
@@ -611,7 +609,6 @@ texture_font_load_glyphs( texture_font_t * self,
 	hb_shape( self->hb_ft_font, self->buffer, NULL, 0 );
 
 	glyph_info = hb_buffer_get_glyph_infos(self->buffer, &glyph_count);
-	printf("glyph_count: %d\n",glyph_count);
 
 	for ( i = 0; i < glyph_count; ++i ) {
 		/* Check if codepoint has been already loaded */
@@ -769,7 +766,7 @@ cleanup_stroker:
 		size_t tgt_h = src_h + padding.top + padding.bottom;
 
 		region = texture_atlas_get_region( self->atlas, tgt_w, tgt_h );
-		printf("Region { %d,%d,%zu,%zu,%zu,%zu,%d }\n",region.x,region.y,tgt_w,tgt_h,src_w,src_h,ft_bitmap.width);
+//		printf("Region { %d,%d,%zu,%zu,%zu,%zu,%d }\n",region.x,region.y,tgt_w,tgt_h,src_w,src_h,ft_bitmap.width);
 
 		if ( region.x < 0 ) {
 			freetype_gl_error( Texture_Atlas_Full,

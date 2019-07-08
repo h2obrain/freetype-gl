@@ -49,3 +49,5 @@ makefont
 /build
 
 *.orig
+
+.settings

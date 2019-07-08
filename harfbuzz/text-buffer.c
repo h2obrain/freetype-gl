@@ -29,7 +29,7 @@ text_buffer_new( ) {
 	text_buffer_t *self = (text_buffer_t *) malloc (sizeof(text_buffer_t));
 	self->buffer = vertex_buffer_new(
 									 "vertex:3f,tex_coord:2f,color:4f,ashift:1f,agamma:1f" );
-	self->line_start = 0;
+	self->line_start_index = 0;
 	self->line_ascender = 0;
 	self->base_color.r = 0.0;
 	self->base_color.g = 0.0;
@@ -58,7 +58,7 @@ text_buffer_clear( text_buffer_t * self ) {
 	assert( self );
 
 	vertex_buffer_clear( self->buffer );
-	self->line_start = 0;
+	self->line_start_index = 0;
 	self->line_ascender = 0;
 	self->line_descender = 0;
 	vector_clear( self->lines );
@@ -96,7 +96,7 @@ void
 text_buffer_move_last_line( text_buffer_t * self, float dy ) {
 	size_t i;
 	int j;
-	for ( i=self->line_start; i < vector_size( self->buffer->items ); ++i ) {
+	for ( i=self->line_start_index; i < vector_size( self->buffer->items ); ++i ) {
 		ivec4 *item = (ivec4 *) vector_get( self->buffer->items, i);
 		for ( j=item->vstart; j<item->vstart+item->vcount; ++j) {
 			glyph_vertex_t * vertex =
@@ -104,37 +104,6 @@ text_buffer_move_last_line( text_buffer_t * self, float dy ) {
 			vertex->y -= dy;
 		}
 	}
-}
-
-// ----------------------------------------------------------------------------
-void text_buffer_set_line_direction( text_buffer_t * self, hb_direction_t direction) {
-//	switch (self->direction) {
-//		case HB_DIRECTION_LTR:
-//		case HB_DIRECTION_RTL:
-//			switch (direction) {
-//				case HB_DIRECTION_LTR:
-//				case HB_DIRECTION_RTL:
-//					break;
-//				case HB_DIRECTION_TTB:
-//				case HB_DIRECTION_BTT:
-//					self->origin.y = self->last_pen_y;
-//					break;
-//			}
-//			break;
-//		case HB_DIRECTION_TTB:
-//		case HB_DIRECTION_BTT:
-//			switch (direction) {
-//				case HB_DIRECTION_LTR:
-//				case HB_DIRECTION_RTL:
-////					self->origin.y = self->last_pen_y;
-//					break;
-//				case HB_DIRECTION_TTB:
-//				case HB_DIRECTION_BTT:
-//					break;
-//			}
-//			break;
-//	}
-	self->direction = direction;
 }
 
 // ----------------------------------------------------------------------------
@@ -147,19 +116,25 @@ void text_buffer_set_line_direction( text_buffer_t * self, hb_direction_t direct
 //
 static void
 text_buffer_finish_line( text_buffer_t * self, vec2 * pen, bool advancePen ) {
-	float line_left = self->line_left;
+	float line_left = self->line_start.x;
 	float line_right = pen->x;
 	float line_width  = line_right - line_left;
-	float line_top = pen->y + self->line_ascender;
-	float line_height = self->line_ascender - self->line_descender;
-	float line_bottom = line_top - line_height;
+	float line_top = self->line_start.y + self->line_ascender;
+	float line_bottom = pen->y + self->line_descender;
+	float line_height  = line_top - line_bottom;
+//	float line_top = pen->y + self->line_ascender;
+//	float line_height = self->line_ascender - self->line_descender;
+//	float line_bottom = line_top - line_height;
+
+	printf("line (height: %.3f)\n",line_height);
 
 	line_info_t line_info;
-	line_info.line_start = self->line_start;
+	line_info.line_start_index = self->line_start_index;
 	line_info.bounds.left = line_left;
 	line_info.bounds.top = line_top;
 	line_info.bounds.width = line_width;
 	line_info.bounds.height = line_height;
+	line_info.direction = self->direction;
 
 	vector_push_back( self->lines,  &line_info);
 
@@ -181,32 +156,76 @@ text_buffer_finish_line( text_buffer_t * self, vec2 * pen, bool advancePen ) {
 		self->bounds.height = self->bounds.top - line_bottom;
 	}
 
-//	if ( advancePen ) {
-//		switch (self->direction) {
-//			case HB_DIRECTION_LTR:
-//			case HB_DIRECTION_RTL:
-				pen->x  = self->origin.x;
+	if ( advancePen ) {
+		switch (self->direction) {
+			case HB_DIRECTION_LTR:
+			case HB_DIRECTION_RTL:
+//				pen->x  = self->origin.x;
+				pen->x  = self->line_start.x;
 				pen->y += (int)(self->line_descender);
-//				break;
-//			case HB_DIRECTION_TTB:
-//			case HB_DIRECTION_BTT:
-//				pen->x += (int)(self->line_descender);
-//				pen->y  = self->origin.y;
-//				break;
-//		}
-//	}
+				break;
+			case HB_DIRECTION_TTB:
+			case HB_DIRECTION_BTT:
+				printf("penlb(%4.1f,%4.1f)\n",pen->x,pen->y);
+				//pen->x += (int)(self->line_descender);
+				pen->x += self->line_descender - self->line_ascender;
+				pen->y  = self->line_start.y;
+				printf("penla(%4.1f,%4.1f)\n",pen->x,pen->y);
+				break;
+		}
+	}
 
 	self->line_descender = 0;
 	self->line_ascender = 0;
-	self->line_start = vector_size( self->buffer->items );
-	self->line_left = pen->x;
+	self->line_start_index = vector_size( self->buffer->items );
+//	self->line_start.x = pen->x;
+	self->line_start = *pen;
+}
+
+// ----------------------------------------------------------------------------
+static
+void text_buffer_set_line_direction( text_buffer_t * self, hb_direction_t direction) {
+	if (vertex_buffer_size( self->buffer )) {
+		switch (self->direction) {
+			case HB_DIRECTION_LTR:
+			case HB_DIRECTION_RTL:
+				switch (direction) {
+					case HB_DIRECTION_LTR:
+					case HB_DIRECTION_RTL:
+						break;
+					case HB_DIRECTION_TTB:
+					case HB_DIRECTION_BTT:
+						text_buffer_finish_line(self, &self->last_pen, false);
+	//					self->origin.y = self->last_pen.y;
+	//					self->line_start.x = pen->x;
+						break;
+				}
+				break;
+			case HB_DIRECTION_TTB:
+			case HB_DIRECTION_BTT:
+				switch (direction) {
+					case HB_DIRECTION_LTR:
+					case HB_DIRECTION_RTL:
+						text_buffer_finish_line(self, &self->last_pen, false);
+	//					self->origin.y = self->last_pen.y;
+	//					self->line_start.y = pen->y;
+						break;
+					case HB_DIRECTION_TTB:
+					case HB_DIRECTION_BTT:
+						break;
+				}
+				break;
+		}
+	}
+	self->direction = direction;
+	printf("pendc(%4.1f,%4.1f)\n",self->last_pen.x,self->last_pen.y);
 }
 
 // ----------------------------------------------------------------------------
 void
-text_buffer_add_text( text_buffer_t * self,
-					  vec2 * pen, markup_t * markup,
-					  const char * text, size_t length ) {
+text_buffer_add_text( text_buffer_t *self,
+					  vec2 *pen, markup_t *markup,
+					  const char *text, size_t length ) {
 	size_t i;
 	const char * prev_character = NULL;
 
@@ -221,18 +240,23 @@ text_buffer_add_text( text_buffer_t * self,
 	}
 
 	if ( length == 0 ) {
-		length = utf8_strlen(text);
+		length = strlen(text);
+//		length = utf8_end(text)-text;
+//		char_count = utf8_strlen(text);
+		if ( length == 0 ) {
+			return;
+		}
 	}
 	if ( vertex_buffer_size( self->buffer ) == 0 ) {
 		self->origin = *pen;
-		self->line_left = pen->x;
+		self->line_start = *pen;
 		self->bounds.left = pen->x;
 		self->bounds.top = pen->y;
 	} else {
 		if (pen->x < self->origin.x) {
 			self->origin.x = pen->x;
 		}
-		if (pen->y != self->last_pen_y) {
+		if (pen->y != self->last_pen.y) {
 			text_buffer_finish_line(self, pen, false);
 		}
 	}
@@ -241,17 +265,22 @@ text_buffer_add_text( text_buffer_t * self,
 
 	/* Create a buffer for harfbuzz to use (TODO use markup->font->buffer) */
 	hb_buffer_t *buffer = hb_buffer_create();
-	while (1) {
-		const char *end = strchr(text, '\n');
+	while (length) {
+		const char *end = memchr(text,'\n',length);
 
         hb_buffer_set_direction(buffer, markup->direction);
         hb_buffer_set_script(buffer, markup->script); /* see hb-unicode.h */
 		hb_buffer_set_language( buffer, markup->font->language );
+
+		size_t len;
 		if (end) {
-			hb_buffer_add_utf8( buffer, text, end-text, 0, end-text );
+			len = end-text;
+			printf("add_text(line:%2d): '%.*s'\n",len,len,text);
 		} else {
-			hb_buffer_add_utf8( buffer, text, strlen(text), 0, strlen(text) );
+			len = length;
+			printf("add_text(rest:%2d): '%.*s'\n",len,len,text);
 		}
+		hb_buffer_add_utf8( buffer, text, len, 0, len );
 		hb_buffer_guess_segment_properties( buffer );
 		hb_shape( markup->font->hb_ft_font, buffer, NULL, 0 );
 
@@ -283,6 +312,7 @@ text_buffer_add_text( text_buffer_t * self,
 		}
 
 		if (!end) break;
+		length -= end+1-text;
 		text = end+1;
 
 		/* newline */
@@ -292,7 +322,7 @@ text_buffer_add_text( text_buffer_t * self,
 	}
 
 
-	self->last_pen_y = pen->y;
+	self->last_pen = *pen;
 }
 
 // ----------------------------------------------------------------------------
@@ -536,12 +566,14 @@ text_buffer_add_char( text_buffer_t * self,
 void
 text_buffer_align( text_buffer_t * self, vec2 * pen,
 				   enum Align alignment ) {
+	/* TODO handle direction */
+
 	if (ALIGN_LEFT == alignment) {
 		return;
 	}
 
 	size_t total_items = vector_size( self->buffer->items );
-	if ( self->line_start != total_items ) {
+	if ( self->line_start_index != total_items ) {
 		text_buffer_finish_line( self, pen, false );
 	}
 
@@ -564,7 +596,7 @@ text_buffer_align( text_buffer_t * self, vec2 * pen,
 		line_info = (line_info_t*)vector_get( self->lines, i );
 
 		if ( i + 1 < lines_count ) {
-			line_end = ((line_info_t*)vector_get( self->lines, i + 1 ))->line_start;
+			line_end = ((line_info_t*)vector_get( self->lines, i + 1 ))->line_start_index;
 		} else {
 			line_end = vector_size( self->buffer->items );
 		}
@@ -582,7 +614,7 @@ text_buffer_align( text_buffer_t * self, vec2 * pen,
 
 		dx = roundf( dx );
 
-		for ( j=line_info->line_start; j < line_end; ++j ) {
+		for ( j=line_info->line_start_index; j < line_end; ++j ) {
 			ivec4 *item = (ivec4 *) vector_get( self->buffer->items, j);
 			for ( k=item->vstart; k<item->vstart+item->vcount; ++k) {
 				glyph_vertex_t * vertex =
@@ -596,7 +628,7 @@ text_buffer_align( text_buffer_t * self, vec2 * pen,
 vec4
 text_buffer_get_bounds( text_buffer_t * self, vec2 * pen ) {
 	size_t total_items = vector_size( self->buffer->items );
-	if ( self->line_start != total_items ) {
+	if ( self->line_start_index != total_items ) {
 		text_buffer_finish_line( self, pen, false );
 	}
 

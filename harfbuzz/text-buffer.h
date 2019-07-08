@@ -40,7 +40,7 @@ namespace ftgl {
  * @code
  *
  * int main( int arrgc, char *argv[] )
- * {
+ * {text_buffer_add_text
  *
  *     return 0;
  * }
@@ -70,9 +70,9 @@ typedef struct  text_buffer_t {
 	vec2 origin;
 
 	/**
-	 * Last pen y location
+	 * Last pen location
 	 */
-	float last_pen_y;
+	vec2 last_pen;
 
 	/**
 	 * Total bounds
@@ -82,12 +82,12 @@ typedef struct  text_buffer_t {
 	/**
 	 * Index (in the vertex buffer) of the current line start
 	 */
-	size_t line_start;
+	size_t line_start_index;
 
 	/**
 	 * Location of the start of the line
 	 */
-	float line_left;
+	vec2 line_start;
 
 	/**
 	 * Vector of line information
@@ -181,13 +181,17 @@ typedef struct line_info_t {
 	/**
 	 * Index (in the vertex buffer) where this line starts
 	 */
-	size_t line_start;
+	size_t line_start_index;
 
 	/**
 	 * bounds of this line
 	 */
 	vec4 bounds;
 
+	/**
+	 * Harfbuzz text direction
+	 */
+	hb_direction_t direction;
 } line_info_t;
 
 /**

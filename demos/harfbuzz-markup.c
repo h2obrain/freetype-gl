@@ -97,7 +97,7 @@ void init() {
 	char *f_italic   = match_description("Droid Serif:size=24:slant=italic");
 	char *f_japanese = match_description("HanaMin:size=18");
 //	char *f_japanese = match_description("Droid Sans Japanese:size=18");
-	char *f_arabic   = match_description("HanaMin:size=18"); /* TBD */
+	char *f_arabic   = match_description("Amiri:size=18"); /* TBD */
 	char *f_math     = match_description("DejaVu Sans:size=24");
 
 	markup_t normal = {
@@ -159,11 +159,16 @@ void init() {
 						&italic,    "jumps over ",
 						&bold,      "the lazy ",
 						&normal,    "dog.\n",
-						&small,     "Now is the time for all good men "
-									"to come to the aid of the party.\n",
+						&small,     "Now is the time for all good people "
+									"to come to party.\n",
 						&italic,    "Ég get etið gler án þess að meiða mig.\n",
+						&math,      "ℕ ⊆ ℤ ⊂ ℚ ⊂ ℝ ⊂ ℂ\n",
+						&normal,    "<ttb>",
 						&japanese,  "私はガラスを食べられます。\nそれは私を傷つけません。\n",
-						&math,      "ℕ ⊆ ℤ ⊂ ℚ ⊂ ℝ ⊂ ℂ",
+						&normal,    "</ttb>\n",
+						&normal,    "<rtl>",
+						&arabic,    "كسول الزنجبيل القط",
+						&normal,    "</rtl>\n",
 						NULL );
 
 	glGenTextures( 1, &font_manager->atlas->id );
@@ -176,7 +181,7 @@ void init() {
 				  font_manager->atlas->height, 0, GL_RGB, GL_UNSIGNED_BYTE,
 				  font_manager->atlas->data );
 
-	text_buffer_align( buffer, &pen, ALIGN_CENTER );
+//	text_buffer_align( buffer, &pen, ALIGN_CENTER );
 
 	vec4 bounds = text_buffer_get_bounds( buffer, &pen );
 	float left = bounds.left;

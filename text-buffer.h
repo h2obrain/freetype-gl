@@ -80,12 +80,12 @@ typedef struct  text_buffer_t {
 	/**
 	 * Index (in the vertex buffer) of the current line start
 	 */
-	size_t line_start;
+	size_t line_start_index;
 
 	/**
 	 * Location of the start of the line
 	 */
-	float line_left;
+	float line_start;
 
 	/**
 	 * Vector of line information
@@ -174,7 +174,7 @@ typedef struct line_info_t {
 	/**
 	 * Index (in the vertex buffer) where this line starts
 	 */
-	size_t line_start;
+	size_t line_start_index;
 
 	/**
 	 * bounds of this line
