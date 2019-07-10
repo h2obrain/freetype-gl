@@ -110,6 +110,15 @@ font_manager_get_from_filename( font_manager_t *self,
 	if ( font ) {
 		vector_push_back( self->fonts, &font );
 		texture_font_load_glyphs( font, self->cache );
+		printf( "Font %s\n"
+				"  - size:      %8.1f\n"
+				"  - ascender:  %8.1f\n"
+				"  - descender: %8.1f\n"
+				"  - height:    %8.1f\n",
+				filename,
+				size,
+				font->ascender,font->descender,
+				font->height);
 		return font;
 	}
 	freetype_gl_error( Cannot_Load_File,

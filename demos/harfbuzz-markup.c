@@ -95,9 +95,10 @@ void init() {
 	char *f_normal   = match_description("Droid Serif:size=24");
 	char *f_bold     = match_description("Droid Serif:size=24:weight=bold");
 	char *f_italic   = match_description("Droid Serif:size=24:slant=italic");
-	char *f_japanese = match_description("HanaMin:size=18");
-//	char *f_japanese = match_description("Droid Sans Japanese:size=18");
-	char *f_arabic   = match_description("Amiri:size=18"); /* TBD */
+	char *f_japanese = match_description("HanaMin:size=24");
+	char *f_japanese_big = match_description("HanaMin:size=32:weight=bold");
+//	char *f_japanese_big = match_description("Droid Sans Japanese:size=24:weight=bold");
+	char *f_arabic   = match_description("Amiri:size=24"); /* TBD */
 	char *f_math     = match_description("DejaVu Sans:size=24");
 
 	markup_t normal = {
@@ -130,6 +131,8 @@ void init() {
 								 japanese.language = "ja";
 								 japanese.direction = HB_DIRECTION_TTB;
 								 japanese.script = HB_SCRIPT_HAN; /* fixme */
+	markup_t japanese_big = japanese; japanese_big.family = f_japanese_big;
+									  japanese_big.size = 32.0;
 	markup_t arabic    = normal; arabic.family = f_arabic;
 								 arabic.size = 24.0;
 								 arabic.language = "ar";
@@ -147,8 +150,12 @@ void init() {
 	bold.font = font_manager_get_from_markup( font_manager, &bold );
 	italic.font = font_manager_get_from_markup( font_manager, &italic );
 	japanese.font = font_manager_get_from_markup( font_manager, &japanese );
+	japanese_big.font = font_manager_get_from_markup( font_manager, &japanese_big );
 	arabic.font = font_manager_get_from_markup( font_manager, &arabic );
 	math.font = font_manager_get_from_markup( font_manager, &math );
+
+//	vec2 penx = {{20, HEIGHT-20}};
+//	text_buffer_printf( buffer, &penx, &japanese,"私", NULL);
 
 	vec2 pen = {{20, HEIGHT-20}};
 	text_buffer_printf( buffer, &pen,
@@ -165,9 +172,13 @@ void init() {
 						&math,      "ℕ ⊆ ℤ ⊂ ℚ ⊂ ℝ ⊂ ℂ\n",
 						&normal,    "<ttb>",
 						&japanese,  "私はガラスを食べられます。\nそれは私を傷つけません。\n",
+						&japanese,  "私はガラス",
+						&japanese_big,"を食べられ",
+						&japanese,  "ます。\n",
+						&japanese,  "bla\nblabla\nblablabla\n",
 						&normal,    "</ttb>\n",
 						&normal,    "<rtl>",
-						&arabic,    "كسول الزنجبيل القط",
+						&arabic,    "كسول 32156 الز123نجبيل القط",
 						&normal,    "</rtl>\n",
 						NULL );
 
@@ -184,10 +195,10 @@ void init() {
 //	text_buffer_align( buffer, &pen, ALIGN_CENTER );
 
 	vec4 bounds = text_buffer_get_bounds( buffer, &pen );
-	float left = bounds.left;
-	float right = bounds.left + bounds.width;
-	float top = bounds.top;
-	float bottom = bounds.top - bounds.height;
+	float left = floorf(bounds.left);
+	float right = ceilf(bounds.left + bounds.width)+1;
+	float top = ceilf(bounds.top);
+	float bottom = floorf(bounds.top - bounds.height)-1;
 
 	bounds_shader = shader_load( "shaders/v3f-c4f.vert",
 								 "shaders/v3f-c4f.frag" );
