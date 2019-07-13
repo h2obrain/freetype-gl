@@ -26,7 +26,7 @@ static inline
 void
 add_paragraph(block_layout_t *self, const markup_t *markup) {
 	assert(self->paragraph_count<BL_MAX_PARAGRAPH_COUNT);
-	if (self->paragraph_count && (self->paragraphs[self->paragraph_count-1]->w == self->w)) return;
+	if (self->paragraph_count && (self->paragraphs[self->paragraph_count-1].w == self->w)) return;
 	self->paragraphs[self->paragraph_count++] = (block_paragraph_t) {
 			.y = 0,
 			.ascender  = markup->font->ascender,
@@ -59,7 +59,6 @@ int layout_add_text(
 		if (self->paragraphs[self->paragraph_count-1].descender > markup->font->descender) {
 			self->paragraphs[self->paragraph_count-1].descender = markup->font->descender;
 		}
-		self->paragraphs[self->paragraph_count-1].w += width;
 	}
 
 	bool first = true;
@@ -68,10 +67,10 @@ int layout_add_text(
 	while (text_size) {
 		const char *end = memchr(text,'\n',text_size);
 
-		if (text == *end) {
+		if (text == end) {
 			if (!first) self->elements[self->element_count-1].text.last_line = true;
 			while (*text++ == '\n');
-			add_paragraph(markup);
+			add_paragraph(self, markup);
 		}
 		first = false;
 
@@ -112,8 +111,8 @@ int layout_add_text(
 			int codepoint = glyph_info[i].codepoint;
 			pos_t x_advance = glyph_pos[i].x_advance/(pos_t)(hres*64);
 			pos_t x_offset = glyph_pos[i].x_offset/(pos_t)(hres*64);
-			texture_glyph_t *glyph = texture_font_get_glyph32(fonts[i], codepoint);
-			if (glyph_info[i].codepoint == '\n') { // breakable spot.. real implementations are MUCH more complex than this!
+			texture_glyph_t *glyph = texture_font_get_glyph32(markup->font, codepoint);
+			if (glyph_info[i].codepoint == ' ') { // breakable spot.. real implementations are MUCH more complex than this!
 				breakable = i;
 				breakable_width = width;
 			}
@@ -124,7 +123,7 @@ int layout_add_text(
 			}
 			if (width > available_width) {
 				if (breakable != UINT32_MAX) {
-					i = breakable;
+					glyph_count = i = breakable;
 					width = breakable_width;
 					end = text + glyph_info[i].cluster;
 					break;
@@ -157,7 +156,14 @@ int layout_add_text(
 				}
 			}
 		}
+
+		self->paragraphs[self->paragraph_count-1].w += width;
+
 		/* add element */
+		hb_glyph_info_t *gi = malloc(glyph_count * sizeof(hb_glyph_info_t));
+		memcpy(gi,glyph_info,glyph_count * sizeof(hb_glyph_info_t));
+		hb_glyph_position_t *gp = malloc(glyph_count * sizeof(hb_glyph_position_t));
+		memcpy(gp,glyph_pos,glyph_count * sizeof(hb_glyph_position_t));
 		self->elements[self->element_count++] = (block_element_t) {
 				.paragraph_y = self->paragraphs[self->paragraph_count-1].y, // identifies line
 				.y_off = height,
@@ -173,8 +179,8 @@ int layout_add_text(
 						.text_size = end-text, // size of text in bytes
 						.markup = markup,
 						.glyph_count = glyph_count,
-						.glyph_info  = glyph_info,
-						.glyph_pos   = glyph_pos
+						.glyph_info  = gi, //glyph_info,
+						.glyph_pos   = gp  //glyph_pos
 					}
 			};
 		/* height */

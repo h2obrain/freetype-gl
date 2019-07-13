@@ -37,8 +37,8 @@ typedef struct {
 			size_t text_size; // size of text in bytes
 			const markup_t *markup;
 			uint32_t glyph_count;
-			hb_glyph_info_t glyph_info[];
-			hb_glyph_position_t glyph_pos[];
+			hb_glyph_info_t *glyph_info;
+			hb_glyph_position_t *glyph_pos;
 		} text;
 		struct {
 			pos_t margin_top, margin_bottom;

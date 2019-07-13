@@ -228,7 +228,7 @@ typedef enum Align
  *
  */
 text_buffer_t *
-text_buffer_new( );
+text_buffer_new(float w, float h);
 
 /**
  * Deletes texture buffer and its associated vertex buffer.

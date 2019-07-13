@@ -84,7 +84,7 @@ void init() {
 							   "shaders/text.frag" );
 
 	font_manager = font_manager_new( 512, 512, LCD_FILTERING_ON );
-	buffer = text_buffer_new( );
+	buffer = text_buffer_new(WIDTH,HEIGHT);
 
 	vec4 black  = {{0.0, 0.0, 0.0, 1.0}};
 	vec4 white  = {{1.0, 1.0, 1.0, 1.0}};

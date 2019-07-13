@@ -49,6 +49,7 @@ set(FREETYPE_GL_HB_HDR
     edtaa3func.h
     font-manager.h
     text-buffer.h
+    block-layout.h
 )
 
 set(FREETYPE_GL_HB_SRC
@@ -63,6 +64,7 @@ set(FREETYPE_GL_HB_SRC
     edtaa3func.c
     font-manager.c
     text-buffer.c
+    block-layout.c
 )
 
 if(freetype-gl_BUILD_SHARED)
