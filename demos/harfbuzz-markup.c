@@ -178,7 +178,7 @@ void init() {
 						&japanese,  "bla\nblabla\nblablabla\n",
 						&normal,    "</ttb>\n",
 						&normal,    "<rtl>",
-						&arabic,    "كسول 32156 الز123نجبيل القط",
+						&arabic,    "كسول الز123نجبيل القط",
 						&normal,    "</rtl>\n",
 						NULL );
 

@@ -30,28 +30,29 @@ static void text_buffer_set_line_direction( text_buffer_t * self, hb_direction_t
 // ----------------------------------------------------------------------------
 
 text_buffer_t *
-text_buffer_new( ) {
+text_buffer_new( float w, float h ) {
 	text_buffer_t *self = (text_buffer_t *) malloc (sizeof(text_buffer_t));
 	self->buffer = vertex_buffer_new( "vertex:3f,tex_coord:2f,color:4f,ashift:1f,agamma:1f" );
-	self->line_start_index = 0;
-	self->line_ascender = 0;
 	self->base_color.r = 0.0;
 	self->base_color.g = 0.0;
 	self->base_color.b = 0.0;
 	self->base_color.a = 1.0;
-	self->line_descender = 0;
-	self->lines = vector_new( sizeof(line_info_t) );
-	self->bounds.left   = 0.0;
-	self->bounds.top    = 0.0;
-	self->bounds.width  = 0.0;
-	self->bounds.height = 0.0;
-	self->direction = HB_DIRECTION_INVALID;
+//	self->line_start_index = 0;
+//	self->line_ascender = 0;
+//	self->line_descender = 0;
+//	self->lines = vector_new( sizeof(line_info_t) );
+//	self->bounds.left   = 0.0;
+//	self->bounds.top    = 0.0;
+//	self->bounds.width  = 0.0;
+//	self->bounds.height = 0.0;
+//	self->direction = HB_DIRECTION_INVALID;
+	layout_init(&self->layout, w, h);
 	return self;
 }
 
 // ----------------------------------------------------------------------------
 void text_buffer_delete( text_buffer_t * self ) {
-	vector_delete( self->lines );
+//	vector_delete( self->lines );
 	vertex_buffer_delete( self->buffer );
 	free( self );
 }
@@ -64,11 +65,18 @@ void text_buffer_clear( text_buffer_t * self ) {
 	self->line_start_index = 0;
 	self->line_ascender = 0;
 	self->line_descender = 0;
-	vector_clear( self->lines );
-	self->bounds.left   = 0.0;
-	self->bounds.top    = 0.0;
-	self->bounds.width  = 0.0;
-	self->bounds.height = 0.0;
+//	vector_clear( self->lines );
+//	self->bounds.left   = 0.0;
+//	self->bounds.top    = 0.0;
+//	self->bounds.width  = 0.0;
+//	self->bounds.height = 0.0;
+	layout_clear( &self->layout );
+}
+
+static inline void layout_to_vertex_buffer(text_buffer_t * self, vec2 *pen) {
+	for (size_t e=0; e<self->layout.element_count; e++) {
+		for (int32_t c)
+	}
 }
 
 // ----------------------------------------------------------------------------
@@ -88,9 +96,12 @@ void text_buffer_printf( text_buffer_t * self, vec2 *pen, ... ) {
 			return;
 		}
 		text = va_arg( args, char * );
-		text_buffer_add_text( self, pen, markup, text, 0 );
+//		text_buffer_add_text( self, pen, markup, text, 0 );
+		layout_add_text(&self->layout, markup, text,0);
 	} while ( markup != 0 );
 	va_end ( args );
+
+	layout_to_vertex_buffer(self, pen->x, pen->y);
 }
 
 // ----------------------------------------------------------------------------

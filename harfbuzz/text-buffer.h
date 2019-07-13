@@ -14,6 +14,7 @@ extern "C" {
 #include <hb-ft.h>
 #include "vertex-buffer.h"
 #include "markup.h"
+#include "block-layout.h"
 
 #ifdef __cplusplus
 namespace ftgl {
@@ -63,51 +64,55 @@ typedef struct  text_buffer_t {
 	 */
 	vec4 base_color;
 
-
 	/**
-	 * Pen origin
+	 * Block layout
 	 */
-	vec2 origin;
+	block_layout_t layout;
 
-	/**
-	 * Last pen location
-	 */
-	vec2 last_pen;
-
-	/**
-	 * Total bounds
-	 */
-	vec4 bounds;
-
-	/**
-	 * Index (in the vertex buffer) of the current line start
-	 */
-	size_t line_start_index;
-
-	/**
-	 * Location of the start of the line
-	 */
-	vec2 line_start;
-
-	/**
-	 * Vector of line information
-	 */
-	vector_t * lines;
-
-	/**
-	 * Current line ascender
-	 */
-	float line_ascender;
-
-	/**
-	 * Current line decender
-	 */
-	float line_descender;
-
-	/**
-	 * Harfbuzz text direction
-	 */
-	hb_direction_t direction;
+//	/**
+//	 * Pen origin
+//	 */
+//	vec2 origin;
+//
+//	/**
+//	 * Last pen location
+//	 */
+//	vec2 last_pen;
+//
+//	/**
+//	 * Total bounds
+//	 */
+//	vec4 bounds;
+//
+//	/**
+//	 * Index (in the vertex buffer) of the current line start
+//	 */
+//	size_t line_start_index;
+//
+//	/**
+//	 * Location of the start of the line
+//	 */
+//	vec2 line_start;
+//
+//	/**
+//	 * Vector of line information
+//	 */
+//	vector_t * lines;
+//
+//	/**
+//	 * Current line ascender
+//	 */
+//	float line_ascender;
+//
+//	/**
+//	 * Current line decender
+//	 */
+//	float line_descender;
+//
+//	/**
+//	 * Harfbuzz text direction
+//	 */
+//	hb_direction_t direction;
 } text_buffer_t;
 
 
