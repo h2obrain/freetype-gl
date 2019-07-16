@@ -301,10 +301,9 @@ int main( int argc, char **argv ) {
 	char* screenshot_path = NULL;
 
 	if (argc > 1) {
-		if (argc == 3 && 0 == strcmp( "--screenshot", argv[1] ))
+		if (argc == 3 && 0 == strcmp( "--screenshot", argv[1] )) {
 			screenshot_path = argv[2];
-		else
-		{
+		} else {
 			fprintf( stderr, "Unknown or incomplete parameters given\n" );
 			exit( EXIT_FAILURE );
 		}

@@ -74,9 +74,13 @@ void text_buffer_clear( text_buffer_t * self ) {
 }
 
 static inline void layout_to_vertex_buffer(text_buffer_t * self, vec2 *pen) {
+	vec2 pen_orig = *pen;
 	for (size_t e=0; e<self->layout.element_count; e++) {
 		block_element_t *el = &self->layout.elements[e];
 		assert(self->layout.elements.type==BET_TEXT);
+		printf("X po:%5.1f par:%5.1f el:%5.1f\n",pen_orig.x, el->paragraph->x, el->x);
+		pen->x = pen_orig.x + el->paragraph->x + el->x;
+		pen->y = pen_orig.y - (el->paragraph->y + el->y + self->layout.paragraphs[0].ascender);
 		for (int32_t c=0; c<el->text.glyph_count; c++) {
 			text_buffer_add_char(self, pen, el->text.markup, &el->text.glyph_info[c],&el->text.glyph_pos[c]);
 		}
@@ -85,7 +89,7 @@ static inline void layout_to_vertex_buffer(text_buffer_t * self, vec2 *pen) {
 
 vec4
 text_buffer_get_bounds( text_buffer_t * self, vec2 * pen ) {
-	return (vec4){0,0,0,0};
+	return (vec4){10,10,100,100};
 //
 //	for (size_t p=0; p<self->layout.paragraph_count; p++) {
 //		block_element_t *par = &self->layout.paragraphs[p];
@@ -112,12 +116,13 @@ void text_buffer_printf( text_buffer_t * self, vec2 *pen, ... ) {
 	do {
 		markup = va_arg( args, markup_t * );
 		if ( markup == NULL ) {
-			return;
+			goto text_buffer_printf_done;
 		}
 		text = va_arg( args, char * );
 //		text_buffer_add_text( self, pen, markup, text, 0 );
 		layout_add_text(&self->layout, markup, text,0);
 	} while ( markup != 0 );
+text_buffer_printf_done:
 	va_end ( args );
 
 	layout_to_vertex_buffer(self, pen);
