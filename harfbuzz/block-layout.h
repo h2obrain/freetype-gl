@@ -34,6 +34,7 @@ typedef struct {
 	pos_t x; // paragraph x offset
 	pos_t y; // paragraph y offset (for multiline elements)
 	pos_t w; // width
+	pos_t h; // height
 	block_element_type_t type;
 	union {
 		// descender and margin_bottom could be removed to save space
@@ -51,7 +52,6 @@ typedef struct {
 		struct {
 			pos_t margin_top, margin_bottom;
 			// tbd
-			pos_t h;
 			void *data;
 		} bitmap;
 	};

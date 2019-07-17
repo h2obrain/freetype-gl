@@ -111,6 +111,7 @@ typedef struct texture_glyph_t
 	 */
 	int offset_y;
 
+#ifdef TEXTURE_FONT_ENABLE_NORMALIZED_TEXTURE_COORDINATES
 	/**
 	 * First normalized texture coordinate (x) of top-left corner
 	 */
@@ -130,6 +131,9 @@ typedef struct texture_glyph_t
 	 * Second normalized texture coordinate (y) of bottom-right corner
 	 */
 	float t1;
+#else
+	ivec4 tex_region;
+#endif
 
 	/**
 	 * Mode this glyph was rendered
@@ -350,20 +354,24 @@ typedef struct texture_font_t
 	 */
 	hb_language_t language;
 
+#ifdef TEXTURE_FONT_ENABLE_NORMALIZED_TEXTURE_COORDINATES
 	/**
 	 * Whether to scale texture coordinates
 	 */
 	int scaletex;
+#endif
 
 	/**
 	 * Freetype size pointer
 	 */
 	FT_Size ft_size;
 
+#ifdef TEXTURE_FONT_ENABLE_SCALING
 	/**
 	 * factor to scale font coordinates
 	 */
 	float scale;
+#endif
 } texture_font_t;
 
 /**
@@ -571,12 +579,15 @@ texture_font_load_glyphs( texture_font_t * self,
 void
 texture_font_enlarge_atlas( texture_font_t * self, size_t width_new,
 			size_t height_new);
+
+#if defined(TEXTURE_FONT_ENABLE_SCALING) && defined(TEXTURE_FONT_ENABLE_NORMALIZED_TEXTURE_COORDINATES)
 void
 texture_font_enlarge_glyphs( texture_font_t * self, float mulw, float mulh);
 
 void
 texture_font_enlarge_texture( texture_font_t * self, size_t width_new,
 				size_t height_new);
+#endif
 
 /**
  * Creates a new empty glyph

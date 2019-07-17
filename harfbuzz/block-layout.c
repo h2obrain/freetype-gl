@@ -144,65 +144,73 @@ int layout_add_text(
 //		uint32_t line_nr = 0;
 
 		/* layout width.. */
-		pos_t width = 0;
+		pos_t width,height;
+		width = height = 0;
 		pos_t hres = markup->font->hres;
 		uint32_t breakable = UINT32_MAX;
-		pos_t breakable_width = 0;
+		pos_t breakable_width, breakable_height;
+		breakable_width = breakable_height = 0;
 		for (i = 0; i < glyph_count; ++i) {
 			int codepoint = glyph_info[i].codepoint;
 			pos_t x_advance = glyph_pos[i].x_advance/(pos_t)(hres*64);
+			pos_t y_advance = glyph_pos[i].y_advance/(pos_t)(hres*64);
 			pos_t x_offset = glyph_pos[i].x_offset/(pos_t)(hres*64);
+			pos_t y_offset = glyph_pos[i].y_offset/(pos_t)(hres*64);
 			texture_glyph_t *glyph = texture_font_get_glyph32(markup->font, codepoint);
 			if (glyph_info[i].codepoint == ' ') { // breakable spot.. real implementations are MUCH more complex than this!
 				breakable = i;
-				breakable_width = width;
+				breakable_width  = width;
+				breakable_height = height;
 			}
 			if ( i < (glyph_count-1) ) {
-				width += x_advance + x_offset;
+				width  += x_advance + x_offset;
+				height += y_advance + y_offset;
 			} else {
-				width += glyph->offset_x + glyph->width;
+				width  += glyph->offset_x + glyph->width;
+				height += glyph->offset_y + glyph->height;
 			}
 			if (width > available_width) {
 				if (breakable != UINT32_MAX) {
 					i = breakable;
-					width = breakable_width;
+					width  = breakable_width;
+					height = breakable_height;
 					end = text + glyph_info[i].cluster;
 					break;
 				} else {
 					i=0;
-					width = 0;
+					width = height = 0;
 					end = text;
 					break;
-//				if (self->element_count > 0) {
-//					uint32_t e = self->element_count - 1;
-//					while (self->elements[self->element_count].paragraph_y == self->elements[e].paragraph_y) {
-//						pos_t element_height = self->elements[e].y_off;
-//						switch (self->elements[e].type) {
-//							case BET_TEXT:
-//								element_height += self->elements[e].text.markup->font->height;
-//								break;
-//							case BET_BITMAP:
-//								element_height += self->elements[e].bitmap.margin_top
-//								                + self->elements[e].bitmap.margin_bottom
-//												+ self->elements[e].bitmap.h;
-//								break;
-//						}
-//						while (paragraph->pen.y < element_height) {
-//							paragraph->pen.y += markup->font->height;
-//						}
-//						available_width += self->elements[self->element_count].w; // TODO + advance_x_e;
-//						if (width<available_width) break;
-//						if (e==0) {
-//							assert("Failed to fit element!" && 0);
-//							return -1;
-//						}
-//						e--;
-//					}
+					// >> old!
+////				if (self->element_count > 0) {
+////					uint32_t e = self->element_count - 1;
+////					while (self->elements[self->element_count].paragraph_y == self->elements[e].paragraph_y) {
+////						pos_t element_height = self->elements[e].y_off;
+////						switch (self->elements[e].type) {
+////							case BET_TEXT:
+////								element_height += self->elements[e].text.markup->font->height;
+////								break;
+////							case BET_BITMAP:
+////								element_height += self->elements[e].bitmap.margin_top
+////								                + self->elements[e].bitmap.margin_bottom
+////												+ self->elements[e].bitmap.h;
+////								break;
+////						}
+////						while (paragraph->pen.y < element_height) {
+////							paragraph->pen.y += markup->font->height;
+////						}
+////						available_width += self->elements[self->element_count].w; // TODO + advance_x_e;
+////						if (width<available_width) break;
+////						if (e==0) {
+////							assert("Failed to fit element!" && 0);
+////							return -1;
+////						}
+////						e--;
+////					}
 				}
 			}
 		}
 		if (i>0) {
-
 			/* add element */
 			hb_glyph_info_t *gi = malloc(i * sizeof(hb_glyph_info_t));
 			memcpy(gi,glyph_info,i * sizeof(hb_glyph_info_t));
@@ -213,16 +221,17 @@ int layout_add_text(
 					.x = paragraph->pen.x,
 					.y = paragraph->pen.y,
 					.w = width,      // width
+					.h = height,     // height
 					.type = BET_TEXT,
 					// descender and margin_bottom could be removed to save space
 					.text = {
-	//						.line_nr = line_nr,
-							.last_line = !end,
-	//						.ascender  = markup->font->ascender,
-	//						.descender = markup->font->descender,
-							.text = text, // utf8 text
-							.text_size = end-text, // size of text in bytes
-							.markup = markup,
+	//						.line_nr     = line_nr,
+							.last_line   = !end,
+	//						.ascender    = markup->font->ascender,
+	//						.descender   = markup->font->descender,
+							.text        = text, // utf8 text
+							.text_size   = end-text, // size of text in bytes
+							.markup      = markup,
 							.glyph_count = i,
 							.glyph_info  = gi, //glyph_info,
 							.glyph_pos   = gp  //glyph_pos
@@ -230,20 +239,22 @@ int layout_add_text(
 				};
 
 			/* update paragraph width */
+//			switch (markup->font->language)
 			paragraph->pen.x += width;
+//			paragraph->pen.y += height;
 			if (paragraph->w < paragraph->pen.x) paragraph->w = paragraph->pen.x;
 		}
 
-		pos_t height = paragraph->pen.y;
-		/* height */
-		height += markup->font->height;
+//		pos_t height = paragraph->pen.y;
+//		/* height */
+//		height += markup->font->height;
 		/* update paragraph height */
 		if (paragraph->h < height) paragraph->h = height;
 		/* end line */
 		if (!end) break;
 		/* update pen */
-		paragraph->pen.x = 0;
-		paragraph->pen.y = height;
+		paragraph->pen.x  = 0;
+		paragraph->pen.y += paragraph->h - paragraph->descender;
 
 		char buf[1024]; char *bp=buf; buf[0]='\0';
 		bp += strlen(strncpy(bp,"Breaking line ",sizeof(buf)-(bp-buf)));

@@ -478,10 +478,14 @@ text_buffer_add_char( text_buffer_t * self,
 		float y0 = (float)(int)( pen->y + font->descender );
 		float x1 = x0 + x_advance;
 		float y1 = (float)(int)( pen->y + font->ascender );
+#if defined(TEXTURE_FONT_ENABLE_NORMALIZED_TEXTURE_COORDINATES)
 		float s0 = black->s0;
 		float t0 = black->t0;
 		float s1 = black->s1;
 		float t1 = black->t1;
+#else
+#error "not supported!"
+#endif
 
 		SET_GLYPH_VERTEX(vertices[vcount+0], (float)(int)x0,y0,0,  s0,t0,  r,g,b,a,  x0-((int)x0), gamma );
 		SET_GLYPH_VERTEX(vertices[vcount+1], (float)(int)x0,y1,0,  s0,t1,  r,g,b,a,  x0-((int)x0), gamma );
@@ -507,10 +511,14 @@ text_buffer_add_char( text_buffer_t * self,
 		float y0 = (float)(int)( pen->y + font->underline_position );
 		float x1 = x0 + x_advance;
 		float y1 = (float)(int)( y0 + font->underline_thickness );
+#if defined(TEXTURE_FONT_ENABLE_NORMALIZED_TEXTURE_COORDINATES)
 		float s0 = black->s0;
 		float t0 = black->t0;
 		float s1 = black->s1;
 		float t1 = black->t1;
+#else
+#error "not supported!"
+#endif
 
 		SET_GLYPH_VERTEX(vertices[vcount+0], (float)(int)x0,y0,0,  s0,t0,  r,g,b,a,  x0-((int)x0), gamma );
 		SET_GLYPH_VERTEX(vertices[vcount+1], (float)(int)x0,y1,0,  s0,t1,  r,g,b,a,  x0-((int)x0), gamma );
@@ -536,10 +544,17 @@ text_buffer_add_char( text_buffer_t * self,
 		float y0 = (float)(int)( pen->y + (int)font->ascender );
 		float x1 = x0 + x_advance;
 		float y1 = (float)(int)( y0 + (int)font->underline_thickness );
+#if defined(TEXTURE_FONT_ENABLE_NORMALIZED_TEXTURE_COORDINATES)
 		float s0 = black->s0;
 		float t0 = black->t0;
 		float s1 = black->s1;
 		float t1 = black->t1;
+#else
+		float s0 = black->tex_region.;
+		float t0 = black->t0;
+		float s1 = black->s1;
+		float t1 = black->t1;
+#endif
 		SET_GLYPH_VERTEX(vertices[vcount+0], (float)(int)x0,y0,0,  s0,t0,  r,g,b,a,  x0-((int)x0), gamma );
 		SET_GLYPH_VERTEX(vertices[vcount+1], (float)(int)x0,y1,0,  s0,t1,  r,g,b,a,  x0-((int)x0), gamma );
 		SET_GLYPH_VERTEX(vertices[vcount+2], (float)(int)x1,y1,0,  s1,t1,  r,g,b,a,  x1-((int)x1), gamma );
@@ -564,10 +579,14 @@ text_buffer_add_char( text_buffer_t * self,
 		float y0  = (float)(int)( pen->y + (float)font->ascender/3);
 		float x1  = x0 + x_advance;
 		float y1  = (float)(int)( y0 + (int)font->underline_thickness );
+#if defined(TEXTURE_FONT_ENABLE_NORMALIZED_TEXTURE_COORDINATES)
 		float s0 = black->s0;
 		float t0 = black->t0;
 		float s1 = black->s1;
 		float t1 = black->t1;
+#else
+#error "not supported!"
+#endif
 		SET_GLYPH_VERTEX(vertices[vcount+0], (float)(int)x0,y0,0,  s0,t0,  r,g,b,a,  x0-((int)x0), gamma );
 		SET_GLYPH_VERTEX(vertices[vcount+1], (float)(int)x0,y1,0,  s0,t1,  r,g,b,a,  x0-((int)x0), gamma );
 		SET_GLYPH_VERTEX(vertices[vcount+2], (float)(int)x1,y1,0,  s1,t1,  r,g,b,a,  x1-((int)x1), gamma );
@@ -595,10 +614,14 @@ text_buffer_add_char( text_buffer_t * self,
 //		float y0 = (float)(int)( pen->y + glyph->offset_y );
 //		float x1 = ( x0 + glyph->width );
 //		float y1 = (float)(int)( y0 - glyph->height );
+#if defined(TEXTURE_FONT_ENABLE_NORMALIZED_TEXTURE_COORDINATES)
 		float s0 = glyph->s0;
 		float t0 = glyph->t0;
 		float s1 = glyph->s1;
 		float t1 = glyph->t1;
+#else
+#error "not supported!"
+#endif
 
 		SET_GLYPH_VERTEX(vertices[vcount+0], (float)(int)x0,y0,0,  s0,t0,  r,g,b,a,  x0-((int)x0), gamma );
 		SET_GLYPH_VERTEX(vertices[vcount+1], (float)(int)x0,y1,0,  s0,t1,  r,g,b,a,  x0-((int)x0), gamma );

@@ -59,10 +59,14 @@ texture_glyph_new(void) {
 	/* End of attribute part */
 	self->offset_x  = 0;
 	self->offset_y  = 0;
+#if defined(TEXTURE_FONT_ENABLE_NORMALIZED_TEXTURE_COORDINATES)
 	self->s0        = 0.0;
 	self->t0        = 0.0;
 	self->s1        = 0.0;
 	self->t1        = 0.0;
+#else
+	self->tex_region = (ivec4) {0};
+#endif
 	return self;
 }
 
@@ -101,40 +105,44 @@ texture_font_set_size ( texture_font_t *self, float size ) {
 		(int)((1.0)      * 0x10000L)};
 
 	if ( texture_is_color_font( self ) ) {
-	/* Select best size */
-	if (self->face->num_fixed_sizes == 0) {
-		freetype_error( error, "FT_Error (%s:%d) : no fixed size in color font\n",
-				__FILENAME__, __LINE__);
-		return 0;
-	}
-	
-	int best_match = 0;
-	int diff = abs((int)size - self->face->available_sizes[0].width);
-	int i;
-
-	for (i = 1; i < self->face->num_fixed_sizes; ++i) {
-		int ndiff = abs((int)size - self->face->available_sizes[i].width);
-		if (ndiff < diff) {
-		best_match = i;
-		diff = ndiff;
+		/* Select best size */
+		if (self->face->num_fixed_sizes == 0) {
+			freetype_error( error, "FT_Error (%s:%d) : no fixed size in color font\n",
+					__FILENAME__, __LINE__);
+			return 0;
 		}
-	}
-	error = FT_Select_Size(self->face, best_match);
-	if (error) {
-		freetype_error( error, "FT_Error (%s:%d, code 0x%02x) : %s\n",
-				__FILENAME__, __LINE__, FT_Errors[error].code, FT_Errors[error].message);
-		return 0;
-	}
-	self->scale = self->size / self->face->available_sizes[best_match].width;
-	} else {
-	/* Set char size */
-	error = FT_Set_Char_Size(self->face, (int)(size * 64), 0, DPI * self->hres, DPI);
+
+		int best_match = 0;
+		int diff = abs((int)size - self->face->available_sizes[0].width);
+		int i;
 	
-	if (error) {
-		freetype_error( error, "FT_Error (%s:%d, code 0x%02x) : %s\n",
-				__FILENAME__, __LINE__, FT_Errors[error].code, FT_Errors[error].message);
-		return 0;
-	}
+		for (i = 1; i < self->face->num_fixed_sizes; ++i) {
+			int ndiff = abs((int)size - self->face->available_sizes[i].width);
+			if (ndiff < diff) {
+				best_match = i;
+				diff = ndiff;
+			}
+		}
+		error = FT_Select_Size(self->face, best_match);
+		if (error) {
+			freetype_error( error, "FT_Error (%s:%d, code 0x%02x) : %s\n",
+					__FILENAME__, __LINE__, FT_Errors[error].code, FT_Errors[error].message);
+			return 0;
+		}
+#if defined(TEXTURE_FONT_ENABLE_SCALING)
+		self->scale = self->size / self->face->available_sizes[best_match].width;
+#else
+		self->size = self->face->available_sizes[best_match].width;
+#endif
+	} else {
+		/* Set char size */
+		error = FT_Set_Char_Size(self->face, (int)(size * 64), 0, DPI * self->hres, DPI);
+
+		if (error) {
+			freetype_error( error, "FT_Error (%s:%d, code 0x%02x) : %s\n",
+					__FILENAME__, __LINE__, FT_Errors[error].code, FT_Errors[error].message);
+			return 0;
+		}
 	}
 	/* Set transform matrix */
 	FT_Set_Transform(self->face, &matrix, NULL);
@@ -185,8 +193,12 @@ texture_font_init(texture_font_t *self) {
 	self->hres = HRES;
 	self->hinting = 1;
 	self->filtering = 1;
+#if defined(TEXTURE_FONT_ENABLE_SCALING)
 	self->scaletex = 1;
+#endif
+#if defined(TEXTURE_FONT_ENABLE_NORMALIZED_TEXTURE_COORDINATES)
 	self->scale = 1.0;
+#endif
 	self->face = NULL;
 	self->hb_ft_font = 0;
 
@@ -804,12 +816,20 @@ cleanup_stroker:
 		glyph = texture_glyph_new( );
 		glyph->codepoint = glyph_info[i].codepoint;
 
+#ifdef TEXTURE_FONT_ENABLE_SCALING
 		glyph->width    = tgt_w * self->scale;
 		glyph->height   = tgt_h * self->scale;
-		glyph->rendermode = self->rendermode;
-		glyph->outline_thickness = self->outline_thickness;
 		glyph->offset_x = ft_glyph_left * self->scale;
 		glyph->offset_y = ft_glyph_top * self->scale;
+#else
+		glyph->width    = tgt_w;
+		glyph->height   = tgt_h;
+		glyph->offset_x = ft_glyph_left;
+		glyph->offset_y = ft_glyph_top;
+#endif
+		glyph->rendermode = self->rendermode;
+		glyph->outline_thickness = self->outline_thickness;
+#ifdef TEXTURE_FONT_ENABLE_TEXTURE_COORDINATE_SCALING
 		if (self->scaletex) {
 			glyph->s0       = x/(float)self->atlas->width;
 			glyph->t0       = y/(float)self->atlas->height;
@@ -825,7 +845,10 @@ cleanup_stroker:
 			glyph->s1       = x + tgt_w - 0.5;
 			glyph->t1       = y + tgt_h - 0.5;
 		}
-/*
+#else
+		glyph->tex_region = region;
+#endif
+		/*
 		slot = self->face->glyph;
 		if ( self->atlas->depth == 4 ) {
 			// color fonts use actual pixels, not subpixels
@@ -920,6 +943,7 @@ texture_font_enlarge_texture( texture_font_t * self, size_t width_new,
 	texture_atlas_set_region(ta, 1, 1, width_old - 2, height_old - 2, data_old + old_row_size + pixel_size, old_row_size);
 	free(data_old);    
 }
+#if defined(TEXTURE_FONT_ENABLE_SCALING) && defined(TEXTURE_FONT_ENABLE_NORMALIZED_TEXTURE_COORDINATES)
 // -------------------------------------------- texture_font_enlarge_atlas ---
 void
 texture_font_enlarge_glyphs( texture_font_t * self, float mulw, float mulh) {
@@ -948,3 +972,4 @@ texture_font_enlarge_atlas( texture_font_t * self, size_t width_new,
 		texture_font_enlarge_glyphs( self, mulw, mulh );
 	}
 }
+#endif

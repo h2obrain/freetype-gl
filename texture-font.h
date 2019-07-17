@@ -51,6 +51,9 @@ namespace ftgl {
  * @{
  */
 
+#define TEXTURE_FONT_ENABLE_SCALING
+#define TEXTURE_FONT_ENABLE_NORMALIZED_TEXTURE_COORDINATES
+
 
 /**
  * A list of possible ways to render a glyph.

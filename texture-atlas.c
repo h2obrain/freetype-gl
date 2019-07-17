@@ -28,10 +28,14 @@ void texture_atlas_special ( texture_atlas_t * self ) {
 	
 	texture_atlas_set_region( self, region.x, region.y, 4, 4, data, 0 );
 	glyph->codepoint = -1;
+#if defined(TEXTURE_FONT_ENABLE_NORMALIZED_TEXTURE_COORDINATES)
 	glyph->s0 = (region.x+2)/(float)self->width;
 	glyph->t0 = (region.y+2)/(float)self->height;
 	glyph->s1 = (region.x+3)/(float)self->width;
 	glyph->t1 = (region.y+3)/(float)self->height;
+#else
+	glyph->tex_region = region;
+#endif
 
 	self->special = (void*)glyph;
 }
