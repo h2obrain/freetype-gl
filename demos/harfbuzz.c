@@ -32,8 +32,8 @@
 #endif
 
 
-#define WIDTH  1600
-#define HEIGHT 1200
+#define WIDTH  800
+#define HEIGHT 480
 
 // ------------------------------------------------------- global variables ---
 GLuint shader;
@@ -47,16 +47,20 @@ const hb_direction_t direction = HB_DIRECTION_RTL;
 const hb_script_t script       = HB_SCRIPT_ARABIC;
 const char *language           = "ar";
 
-
 // ------------------------------------------------------------------- init ---
+#define NUM_FONTS (sizeof(fonts)/sizeof(texture_font_t *))
 void init( void ) {
 	size_t i, j;
 
-	atlas = texture_atlas_new( 512, 512, 3 );
-	texture_font_t *fonts[20];
-	for ( i=0; i< 20; ++i ) {
-		printf("Creating font size: %d\n", 12+i);
-		fonts[i] =  texture_font_new_from_file(atlas, 12+i, font_filename, language),
+	atlas = texture_atlas_new( 300, 330, 3 );
+	texture_font_t *fonts[15];
+	printf("Creating font size: %zu\n", 8);
+	fonts[0] = texture_font_new_from_file(atlas, 8, font_filename, language);
+	texture_font_load_glyphs(fonts[0], text );
+	for ( i=1; i<NUM_FONTS; ++i ) {
+		printf("Creating font size: %zu\n", 8+i);
+//		fonts[i] = texture_font_new_from_file(atlas, 12+i, font_filename, language);
+		fonts[i] = texture_font_clone(fonts[0], 8+i);
 		texture_font_load_glyphs(fonts[i], text );
 	}
 
@@ -68,7 +72,7 @@ void init( void ) {
 	/* Create a buffer for harfbuzz to use */
 	hb_buffer_t *buffer = hb_buffer_create();
 
-
+	/* display atlas */
 	float gamma = 1.0;
 	float shift = 0.0;
 	float r = 0.0;
@@ -91,13 +95,20 @@ void init( void ) {
 	GLuint indices[6] = { 0,1,2, 0,2,3 };
 	vertex_buffer_push_back( vbuffer, vertices, 4, indices, 6 );
 
+#if !defined(TEXTURE_FONT_ENABLE_NORMALIZED_TEXTURE_COORDINATES)
+	float atlas_width,atlas_height;
+	atlas_width  = (float)atlas->width;
+	atlas_height = (float)atlas->height;
+#endif
 
 	float x,y;
 	y = HEIGHT;
-	for (i=0; i < 20; ++i) {
-		hb_buffer_set_language( buffer, fonts[i]->language );
+	for (i=0; i < NUM_FONTS; ++i) {
 		hb_buffer_add_utf8( buffer, text, strlen(text), 0, strlen(text) );
-		hb_buffer_guess_segment_properties( buffer );
+		hb_buffer_set_language( buffer, fonts[i]->language );
+//		hb_buffer_guess_segment_properties( buffer );
+		hb_buffer_set_script( buffer, script );
+		hb_buffer_set_direction( buffer, direction );
 		hb_shape( fonts[i]->hb_ft_font, buffer, NULL, 0 );
 
 		unsigned int         glyph_count;
@@ -135,6 +146,7 @@ void init( void ) {
 			float y_advance = glyph_pos[j].y_advance/(float)(64);
 			float y_offset = glyph_pos[j].y_offset/(float)(64);
 			texture_glyph_t *glyph = texture_font_get_glyph32(fonts[i], codepoint);
+			if (glyph == NULL) continue;
 
 			float r = 0.0;
 			float g = 0.0;
@@ -144,10 +156,17 @@ void init( void ) {
 			float x1 = x0 + glyph->width;
 			float y0 = floor(y + y_offset + glyph->offset_y);
 			float y1 = floor(y0 - glyph->height);
-			float s0 = glyph->s0;
-			float t0 = glyph->t0;
-			float s1 = glyph->s1;
-			float t1 = glyph->t1;
+#if defined(TEXTURE_FONT_ENABLE_NORMALIZED_TEXTURE_COORDINATES)
+		float s0 = glyph->s0;
+		float t0 = glyph->t0;
+		float s1 = glyph->s1;
+		float t1 = glyph->t1;
+#else
+		float s0 = glyph->tex_region.x/atlas_width;
+		float t0 = glyph->tex_region.y/atlas_height;
+		float s1 = (glyph->tex_region.x+glyph->tex_region.width)/atlas_width;
+		float t1 = (glyph->tex_region.y+glyph->tex_region.height)/atlas_height;
+#endif
 			vertex_t vertices[4] =  {
 				{x0,y0,0, s0,t0, r,g,b,a, shift, gamma},
 				{x0,y1,0, s0,t1, r,g,b,a, shift, gamma},
@@ -157,7 +176,7 @@ void init( void ) {
 			vertex_buffer_push_back( vbuffer, vertices, 4, indices, 6 );
 
 			x += x_advance;
-			y += y_advance;
+			y -= y_advance;
 		}
 
 		y += fonts[i]->descender;

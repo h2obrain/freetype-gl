@@ -297,7 +297,7 @@ typedef struct texture_font_t
 	/**
 	 * Font size
 	 */
-	float size;
+	float pt_size;
 
 	/**
 	 * Whether to use autohint when rendering font

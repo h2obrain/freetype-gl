@@ -467,7 +467,7 @@ int main( int argc, char **argv ) {
 	// Texture information
 	// -------------------
 	fprintf( file, " %ff, %ff, %ff, %ff, %ff, %" PRIzu ", \n",
-			 font->size, font->height,
+			 font->pt_size, font->height,
 			 font->linegap,font->ascender, font->descender,
 			 glyph_count );
 

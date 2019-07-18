@@ -468,6 +468,12 @@ text_buffer_add_char( text_buffer_t * self,
 	float y_advance = glyph_pos->y_advance/(float)(64);
 	float y_offset  = glyph_pos->y_offset/(float)(64);
 
+#if !defined(TEXTURE_FONT_ENABLE_NORMALIZED_TEXTURE_COORDINATES)
+	float atlas_width,atlas_height;
+	atlas_width  = (float)markup->font->atlas->width;
+	atlas_height = (float)markup->font->atlas->height;
+#endif
+
 	// Background
 	if ( markup->background_color.alpha > 0 ) {
 		float r = markup->background_color.r;
@@ -484,7 +490,10 @@ text_buffer_add_char( text_buffer_t * self,
 		float s1 = black->s1;
 		float t1 = black->t1;
 #else
-#error "not supported!"
+		float s0 = black->tex_region.x/atlas_width;
+		float t0 = black->tex_region.y/atlas_height;
+		float s1 = (black->tex_region.x+black->tex_region.width)/atlas_width;
+		float t1 = (black->tex_region.y+black->tex_region.height)/atlas_height;
 #endif
 
 		SET_GLYPH_VERTEX(vertices[vcount+0], (float)(int)x0,y0,0,  s0,t0,  r,g,b,a,  x0-((int)x0), gamma );
@@ -517,7 +526,10 @@ text_buffer_add_char( text_buffer_t * self,
 		float s1 = black->s1;
 		float t1 = black->t1;
 #else
-#error "not supported!"
+		float s0 = black->tex_region.x/atlas_width;
+		float t0 = black->tex_region.y/atlas_height;
+		float s1 = (black->tex_region.x+black->tex_region.width)/atlas_width;
+		float t1 = (black->tex_region.y+black->tex_region.height)/atlas_height;
 #endif
 
 		SET_GLYPH_VERTEX(vertices[vcount+0], (float)(int)x0,y0,0,  s0,t0,  r,g,b,a,  x0-((int)x0), gamma );
@@ -550,10 +562,10 @@ text_buffer_add_char( text_buffer_t * self,
 		float s1 = black->s1;
 		float t1 = black->t1;
 #else
-		float s0 = black->tex_region.;
-		float t0 = black->t0;
-		float s1 = black->s1;
-		float t1 = black->t1;
+		float s0 = black->tex_region.x/atlas_width;
+		float t0 = black->tex_region.y/atlas_height;
+		float s1 = (black->tex_region.x+black->tex_region.width)/atlas_width;
+		float t1 = (black->tex_region.y+black->tex_region.height)/atlas_height;
 #endif
 		SET_GLYPH_VERTEX(vertices[vcount+0], (float)(int)x0,y0,0,  s0,t0,  r,g,b,a,  x0-((int)x0), gamma );
 		SET_GLYPH_VERTEX(vertices[vcount+1], (float)(int)x0,y1,0,  s0,t1,  r,g,b,a,  x0-((int)x0), gamma );
@@ -585,7 +597,10 @@ text_buffer_add_char( text_buffer_t * self,
 		float s1 = black->s1;
 		float t1 = black->t1;
 #else
-#error "not supported!"
+		float s0 = black->tex_region.x/atlas_width;
+		float t0 = black->tex_region.y/atlas_height;
+		float s1 = (black->tex_region.x+black->tex_region.width)/atlas_width;
+		float t1 = (black->tex_region.y+black->tex_region.height)/atlas_height;
 #endif
 		SET_GLYPH_VERTEX(vertices[vcount+0], (float)(int)x0,y0,0,  s0,t0,  r,g,b,a,  x0-((int)x0), gamma );
 		SET_GLYPH_VERTEX(vertices[vcount+1], (float)(int)x0,y1,0,  s0,t1,  r,g,b,a,  x0-((int)x0), gamma );
@@ -620,7 +635,10 @@ text_buffer_add_char( text_buffer_t * self,
 		float s1 = glyph->s1;
 		float t1 = glyph->t1;
 #else
-#error "not supported!"
+		float s0 = glyph->tex_region.x/atlas_width;
+		float t0 = glyph->tex_region.y/atlas_height;
+		float s1 = (glyph->tex_region.x+glyph->tex_region.width)/atlas_width;
+		float t1 = (glyph->tex_region.y+glyph->tex_region.height)/atlas_height;
 #endif
 
 		SET_GLYPH_VERTEX(vertices[vcount+0], (float)(int)x0,y0,0,  s0,t0,  r,g,b,a,  x0-((int)x0), gamma );

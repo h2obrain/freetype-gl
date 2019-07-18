@@ -95,6 +95,7 @@ texture_is_color_font( texture_font_t *self) {
 
 // -------------------------------------------------- texture_font_set_size ---
 
+static
 int
 texture_font_set_size ( texture_font_t *self, float size ) {
 	FT_Error error=0;
@@ -130,12 +131,15 @@ texture_font_set_size ( texture_font_t *self, float size ) {
 			return 0;
 		}
 #if defined(TEXTURE_FONT_ENABLE_SCALING)
-		self->scale = self->size / self->face->available_sizes[best_match].width;
+		self->scale = pt_size / self->face->available_sizes[best_match].width;
 #else
-		self->size = self->face->available_sizes[best_match].width;
+		size = self->face->available_sizes[best_match].width;
+		self->pt_size = size / self->hres;
 #endif
 	} else {
 		/* Set char size */
+		self->pt_size = size / self->hres;
+//		self->size = size;
 		error = FT_Set_Char_Size(self->face, (int)(size * 64), 0, DPI * self->hres, DPI);
 
 		if (error) {
@@ -156,13 +160,13 @@ void
 texture_font_init_size( texture_font_t * self) {
 	FT_Size_Metrics metrics;
 	
-	self->underline_position = self->face->underline_position / (float)(self->hres*self->hres) * self->size;
+	self->underline_position = self->face->underline_position / (float)(self->hres*self->hres) * self->pt_size;
 	self->underline_position = roundf( self->underline_position );
 	if ( self->underline_position > -2 ) {
 		self->underline_position = -2.0;
 	}
 
-	self->underline_thickness = self->face->underline_thickness / (float)(self->hres*self->hres) * self->size;
+	self->underline_thickness = self->face->underline_thickness / (float)(self->hres*self->hres) * self->pt_size;
 	self->underline_thickness = roundf( self->underline_thickness );
 	if ( self->underline_thickness < 1 ) {
 		self->underline_thickness = 1.0;
@@ -179,7 +183,7 @@ texture_font_init_size( texture_font_t * self) {
 static int
 texture_font_init(texture_font_t *self) {
 	assert(self->atlas);
-	assert(self->size > 0);
+	assert(self->pt_size > 0);
 	assert((self->location == TEXTURE_FONT_FILE && self->filename)
 		|| (self->location == TEXTURE_FONT_MEMORY
 			&& self->memory.base && self->memory.size));
@@ -210,13 +214,13 @@ texture_font_init(texture_font_t *self) {
 	self->lcd_weights[3] = 0x40;
 	self->lcd_weights[4] = 0x10;
 
-	if (!texture_font_load_face(self, self->size * self->hres)) { //100.f)) {
+	if (!texture_font_load_face(self, self->pt_size * self->hres)) {
 		return -1;
 	}
 
 	texture_font_init_size( self );
 
-	if (!texture_font_set_size(self, self->size)) {
+	if (!texture_font_set_size(self, self->pt_size)) {
 		return -1;
 	}
 	
@@ -255,7 +259,7 @@ texture_font_new_from_file(texture_atlas_t *atlas, const float pt_size,
 	}
 
 	self->atlas = atlas;
-	self->size  = pt_size;
+	self->pt_size  = pt_size;
 
 	self->location = TEXTURE_FONT_FILE;
 	self->filename = strdup(filename);
@@ -288,7 +292,7 @@ texture_font_new_from_memory(texture_atlas_t *atlas, float pt_size,
 	}
 
 	self->atlas = atlas;
-	self->size  = pt_size;
+	self->pt_size = pt_size;
 
 	self->location = TEXTURE_FONT_MEMORY;
 	self->memory.base = memory_base;
@@ -309,7 +313,7 @@ texture_font_new_from_memory(texture_atlas_t *atlas, float pt_size,
 texture_font_t *
 texture_font_clone( texture_font_t *old, float pt_size) {
 	texture_font_t *self;
-	FT_Error error = 0;
+//	FT_Error error = 0;
 	
 	self = calloc(1, sizeof(*self));
 	if (!self) {
@@ -319,31 +323,39 @@ texture_font_clone( texture_font_t *old, float pt_size) {
 	}
 
 	memcpy(self, old, sizeof(*self));
-	self->glyphs = vector_new(sizeof(texture_glyph_t *));
 
-	error = FT_New_Size( self->face, &self->ft_size );
-	if (error) {
-		freetype_error( error, "FT_Error (%s:%d, code 0x%02x) : %s\n",
-				__FILENAME__, __LINE__, FT_Errors[error].code, FT_Errors[error].message);
-		return NULL;
-	}
+	self->glyphs = NULL;
+	self->pt_size = pt_size;
+	texture_font_init(self);
 
-	error = FT_Activate_Size( self->ft_size );
-	if (error) {
-		freetype_error( error, "FT_Error (%s:%d, code 0x%02x) : %s\n",
-				__FILENAME__, __LINE__, FT_Errors[error].code, FT_Errors[error].message);
-		return NULL;
-	}
-	
-	if (!texture_font_set_size ( self, pt_size * self->hres)) { //100.f )) {
-		return NULL;
-	}
 
-	texture_font_init_size( self );
-	
-	if (!texture_font_set_size ( self, pt_size )) {
-		return NULL;
-	}
+//	self->glyphs = vector_new(sizeof(texture_glyph_t *));
+//
+////	error = FT_New_Size( self->face, &self->ft_size );
+////	if (error) {
+////		freetype_error( error, "FT_Error (%s:%d, code 0x%02x) : %s\n",
+////				__FILENAME__, __LINE__, FT_Errors[error].code, FT_Errors[error].message);
+////		return NULL;
+////	}
+////
+////	error = FT_Activate_Size( self->ft_size );
+////	if (error) {
+////		freetype_error( error, "FT_Error (%s:%d, code 0x%02x) : %s\n",
+////				__FILENAME__, __LINE__, FT_Errors[error].code, FT_Errors[error].message);
+////		return NULL;
+////	}
+//
+//	self->pt_size = pt_size;
+//
+//	if (!texture_font_load_face(self, self->pt_size * self->hres)) {
+//		return -1;
+//	}
+//
+//	texture_font_init_size( self );
+//
+//	if (!texture_font_set_size ( self, self->pt_size )) {
+//		return NULL;
+//	}
 
 	return self;
 }
@@ -351,6 +363,12 @@ texture_font_clone( texture_font_t *old, float pt_size) {
 
 void
 texture_font_close( texture_font_t *self, font_mode_t face_mode, font_mode_t library_mode ) {
+	(void)library_mode;
+	if (self->buffer && self->mode <= face_mode ) {
+		hb_buffer_destroy(self->buffer);
+		self->buffer = NULL;
+	}
+
 //	if ( self->face && self->mode <= face_mode ) {
 //		FT_Done_Face( self->face );
 //		self->face = NULL;
@@ -395,25 +413,25 @@ texture_font_load_face( texture_font_t *self, float size ) {
 
 	if ( !self->face ) {
 	switch (self->location) {
-	case TEXTURE_FONT_FILE:
-		error = FT_New_Face(self->library->library, self->filename, 0, &self->face);
-		if (error) {
-			freetype_error( error, "FT_Error, file %s (%s:%d, code 0x%02x) : %s\n",
-					self->filename, __FILENAME__, __LINE__, FT_Errors[error].code, FT_Errors[error].message);
-			goto cleanup_library;
-		}
-		break;
+		case TEXTURE_FONT_FILE:
+			error = FT_New_Face(self->library->library, self->filename, 0, &self->face);
+			if (error) {
+				freetype_error( error, "FT_Error, file %s (%s:%d, code 0x%02x) : %s\n",
+						self->filename, __FILENAME__, __LINE__, FT_Errors[error].code, FT_Errors[error].message);
+				goto cleanup_library;
+			}
+			break;
 
-	case TEXTURE_FONT_MEMORY:
-		error = FT_New_Memory_Face(self->library->library,
-				   	self->memory.base, self->memory.size, 0, &self->face);
-		if (error) {
-			freetype_error( error, "FT_Error memory %p:%x (%s:%d, code 0x%02x) : %s\n",
-					self->memory.base, self->memory.size,
-					__FILENAME__, __LINE__, FT_Errors[error].code, FT_Errors[error].message);
-			goto cleanup_library;
-		}
-		break;
+		case TEXTURE_FONT_MEMORY:
+			error = FT_New_Memory_Face(self->library->library,
+						self->memory.base, self->memory.size, 0, &self->face);
+			if (error) {
+				freetype_error( error, "FT_Error memory %p:%x (%s:%d, code 0x%02x) : %s\n",
+						self->memory.base, self->memory.size,
+						__FILENAME__, __LINE__, FT_Errors[error].code, FT_Errors[error].message);
+				goto cleanup_library;
+			}
+			break;
 	}
 
 	/* Select charmap */
@@ -603,7 +621,7 @@ texture_font_load_glyphs( texture_font_t * self,
 		return 0;
 	}
 
-	if (!texture_font_load_face(self, self->size)) {
+	if (!texture_font_load_face(self, self->pt_size)) {
 		return utf8_strlen( codepoints );
 	}
 
@@ -611,8 +629,9 @@ texture_font_load_glyphs( texture_font_t * self,
 //	height = self->atlas->height;
 //	depth  = self->atlas->depth;
 
-	hb_buffer_set_language( self->buffer,
-							self->language );
+	hb_buffer_set_language( self->buffer, self->language );
+//	hb_buffer_set_script( self->buffer, self->script );
+//	hb_buffer_set_direction( self->buffer, self->direction );
 
 	/* Layout the text */
 	hb_buffer_add_utf8( self->buffer, codepoints, strlen(codepoints), 0, strlen(codepoints) );

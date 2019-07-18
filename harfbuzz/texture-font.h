@@ -248,7 +248,7 @@ typedef struct texture_font_t
 	/**
 	 * Font size
 	 */
-	float size;
+	float pt_size;
 
 	/**
 	 * Font hres (vertical hinting trick
@@ -379,14 +379,13 @@ typedef struct texture_font_t
  *
  * @return a new library (no font loaded yet)
  */
-texture_font_library_t *
-  texture_library_new();
+texture_font_library_t *texture_library_new(void);
 
 /**
  * This variable holds the per-thread library
  */
 
-extern __THREAD texture_font_library_t * freetype_gl_library;
+extern __THREAD texture_font_library_t *freetype_gl_library;
 
 /**
  * This function creates a new texture font from given filename and size.  The

@@ -80,7 +80,7 @@ font_manager_delete_font( font_manager_t * self,
 	for ( i=0; i<self->fonts->size;++i ) {
 		other = (texture_font_t *) vector_get( self->fonts, i );
 		if ( (strcmp(font->filename, other->filename) == 0)
-			   && ( font->size == other->size) ) {
+			   && ( font->pt_size == other->pt_size) ) {
 			vector_erase( self->fonts, i);
 			break;
 		}
@@ -102,7 +102,7 @@ font_manager_get_from_filename( font_manager_t *self,
 	assert( self );
 	for ( i=0; i<vector_size(self->fonts); ++i ) {
 		font = * (texture_font_t **) vector_get( self->fonts, i );
-		if ( (strcmp(font->filename, filename) == 0) && ( font->size == size) ) {
+		if ( (strcmp(font->filename, filename) == 0) && ( font->pt_size == size) ) {
 			return font;
 		}
 	}
@@ -206,7 +206,7 @@ font_manager_match_description( font_manager_t * self,
 	}
 	FcInit();
 	FcPattern *pattern = FcPatternCreate();
-	FcPatternAddDouble( pattern, FC_SIZE, size );
+	FcPatternAddDouble( pattern, FC_SIZE, pt_size );
 	FcPatternAddInteger( pattern, FC_WEIGHT, weight );
 	FcPatternAddInteger( pattern, FC_SLANT, slant );
 	FcPatternAddString( pattern, FC_FAMILY, (FcChar8*) family );

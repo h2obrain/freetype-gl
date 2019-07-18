@@ -27,7 +27,7 @@
 #include <vec234.h>
 
 #define WIDTH  500
-#define HEIGHT 1000
+#define HEIGHT 800
 
 // ------------------------------------------------------- typedef & struct ---
 typedef struct {

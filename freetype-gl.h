@@ -7,7 +7,9 @@
 #define __FREETYPE_GL_H__
 
 /* Mandatory */
+#ifndef FREETYPE_GL_NOGL
 #include "opengl.h"
+#endif
 #include "vec234.h"
 #include "vector.h"
 #include "texture-atlas.h"

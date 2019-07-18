@@ -223,7 +223,7 @@ texture_font_set_size ( texture_font_t *self, float size ) {
 				__FILENAME__, __LINE__, FT_Errors[error].code, FT_Errors[error].message);
 		return 0;
 	}
-	self->scale = self->size / self->face->available_sizes[best_match].width;
+	self->scale = self->pt_size / self->face->available_sizes[best_match].width;
 	} else {
 	/* Set char size */
 	error = FT_Set_Char_Size(self->face, (int)(size * HRES), 0, DPI * HRES, DPI);
@@ -246,13 +246,13 @@ void
 texture_font_init_size( texture_font_t * self) {
 	FT_Size_Metrics metrics;
 	
-	self->underline_position = self->face->underline_position / (float)(HRESf*HRESf) * self->size;
+	self->underline_position = self->face->underline_position / (float)(HRESf*HRESf) * self->pt_size;
 	self->underline_position = roundf( self->underline_position );
 	if ( self->underline_position > -2 ) {
 		self->underline_position = -2.0;
 	}
 
-	self->underline_thickness = self->face->underline_thickness / (float)(HRESf*HRESf) * self->size;
+	self->underline_thickness = self->face->underline_thickness / (float)(HRESf*HRESf) * self->pt_size;
 	self->underline_thickness = roundf( self->underline_thickness );
 	if ( self->underline_thickness < 1 ) {
 		self->underline_thickness = 1.0;
@@ -269,7 +269,7 @@ texture_font_init_size( texture_font_t * self) {
 static int
 texture_font_init(texture_font_t *self) {
 	assert(self->atlas);
-	assert(self->size > 0);
+	assert(self->pt_size > 0);
 	assert((self->location == TEXTURE_FONT_FILE && self->filename)
 		|| (self->location == TEXTURE_FONT_MEMORY
 			&& self->memory.base && self->memory.size));
@@ -294,13 +294,13 @@ texture_font_init(texture_font_t *self) {
 	self->lcd_weights[3] = 0x40;
 	self->lcd_weights[4] = 0x10;
 
-	if (!texture_font_load_face(self, self->size * 100.f)) {
+	if (!texture_font_load_face(self, self->pt_size * 100.f)) {
 		return -1;
 	}
 
 	texture_font_init_size( self );
 
-	if (!texture_font_set_size(self, self->size))
+	if (!texture_font_set_size(self, self->pt_size))
 	return -1;
 	
 	/* NULL is a special glyph */
@@ -335,7 +335,7 @@ texture_font_new_from_file(texture_atlas_t *atlas, const float pt_size,
 	}
 
 	self->atlas = atlas;
-	self->size  = pt_size;
+	self->pt_size  = pt_size;
 
 	self->location = TEXTURE_FONT_FILE;
 	self->filename = strdup(filename);
@@ -366,7 +366,7 @@ texture_font_new_from_memory(texture_atlas_t *atlas, float pt_size,
 	}
 
 	self->atlas = atlas;
-	self->size  = pt_size;
+	self->pt_size  = pt_size;
 
 	self->location = TEXTURE_FONT_MEMORY;
 	self->memory.base = memory_base;
@@ -650,7 +650,7 @@ texture_font_load_glyph( texture_font_t * self,
 		return 1;
 	}
 
-	if (!texture_font_load_face(self, self->size)) {
+	if (!texture_font_load_face(self, self->pt_size)) {
 		return 0;
 	}
 
