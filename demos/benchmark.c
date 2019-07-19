@@ -26,7 +26,7 @@ typedef struct {
 texture_atlas_t * atlas;
 texture_font_t * font;
 vertex_buffer_t * buffer;
-char *text =
+char *text_ar =
 	"A Quick Brown Fox Jumps Over The Lazy Dog 0123456789 "
 	"A Quick Brown Fox Jumps Over The Lazy Dog 0123456789 ";
 int line_count = 42;
@@ -83,7 +83,7 @@ void init( void ) {
 	pen.y = -font->descender;
 	for ( i=0; i<line_count; ++i ) {
 		pen.x = 10.0;
-		add_text( buffer, font, text, &color, &pen );
+		add_text( buffer, font, text_ar, &color, &pen );
 		pen.y += font->height - font->linegap;
 	}
 
@@ -120,7 +120,7 @@ void display( GLFWwindow* window ) {
 		printf(
 			"Computing FPS with text generation and rendering at each frame...\n" );
 		printf(
-			"Number of glyphs: %d\n", (int)strlen(text)*line_count );
+			"Number of glyphs: %d\n", (int)strlen(text_ar)*line_count );
 	}
 
 	frame++;
@@ -129,13 +129,13 @@ void display( GLFWwindow* window ) {
 	if ( time > 2.5 ) {
 		printf( "FPS : %.2f (%d frames in %.2f second, %.1f glyph/second)\n",
 				frame/time, frame, time,
-				frame/time * strlen(text)*line_count );
+				frame/time * strlen(text_ar)*line_count );
 		glfwSetTime( 0.0 );
 		frame = 0;
 		++count;
 		if ( count == 5 ) {
 			printf( "\nComputing FPS with text rendering at each frame...\n" );
-			printf( "Number of glyphs: %d\n", (int)strlen(text)*line_count );
+			printf( "Number of glyphs: %d\n", (int)strlen(text_ar)*line_count );
 		}
 		if ( count > 9 ) {
 			glfwSetWindowShouldClose( window, GL_TRUE );
@@ -150,7 +150,7 @@ void display( GLFWwindow* window ) {
 		pen.y = -font->descender;
 		for ( i=0; i<line_count; ++i ) {
 			pen.x = 10.0;
-			add_text( buffer, font, text, &color, &pen );
+			add_text( buffer, font, text_ar, &color, &pen );
 			pen.y += font->height - font->linegap;
 		}
 	}

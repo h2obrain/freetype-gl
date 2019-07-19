@@ -41,10 +41,10 @@ texture_atlas_t *atlas;
 vertex_buffer_t * vbuffer;
 mat4 model, view, projection;
 
-const char *text = "صِف خَلقَ خَودِ كَمِثلِ الشَمسِ إِذ بَزَغَت — يَحظى الضَجيعُ بِها نَجلاءَ مِعطارِ";
+const char *text_ar = "صِف خَلقَ خَودِ كَمِثلِ الشَمسِ إِذ بَزَغَت — يَحظى الضَجيعُ بِها نَجلاءَ مِعطارِ";
 const char *font_filename      = "fonts/amiri-regular.ttf";
-const hb_direction_t direction = HB_DIRECTION_RTL;
-const hb_script_t script       = HB_SCRIPT_ARABIC;
+const hb_direction_t direction_ar = HB_DIRECTION_RTL;
+const hb_script_t script_ar       = HB_SCRIPT_ARABIC;
 const char *language           = "ar";
 
 // ------------------------------------------------------------------- init ---
@@ -56,12 +56,12 @@ void init( void ) {
 	texture_font_t *fonts[15];
 	printf("Creating font size: %zu\n", 8);
 	fonts[0] = texture_font_new_from_file(atlas, 8, font_filename, language);
-	texture_font_load_glyphs(fonts[0], text );
+	texture_font_load_glyphs(fonts[0], text_ar );
 	for ( i=1; i<NUM_FONTS; ++i ) {
 		printf("Creating font size: %zu\n", 8+i);
 //		fonts[i] = texture_font_new_from_file(atlas, 12+i, font_filename, language);
 		fonts[i] = texture_font_clone(fonts[0], 8+i);
-		texture_font_load_glyphs(fonts[i], text );
+		texture_font_load_glyphs(fonts[i], text_ar );
 	}
 
 
@@ -104,11 +104,11 @@ void init( void ) {
 	float x,y;
 	y = HEIGHT;
 	for (i=0; i < NUM_FONTS; ++i) {
-		hb_buffer_add_utf8( buffer, text, strlen(text), 0, strlen(text) );
+		hb_buffer_add_utf8( buffer, text_ar, strlen(text_ar), 0, strlen(text_ar) );
 		hb_buffer_set_language( buffer, fonts[i]->language );
 //		hb_buffer_guess_segment_properties( buffer );
-		hb_buffer_set_script( buffer, script );
-		hb_buffer_set_direction( buffer, direction );
+		hb_buffer_set_script( buffer, script_ar );
+		hb_buffer_set_direction( buffer, direction_ar );
 		hb_shape( fonts[i]->hb_ft_font, buffer, NULL, 0 );
 
 		unsigned int         glyph_count;
@@ -117,7 +117,7 @@ void init( void ) {
 		glyph_info = hb_buffer_get_glyph_infos(buffer, &glyph_count);
 		glyph_pos  = hb_buffer_get_glyph_positions(buffer, &glyph_count);
 
-		texture_font_load_glyphs( fonts[i], text );
+		texture_font_load_glyphs( fonts[i], text_ar );
 
 		float gamma = 1.0;
 		float shift = 0.0;

@@ -85,8 +85,8 @@ texture_glyph_delete( texture_glyph_t *self ) {
 
 // -------------------------------------------------- texture_is_color_font ---
 
-int
-texture_is_color_font( texture_font_t *self) {
+int texture_is_color_font(texture_font_t *self);
+int texture_is_color_font(texture_font_t *self) {
 	static const uint32_t tag = FT_MAKE_TAG('C', 'B', 'D', 'T');
 	unsigned long length = 0;
 	FT_Load_Sfnt_Table(self->face, tag, 0, NULL, &length);
@@ -156,8 +156,8 @@ texture_font_set_size ( texture_font_t *self, float size ) {
 
 // --------------------------------------------------
 
-void
-texture_font_init_size( texture_font_t * self) {
+void texture_font_init_size(texture_font_t * self);
+void texture_font_init_size(texture_font_t * self) {
 	FT_Size_Metrics metrics;
 	
 	self->underline_position = self->face->underline_position / (float)(self->hres*self->hres) * self->pt_size;
@@ -799,7 +799,7 @@ cleanup_stroker:
 		region = texture_atlas_get_region( self->atlas, tgt_w, tgt_h );
 //		printf("Region { %d,%d,%zu,%zu,%zu,%zu,%d }\n",region.x,region.y,tgt_w,tgt_h,src_w,src_h,ft_bitmap.width);
 
-		if ( region.x < 0 ) {
+		if (region.x < 0) {
 			freetype_gl_error( Texture_Atlas_Full,
 							   "Texture atlas is full, asked for %i*%i (%s:%d)\n",
 							   tgt_w, tgt_h,
@@ -815,24 +815,32 @@ cleanup_stroker:
 
 		unsigned char *dst_ptr = buffer + (padding.top * tgt_w + padding.left) * self->atlas->depth;
 		unsigned char *src_ptr = ft_bitmap.buffer;
-		for ( h = 0; h < src_h; h++ ) {
+//#define REVERSE
+#ifdef REVERSE
+		src_ptr += ft_bitmap.pitch * (src_h-1);
+#endif
+		for (h = 0; h < src_h; h++) {
 			//difference between width and pitch: https://www.freetype.org/freetype2/docs/reference/ft2-basic_types.html#FT_Bitmap
 			memcpy( dst_ptr, src_ptr, ft_bitmap.width << (self->atlas->depth == 4 ? 2 : 0));
 			dst_ptr += tgt_w * self->atlas->depth;
+#ifdef REVERSE
+			src_ptr -= ft_bitmap.pitch;
+#else
 			src_ptr += ft_bitmap.pitch;
+#endif
 		}
 
-		if ( self->rendermode == RENDER_SIGNED_DISTANCE_FIELD ) {
+		if (self->rendermode == RENDER_SIGNED_DISTANCE_FIELD) {
 			unsigned char *sdf = make_distance_mapb( buffer, tgt_w, tgt_h );
 			free( buffer );
 			buffer = sdf;
 		}
 
-		texture_atlas_set_region( self->atlas, x, y, tgt_w, tgt_h, buffer, tgt_w * self->atlas->depth);
+		texture_atlas_set_region(self->atlas, x, y, tgt_w, tgt_h, buffer, tgt_w * self->atlas->depth);
 
 		free( buffer );
 
-		glyph = texture_glyph_new( );
+		glyph = texture_glyph_new();
 		glyph->codepoint = glyph_info[i].codepoint;
 
 #ifdef TEXTURE_FONT_ENABLE_SCALING
@@ -877,13 +885,13 @@ cleanup_stroker:
 			glyph->advance_x = slot->advance.x * self->scale / self->hres;
 			glyph->advance_y = slot->advance.y * self->scale / self->hres;
 		}
-*/
+		*/
 		int free_glyph = texture_font_index_glyph32(self, glyph, glyph_info[i].codepoint);
 		if (!glyph_info[i].codepoint) { //if (!glyph_index) {
 			if (!free_glyph) {
 				texture_glyph_t *new_glyph = malloc(sizeof(texture_glyph_t));
 				memcpy(new_glyph, glyph, sizeof(texture_glyph_t));
-				glyph=new_glyph;
+				glyph = new_glyph;
 			}
 			free_glyph = texture_font_index_glyph32(self, glyph, 0);
 		}
@@ -892,7 +900,7 @@ cleanup_stroker:
 			free(glyph);
 		}
 
-		if ( self->rendermode != RENDER_NORMAL && self->rendermode != RENDER_SIGNED_DISTANCE_FIELD ) {
+		if ((self->rendermode != RENDER_NORMAL) && (self->rendermode != RENDER_SIGNED_DISTANCE_FIELD) ) {
 			FT_Done_Glyph( ft_glyph );
 		}
 	}
@@ -930,9 +938,8 @@ texture_font_get_glyph32( texture_font_t * self, uint32_t codepoint ) {
 }
 
 // ------------------------------------------  texture_font_enlarge_texture ---
-void
-texture_font_enlarge_texture( texture_font_t * self, size_t width_new,
-			  	size_t height_new) {
+void texture_font_enlarge_texture(texture_font_t * self, size_t width_new, size_t height_new);
+void texture_font_enlarge_texture(texture_font_t * self, size_t width_new, size_t height_new) {
 	assert(self);
 	assert(self->atlas);
 	//ensure size increased
