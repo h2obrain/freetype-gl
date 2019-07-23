@@ -29,7 +29,7 @@ vertex_buffer_t * buffer;
 char *text_ar =
 	"A Quick Brown Fox Jumps Over The Lazy Dog 0123456789 "
 	"A Quick Brown Fox Jumps Over The Lazy Dog 0123456789 ";
-int line_count = 42;
+size_t line_count = 42;
 GLuint shader;
 mat4   model, view, projection;
 
@@ -118,9 +118,10 @@ void display( GLFWwindow* window ) {
 
 	if ( count == 0 && frame == 0 ) {
 		printf(
-			"Computing FPS with text generation and rendering at each frame...\n" );
-		printf(
-			"Number of glyphs: %d\n", (int)strlen(text_ar)*line_count );
+			"Computing FPS with text generation and rendering at each frame...\n"
+			"Number of glyphs: %d\n",
+			(int)(strlen(text_ar)*line_count)
+		);
 	}
 
 	frame++;
@@ -134,8 +135,11 @@ void display( GLFWwindow* window ) {
 		frame = 0;
 		++count;
 		if ( count == 5 ) {
-			printf( "\nComputing FPS with text rendering at each frame...\n" );
-			printf( "Number of glyphs: %d\n", (int)strlen(text_ar)*line_count );
+			printf( "\n"
+					"Computing FPS with text rendering at each frame...\n"
+					"Number of glyphs: %d\n",
+					(int)(strlen(text_ar)*line_count)
+				);
 		}
 		if ( count > 9 ) {
 			glfwSetWindowShouldClose( window, GL_TRUE );
@@ -176,6 +180,7 @@ void display( GLFWwindow* window ) {
 
 // ---------------------------------------------------------------- reshape ---
 void reshape( GLFWwindow* window, int width, int height ) {
+	(void)window;
 	glViewport(0, 0, width, height);
 	mat4_set_orthographic( &projection, 0, width, 0, height, -1, 1);
 }
@@ -183,6 +188,7 @@ void reshape( GLFWwindow* window, int width, int height ) {
 
 // --------------------------------------------------------------- keyboard ---
 void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods ) {
+	(void)window; (void)scancode; (void)mods;
 	if ( key == GLFW_KEY_ESCAPE && action == GLFW_PRESS ) {
 		glfwSetWindowShouldClose( window, GL_TRUE );
 	}
@@ -191,6 +197,7 @@ void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods )
 
 // --------------------------------------------------------- error-callback ---
 void error_callback( int error, const char* description ) {
+	(void)error;
 	fputs( description, stderr );
 }
 

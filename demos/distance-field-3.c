@@ -100,14 +100,14 @@ resize( double *src_data, size_t src_width, size_t src_height,
 		for ( i=0; i < dst_width; ++i ) {
 			int src_i = (int) floor( i * xscale );
 			int src_j = (int) floor( j * yscale );
-			int i0 = min( max( 0, src_i-1 ), src_width-1 );
-			int i1 = min( max( 0, src_i   ), src_width-1 );
-			int i2 = min( max( 0, src_i+1 ), src_width-1 );
-			int i3 = min( max( 0, src_i+2 ), src_width-1 );
-			int j0 = min( max( 0, src_j-1 ), src_height-1 );
-			int j1 = min( max( 0, src_j   ), src_height-1 );
-			int j2 = min( max( 0, src_j+1 ), src_height-1 );
-			int j3 = min( max( 0, src_j+2 ), src_height-1 );
+			int i0 = min( max( 0, src_i-1 ), (int)src_width-1 );
+			int i1 = min( max( 0, src_i   ), (int)src_width-1 );
+			int i2 = min( max( 0, src_i+1 ), (int)src_width-1 );
+			int i3 = min( max( 0, src_i+2 ), (int)src_width-1 );
+			int j0 = min( max( 0, src_j-1 ), (int)src_height-1 );
+			int j1 = min( max( 0, src_j   ), (int)src_height-1 );
+			int j2 = min( max( 0, src_j+1 ), (int)src_height-1 );
+			int j3 = min( max( 0, src_j+2 ), (int)src_height-1 );
 			float t0 = interpolate( i / (float) dst_width,
 									src_data[j0*src_width+i0],
 									src_data[j0*src_width+i1],
@@ -293,15 +293,15 @@ void display( GLFWwindow* window ) {
 	glEnable( GL_BLEND );
 	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
-	texture_glyph_t * glyph = texture_font_get_glyph( font, "@");
+//	texture_glyph_t * glyph = texture_font_get_glyph( font, "@");
 
 	int width, height;
 	glfwGetFramebufferSize( window, &width, &height );
 
-	float glyph_height = glyph->height * width/(float)glyph->width;
-	float glyph_width  = glyph->width * height/(float)glyph->height;
-	int x = -glyph_width/2 + width/2.;
-	int y = -glyph_height/2 + height/2.;
+//	float glyph_height = glyph->height * width/(float)glyph->width;
+//	float glyph_width  = glyph->width * height/(float)glyph->height;
+//	int x = -glyph_width/2 + width/2.;
+//	int y = -glyph_height/2 + height/2.;
 
 	float s = .025+.975*(1+cos(angle/100.0))/2.;
 
@@ -334,6 +334,7 @@ void display( GLFWwindow* window ) {
 
 // ---------------------------------------------------------------- reshape ---
 void reshape( GLFWwindow* window, int width, int height ) {
+	(void)window;
 	glViewport(0, 0, width, height);
 	mat4_set_orthographic( &projection, 0, width, 0, height, -1, 1);
 }
@@ -341,6 +342,7 @@ void reshape( GLFWwindow* window, int width, int height ) {
 
 // --------------------------------------------------------------- keyboard ---
 void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods ) {
+	(void)window; (void)scancode; (void)mods;
 	if ( key == GLFW_KEY_ESCAPE && action == GLFW_PRESS ) {
 		glfwSetWindowShouldClose( window, GL_TRUE );
 	}
@@ -349,6 +351,7 @@ void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods )
 
 // --------------------------------------------------------- error-callback ---
 void error_callback( int error, const char* description ) {
+	(void)error;
 	fputs( description, stderr );
 }
 

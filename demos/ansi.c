@@ -185,7 +185,6 @@ print( text_buffer_t * buffer, vec2 * pen,
 	   char *text, markup_t *markup ) {
 	char *seq_start = text, *seq_end = text;
 	char *p;
-	size_t i;
 	for ( p=text; p<(text+strlen(text)); ++p ) {
 		char *start = strstr( p, "\033[" );
 		char *end = NULL;
@@ -309,6 +308,7 @@ void display( GLFWwindow* window ) {
 
 // ---------------------------------------------------------------- reshape ---
 void reshape( GLFWwindow* window, int width, int height ) {
+	(void)window;
 	glViewport(0, 0, width, height);
 	mat4_set_orthographic( &projection, 0, width, 0, height, -1, 1);
 }
@@ -316,6 +316,7 @@ void reshape( GLFWwindow* window, int width, int height ) {
 
 // --------------------------------------------------------------- keyboard ---
 void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods ) {
+	(void)window; (void)scancode; (void)mods;
 	if ( key == GLFW_KEY_ESCAPE && action == GLFW_PRESS ) {
 		glfwSetWindowShouldClose( window, GL_TRUE );
 	}
@@ -324,6 +325,7 @@ void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods )
 
 // --------------------------------------------------------- error-callback ---
 void error_callback( int error, const char* description ) {
+	(void)error;
 	fputs( description, stderr );
 }
 

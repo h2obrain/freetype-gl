@@ -378,7 +378,7 @@ console_print( console_t *self, char *text ) {
 
 		vector_set( self->lines, self->lines->size-1, &line );
 		free( last_line );
-		if ( (end-start)  < (strlen( text )-1) ) {
+		if ( (end-start)  < (ssize_t)(strlen( text )-1) ) {
 			console_print(self, end+1 );
 		}
 		return;
@@ -493,6 +493,7 @@ console_process( console_t *self,
 
 // ------------------------------------------------------- console activate ---
 void console_activate( console_t *self, char *input ) {
+	(void)self;
 	//console_print( self, "Activate callback\n" );
 	fprintf( stderr, "Activate callback : %s\n", input );
 }
@@ -500,6 +501,7 @@ void console_activate( console_t *self, char *input ) {
 
 // ------------------------------------------------------- console complete ---
 void console_complete( console_t *self, char *input ) {
+	(void)self;
 	// console_print( self, "Complete callback\n" );
 	fprintf( stderr, "Complete callback : %s\n", input );
 }
@@ -507,6 +509,7 @@ void console_complete( console_t *self, char *input ) {
 
 // ----------------------------------------------- console previous history ---
 void console_history_prev( console_t *self, char *input ) {
+	(void)self;
 	// console_print( self, "History prev callback\n" );
 	fprintf( stderr, "History prev callback : %s\n", input );
 }
@@ -514,6 +517,7 @@ void console_history_prev( console_t *self, char *input ) {
 
 // --------------------------------------------------- console next history ---
 void console_history_next( console_t *self, char *input ) {
+	(void)self;
 	// console_print( self, "History next callback\n" );
 	fprintf( stderr, "History next callback : %s\n", input );
 }
@@ -556,6 +560,7 @@ void display( GLFWwindow* window ) {
 
 // ---------------------------------------------------------------- reshape ---
 void reshape( GLFWwindow* window, int width, int height ) {
+	(void)window;
 	glViewport(0, 0, width, height);
 	mat4_set_orthographic( &projection, 0, width, 0, height, -1, 1);
 }
@@ -563,6 +568,7 @@ void reshape( GLFWwindow* window, int width, int height ) {
 
 // ----------------------------------------------------------- on char input ---
 void char_input( GLFWwindow* window, unsigned int cp ) {
+	(void)window;
 	if ( control_key_handled ) {
 		control_key_handled = 0;
 		return;
@@ -574,6 +580,7 @@ void char_input( GLFWwindow* window, unsigned int cp ) {
 
 // --------------------------------------------------------------- keyboard ---
 void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods ) {
+	(void)window; (void)scancode; (void)mods;
 	if ( GLFW_PRESS != action && GLFW_REPEAT != action ) {
 		return;
 	}
@@ -641,6 +648,7 @@ void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods )
 
 // --------------------------------------------------------- error-callback ---
 void error_callback( int error, const char* description ) {
+	(void)error;
 	fputs( description, stderr );
 }
 

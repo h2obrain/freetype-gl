@@ -21,9 +21,6 @@
 #include "utf8-utils.h"
 #include "freetype-gl-err.h"
 
-#define HRES  100
-#define DPI   72
-
 #undef __FTERRORS_H__
 #define FT_ERRORDEF( e, v, s )  { e, s },
 #define FT_ERROR_START_LIST     {
@@ -140,7 +137,7 @@ texture_font_set_size ( texture_font_t *self, float size ) {
 		/* Set char size */
 		self->pt_size = size / self->hres;
 //		self->size = size;
-		error = FT_Set_Char_Size(self->face, (int)(size * 64), 0, DPI * self->hres, DPI);
+		error = FT_Set_Char_Size(self->face, (int)(size * 64), 0, self->dpi * self->hres, self->dpi);
 
 		if (error) {
 			freetype_error( error, "FT_Error (%s:%d, code 0x%02x) : %s\n",
@@ -194,7 +191,6 @@ texture_font_init(texture_font_t *self) {
 	self->descender = 0;
 	self->rendermode = RENDER_NORMAL;
 	self->outline_thickness = 0.0;
-	self->hres = HRES;
 	self->hinting = 1;
 	self->filtering = 1;
 #if defined(TEXTURE_FONT_ENABLE_SCALING)
@@ -245,8 +241,12 @@ texture_library_new() {
 
 // --------------------------------------------- texture_font_new_from_file ---
 texture_font_t *
-texture_font_new_from_file(texture_atlas_t *atlas, const float pt_size,
-		const char *filename, const char *language) {
+texture_font_new_from_file(
+		texture_atlas_t *atlas,
+		const float pt_size, float dpi, float hres,
+		const char *filename,
+		const char *language
+) {
 	texture_font_t *self;
 
 	assert(filename);
@@ -260,6 +260,8 @@ texture_font_new_from_file(texture_atlas_t *atlas, const float pt_size,
 
 	self->atlas = atlas;
 	self->pt_size  = pt_size;
+	self->dpi = dpi;
+	self->hres = hres;
 
 	self->location = TEXTURE_FONT_FILE;
 	self->filename = strdup(filename);
@@ -277,8 +279,12 @@ texture_font_new_from_file(texture_atlas_t *atlas, const float pt_size,
 
 // ------------------------------------------- texture_font_new_from_memory ---
 texture_font_t *
-texture_font_new_from_memory(texture_atlas_t *atlas, float pt_size,
-		const void *memory_base, size_t memory_size, const char *language) {
+texture_font_new_from_memory(
+		texture_atlas_t *atlas,
+		float pt_size, float dpi, float hres,
+		const void *memory_base, size_t memory_size,
+		const char *language
+) {
 	texture_font_t *self;
 
 	assert(memory_base);
@@ -293,6 +299,8 @@ texture_font_new_from_memory(texture_atlas_t *atlas, float pt_size,
 
 	self->atlas = atlas;
 	self->pt_size = pt_size;
+	self->dpi = dpi;
+	self->hres = hres;
 
 	self->location = TEXTURE_FONT_MEMORY;
 	self->memory.base = memory_base;

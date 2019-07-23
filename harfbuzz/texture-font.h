@@ -251,7 +251,12 @@ typedef struct texture_font_t
 	float pt_size;
 
 	/**
-	 * Font hres (vertical hinting trick
+	 * Screen dpi
+	 */
+	float dpi;
+
+	/**
+	 * Font hres (vertical hinting trick)
 	 */
 	float hres;
 
@@ -402,10 +407,12 @@ extern __THREAD texture_font_library_t *freetype_gl_library;
  *
  */
 texture_font_t *
-texture_font_new_from_file( texture_atlas_t * atlas,
-						  const float pt_size,
-						  const char * filename,
-						  const char *language);
+texture_font_new_from_file(
+		texture_atlas_t *atlas,
+		const float pt_size, float dpi, float hres,
+		const char *filename,
+		const char *language
+	);
 
 
 /**
@@ -424,11 +431,12 @@ texture_font_new_from_file( texture_atlas_t * atlas,
  *
  */
 texture_font_t *
-texture_font_new_from_memory( texture_atlas_t *atlas,
-							float pt_size,
-							const void *memory_base,
-							size_t memory_size,
-							const char *language);
+texture_font_new_from_memory(
+		texture_atlas_t *atlas,
+		float pt_size, float dpi, float hres,
+		const void *memory_base, size_t memory_size,
+		const char *language
+	);
 
 /**
  * Clone the freetype-gl font and set a different size

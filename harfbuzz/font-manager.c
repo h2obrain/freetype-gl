@@ -106,7 +106,7 @@ font_manager_get_from_filename( font_manager_t *self,
 			return font;
 		}
 	}
-	font = texture_font_new_from_file( self->atlas, size, filename, language );
+	font = texture_font_new_from_file( self->atlas, size,72,100, filename, language );
 	if ( font ) {
 		vector_push_back( self->fonts, &font );
 		texture_font_load_glyphs( font, self->cache );
@@ -188,6 +188,11 @@ font_manager_match_description( font_manager_t * self,
 ) {
 // Use of fontconfig is disabled by default.
 #if 1
+	(void)self;
+	(void)family;
+	(void)size;
+	(void)bold;
+	(void)italic;
 	return 0;
 #else
 #  if defined _WIN32 || defined _WIN64

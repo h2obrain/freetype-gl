@@ -249,6 +249,7 @@ void TW_CALL get_float( void *value, void *data ) {
 
 // -------------------------------------------------- get/set lcd_filtering ---
 void TW_CALL set_lcd_filtering( const void *value, void *data ) {
+	(void)data;
 	p_lcd_filtering = *(const int *) value;
 	if ( p_lcd_filtering ) {
 		font_manager = font_manager_rgb;
@@ -258,6 +259,7 @@ void TW_CALL set_lcd_filtering( const void *value, void *data ) {
 	build_buffer();
 }
 void TW_CALL get_lcd_filtering( void *value, void *data ) {
+	(void)data;
 	*(int *)value = p_lcd_filtering;
 }
 
@@ -465,6 +467,7 @@ void display( GLFWwindow* window ) {
 
 // ---------------------------------------------------------------- reshape ---
 void reshape( GLFWwindow* window, int width, int height ) {
+	(void)window;
 	glViewport(0, 0, width, height);
 	mat4_set_orthographic( &projection, 0, width, 0, height, -1, 1);
 	TwWindowSize( width, height );
@@ -473,12 +476,14 @@ void reshape( GLFWwindow* window, int width, int height ) {
 
 // ------------------------------------------------------------- cursor_pos ---
 void cursor_pos( GLFWwindow* window, double x, double y ) {
+	(void)window;
 	TwMouseMotion( x, y );
 }
 
 
 // ----------------------------------------------------------- mouse_button ---
 void mouse_button( GLFWwindow* window, int button, int action, int mods) {
+	(void)window; (void)mods;
 	TwMouseAction tw_action;
 	TwMouseButtonID tw_button;
 
@@ -508,6 +513,7 @@ void mouse_button( GLFWwindow* window, int button, int action, int mods) {
 
 // --------------------------------------------------------------- keyboard ---
 void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods ) {
+	(void)window; (void)scancode; (void)mods;
 	int tw_key = 0;
 	int tw_mods = TW_KMOD_NONE;
 
@@ -575,6 +581,7 @@ void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods )
 
 // --------------------------------------------------------- error-callback ---
 void error_callback( int error, const char* description ) {
+	(void)error;
 	fputs( description, stderr );
 }
 

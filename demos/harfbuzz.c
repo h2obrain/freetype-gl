@@ -54,8 +54,8 @@ void init( void ) {
 
 	atlas = texture_atlas_new( 300, 330, 3 );
 	texture_font_t *fonts[15];
-	printf("Creating font size: %zu\n", 8);
-	fonts[0] = texture_font_new_from_file(atlas, 8, font_filename, language);
+	printf("Creating font size: %d\n", 8);
+	fonts[0] = texture_font_new_from_file(atlas, 8,72,100, font_filename, language);
 	texture_font_load_glyphs(fonts[0], text_ar );
 	for ( i=1; i<NUM_FONTS; ++i ) {
 		printf("Creating font size: %zu\n", 8+i);
@@ -229,6 +229,7 @@ void display( GLFWwindow* window ) {
 
 // ---------------------------------------------------------------- reshape ---
 void reshape( GLFWwindow* window, int width, int height ) {
+	(void)window;
 	glViewport(0, 0, width, height);
 	mat4_set_orthographic( &projection, 0, width, 0, height, -1, 1);
 }
@@ -236,6 +237,7 @@ void reshape( GLFWwindow* window, int width, int height ) {
 
 // --------------------------------------------------------------- keyboard ---
 void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods ) {
+	(void)window; (void)scancode; (void)mods;
 	if ( key == GLFW_KEY_ESCAPE && action == GLFW_PRESS ) {
 		glfwSetWindowShouldClose( window, GL_TRUE );
 	}
@@ -244,6 +246,7 @@ void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods )
 
 // --------------------------------------------------------- error-callback ---
 void error_callback( int error, const char* description ) {
+	(void)error;
 	fputs( description, stderr );
 }
 

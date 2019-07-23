@@ -107,9 +107,12 @@ int force_ucs2_charmap( FT_Face face ) {
 // ------------------------------------------------------------------- init ---
 void init( void ) {
 	size_t i, j;
-	int ptSize = 50*64;
-	int device_hdpi = 72;
-	int device_vdpi = 72;
+	int size = 50;
+	int ptSize = size*64;
+	int hdpi = 72;
+	int vdpi = 72;
+	int dpi  = hdpi;
+	int hres = 100;
 
 	atlas = texture_atlas_new( 512, 512, 3 );
 
@@ -120,17 +123,17 @@ void init( void ) {
 	/* Load our fonts */
 	FT_Face ft_face[NUM_EXAMPLES];
 	assert(!FT_New_Face( ft_library, fonts[ENGLISH], 0, &ft_face[ENGLISH]) );
-	assert(!FT_Set_Char_Size( ft_face[ENGLISH], 0, ptSize, device_hdpi, device_vdpi ) );
+	assert(!FT_Set_Char_Size( ft_face[ENGLISH], 0, ptSize, hdpi, vdpi ) );
 	// ftfdump( ft_face[ENGLISH] );            // wonderful world of encodings ...
 	force_ucs2_charmap( ft_face[ENGLISH] ); // which we ignore.
 
 	assert( !FT_New_Face(ft_library, fonts[ARABIC], 0, &ft_face[ARABIC]) );
-	assert( !FT_Set_Char_Size(ft_face[ARABIC], 0, ptSize, device_hdpi, device_vdpi ) );
+	assert( !FT_Set_Char_Size(ft_face[ARABIC], 0, ptSize, hdpi, vdpi ) );
 	// ftfdump( ft_face[ARABIC] );
 	force_ucs2_charmap( ft_face[ARABIC] );
 
 	assert(!FT_New_Face( ft_library, fonts[CHINESE], 0, &ft_face[CHINESE]) );
-	assert(!FT_Set_Char_Size( ft_face[CHINESE], 0, ptSize, device_hdpi, device_vdpi ) );
+	assert(!FT_Set_Char_Size( ft_face[CHINESE], 0, ptSize, hdpi, vdpi ) );
 	// ftfdump( ft_face[CHINESE] );
 	force_ucs2_charmap( ft_face[CHINESE] );
 
@@ -160,8 +163,6 @@ void init( void ) {
 
 		FT_GlyphSlot slot;
 		FT_Bitmap ft_bitmap;
-		float size = 24;
-		size_t hres = 64;
 		FT_Error error;
 		FT_Int32 flags = 0;
 		flags |= FT_LOAD_RENDER;
@@ -172,7 +173,7 @@ void init( void ) {
 							 (int)((0.0)      * 0x10000L),
 							 (int)((1.0)      * 0x10000L) };
 		/* Set char size */
-		error = FT_Set_Char_Size( ft_face[i], (int)(ptSize), 0, 72*hres, 72 );
+		error = FT_Set_Char_Size( ft_face[i], (int)(ptSize), 0, dpi*hres, dpi );
 		if ( error ) {
 			//fprintf( stderr, "FT_Error (line %d, code 0x%02x) : %s\n",
 			//         __LINE__, FT_Errors[error].code, FT_Errors[error].message );
@@ -197,9 +198,9 @@ void init( void ) {
 			ft_bitmap = slot->bitmap;
 			int ft_bitmap_width = slot->bitmap.width;
 			int ft_bitmap_rows  = slot->bitmap.rows;
-			int ft_bitmap_pitch = slot->bitmap.pitch;
-			int ft_glyph_top    = slot->bitmap_top;
-			int ft_glyph_left   = slot->bitmap_left;
+//			int ft_bitmap_pitch = slot->bitmap.pitch;
+//			int ft_glyph_top    = slot->bitmap_top;
+//			int ft_glyph_left   = slot->bitmap_left;
 
 			int w = ft_bitmap_width/3; // 3 because of LCD/RGB encoding
 			int h = ft_bitmap_rows;
@@ -209,7 +210,7 @@ void init( void ) {
 		fprintf( stderr, "Texture atlas is full (%s:%d)\n", __FILE__, __LINE__ );
 				continue;
 			}
-			int x = region.x, y = region.y;
+//			int x = region.x, y = region.y;
 			texture_atlas_set_region( atlas, region.x, region.y,
 									  w, h, ft_bitmap.buffer, ft_bitmap.pitch );
 			printf("%d: %dx%d %f %f\n",
@@ -289,6 +290,7 @@ void display( GLFWwindow* window ) {
 
 // ---------------------------------------------------------------- reshape ---
 void reshape( GLFWwindow* window, int width, int height ) {
+	(void)window;
 	glViewport(0, 0, width, height);
 	mat4_set_orthographic( &projection, 0, width, 0, height, -1, 1);
 }
@@ -296,6 +298,7 @@ void reshape( GLFWwindow* window, int width, int height ) {
 
 // --------------------------------------------------------------- keyboard ---
 void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods ) {
+	(void)window; (void)scancode; (void)mods;
 	if ( key == GLFW_KEY_ESCAPE && action == GLFW_PRESS ) {
 		glfwSetWindowShouldClose( window, GL_TRUE );
 	}
@@ -304,6 +307,7 @@ void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods )
 
 // --------------------------------------------------------- error-callback ---
 void error_callback( int error, const char* description ) {
+	(void)error;
 	fputs( description, stderr );
 }
 

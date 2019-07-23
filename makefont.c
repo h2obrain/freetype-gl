@@ -37,7 +37,7 @@ void print_glyph(FILE * file, texture_glyph_t * glyph) {
 	fprintf( file, "%ff, %ff, %ff, %ff, ", glyph->s0, glyph->t0, glyph->s1, glyph->t1 );
 	fprintf( file, "%" PRIzu ", ", vector_size(glyph->kerning) );
 	if (vector_size(glyph->kerning) == 0) {
-	fprintf( file, "0" );
+	fprintf( file, "{{0}}" );
 	} else {
 	int k;
 	fprintf( file, "{ " );
@@ -286,7 +286,6 @@ int main( int argc, char **argv ) {
 			"Number of missed glyphs : %ld\n"
 			"Texture size            : %ldx%ldx%ld\n"
 			"Texture occupancy       : %.2f%%\n"
-			"\n"
 			"Header filename         : %s\n"
 			"Variable name           : %s\n"
 			"Render mode             : %s\n",
@@ -476,14 +475,14 @@ int main( int argc, char **argv ) {
 	// --------------
 	fprintf( file, " {\n" );
 	GLYPHS_ITERATOR1(i, glyph, font->glyphs) {
-	fprintf( file, " {\n" );
+	fprintf( file, " {{\n" );
 	GLYPHS_ITERATOR2(i, glyph, font->glyphs) {
 		fprintf( file, "  &%s_glyph_%08x,\n", variable_name, glyph->codepoint );
 	} else {
 		fprintf( file, "  NULL,\n" );
 	}
 	GLYPHS_ITERATOR_END1;
-	fprintf( file, " },\n" );
+	fprintf( file, " }},\n" );
 	} GLYPHS_ITERATOR_END2;
 	fprintf( file, " }\n};\n" );
 	fprintf( file,

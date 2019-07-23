@@ -12,6 +12,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 #include <fontconfig/fontconfig.h>
 
 #include "freetype-gl.h"
@@ -56,7 +57,7 @@ match_description( char * description ) {
 
 	char *filename = 0;
 	FcInit();
-	FcPattern *pattern = FcNameParse(description);
+	FcPattern *pattern = FcNameParse((uint8_t *)description);
 	FcConfigSubstitute( 0, pattern, FcMatchPattern );
 	FcDefaultSubstitute( pattern );
 	FcResult result;
@@ -276,6 +277,7 @@ void display( GLFWwindow* window ) {
 
 // ---------------------------------------------------------------- reshape ---
 void reshape( GLFWwindow* window, int width, int height ) {
+	(void)window;
 	glViewport(0, 0, width, height);
 	mat4_set_orthographic( &projection, 0, width, 0, height, -1, 1);
 }
@@ -283,6 +285,7 @@ void reshape( GLFWwindow* window, int width, int height ) {
 
 // --------------------------------------------------------------- keyboard ---
 void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods ) {
+	(void)window; (void)scancode; (void)mods;
 	if ( key == GLFW_KEY_ESCAPE && action == GLFW_PRESS ) {
 		glfwSetWindowShouldClose( window, GL_TRUE );
 	}
@@ -291,6 +294,7 @@ void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods )
 
 // --------------------------------------------------------- error-callback ---
 void error_callback( int error, const char* description ) {
+	(void)error;
 	fputs( description, stderr );
 }
 
