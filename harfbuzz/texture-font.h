@@ -60,7 +60,7 @@ namespace ftgl {
 /**
  * A list of possible ways to render a glyph.
  */
-typedef enum rendermode_t
+typedef enum
 {
 	RENDER_NORMAL,
 	RENDER_OUTLINE_EDGE,
@@ -72,7 +72,7 @@ typedef enum rendermode_t
 /**
  * Glyph array end mark type
  */
-typedef enum glyphmode_t
+typedef enum
 {
 	GLYPH_END=0,
 	GLYPH_CONT=1
@@ -81,7 +81,7 @@ typedef enum glyphmode_t
 /**
  * A structure that describe a glyph.
  */
-typedef struct texture_glyph_t
+typedef struct
 {
 	/**
 	 * Unicode codepoint this glyph represents in UTF-32 LE encoding.
@@ -152,7 +152,7 @@ typedef struct texture_glyph_t
 
 } texture_glyph_t;
 
-typedef enum font_location_t {
+typedef enum {
 	TEXTURE_FONT_FILE = 0,
 	TEXTURE_FONT_MEMORY,
 } font_location_t;
@@ -160,7 +160,7 @@ typedef enum font_location_t {
 /**
  * Enum type for automatic open/close
  */
-typedef enum font_mode_t {
+typedef enum {
 	MODE_AUTO_CLOSE = 0,
 	MODE_GLYPHS_CLOSE,
 	MODE_FREE_CLOSE,
@@ -191,7 +191,7 @@ typedef struct fT_SizeRec_* FT_Size;
 /**
  *  Texture font library structure.
  */
-typedef struct texture_font_library_t
+typedef struct
 {
 	/**
 	 * Flag for mode
@@ -207,7 +207,7 @@ typedef struct texture_font_library_t
 /**
  *  Texture font structure.
  */
-typedef struct texture_font_t
+typedef struct
 {
 	/**
 	 * Vector of glyphs contained in this font.

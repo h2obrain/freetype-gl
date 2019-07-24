@@ -176,19 +176,38 @@ void texture_font_init_size(texture_font_t * self) {
 	self->linegap = self->height - self->ascender + self->descender;
 }
 
-// ------------------------------------------------------ texture_font_init ---
-static int
-texture_font_init(texture_font_t *self) {
-	assert(self->atlas);
-	assert(self->pt_size > 0);
-	assert((self->location == TEXTURE_FONT_FILE && self->filename)
-		|| (self->location == TEXTURE_FONT_MEMORY
-			&& self->memory.base && self->memory.size));
+// ------------------------------------------------------ texture_font_reset ---
+static void texture_font_reset(texture_font_t *self) {
+	self->glyphs = NULL;
+	self->face = NULL;
+	self->hb_ft_font = NULL;
+	self->buffer = NULL;
 
-	self->glyphs = vector_new(sizeof(texture_glyph_t *));
 	self->height = 0;
 	self->ascender = 0;
 	self->descender = 0;
+}
+
+
+// ------------------------------------------------------ texture_font_defaults ---
+static void texture_font_defaults(texture_font_t *self) {
+//	texture_font_reset(self); // should not be needed..
+
+	self->pt_size  = 5;
+	self->dpi = 72;
+	self->hres = 1;
+
+	self->location = -1;
+	self->filename = NULL;
+	self->memory.base = 0;
+	self->memory.size = 0;
+	self->mode = mode_default;
+
+	self->language = NULL;
+
+//	self->height = 0;
+//	self->ascender = 0;
+//	self->descender = 0;
 	self->rendermode = RENDER_NORMAL;
 	self->outline_thickness = 0.0;
 	self->hinting = 1;
@@ -199,8 +218,9 @@ texture_font_init(texture_font_t *self) {
 #if defined(TEXTURE_FONT_ENABLE_NORMALIZED_TEXTURE_COORDINATES)
 	self->scale = 1.0;
 #endif
-	self->face = NULL;
-	self->hb_ft_font = 0;
+//	self->face = NULL;
+//	self->hb_ft_font = 0;
+//	self->buffer = NULL;
 
 	// FT_LCD_FILTER_LIGHT   is (0x00, 0x55, 0x56, 0x55, 0x00)
 	// FT_LCD_FILTER_DEFAULT is (0x10, 0x40, 0x70, 0x40, 0x10)
@@ -209,6 +229,21 @@ texture_font_init(texture_font_t *self) {
 	self->lcd_weights[2] = 0x70;
 	self->lcd_weights[3] = 0x40;
 	self->lcd_weights[4] = 0x10;
+}
+
+// ------------------------------------------------------ texture_font_init ---
+static int
+texture_font_init(texture_font_t *self) {
+	assert(self->atlas);
+	assert(self->pt_size > 0);
+	assert((self->location == TEXTURE_FONT_FILE && self->filename)
+		|| (self->location == TEXTURE_FONT_MEMORY
+			&& self->memory.base && self->memory.size));
+
+
+	texture_font_reset(self);
+
+	self->glyphs = vector_new(sizeof(texture_glyph_t *));
 
 	if (!texture_font_load_face(self, self->pt_size * self->hres)) {
 		return -1;
@@ -258,6 +293,8 @@ texture_font_new_from_file(
 		return NULL;
 	}
 
+	texture_font_defaults(self);
+
 	self->atlas = atlas;
 	self->pt_size  = pt_size;
 	self->dpi = dpi;
@@ -296,6 +333,8 @@ texture_font_new_from_memory(
 			   "line %d: No more memory for allocating data\n", __LINE__);
 		return NULL;
 	}
+
+	texture_font_defaults(self);
 
 	self->atlas = atlas;
 	self->pt_size = pt_size;
@@ -684,10 +723,10 @@ texture_font_load_glyphs( texture_font_t * self,
 
 		if ( self->atlas->depth == 4 ) {
 #ifdef FT_LOAD_COLOR
-		flags |= FT_LOAD_COLOR;
+			flags |= FT_LOAD_COLOR;
 #else
-		freetype_error( 0, "FT_Error (%s:%d, code 0x%02x) : %s\n",
-					__FILENAME__, __LINE__, 0, "FT_LOAD_COLOR not available");
+			freetype_error( 0, "FT_Error (%s:%d, code 0x%02x) : %s\n",
+						__FILENAME__, __LINE__, 0, "FT_LOAD_COLOR not available");
 #endif
 		}
 
@@ -719,9 +758,9 @@ texture_font_load_glyphs( texture_font_t * self,
 			error = FT_Stroker_New( self->library->library, &stroker );
 
 			if ( error ) {
-			freetype_error( error, "FT_Error (0x%02x) : %s\n",
-				FT_Errors[error].code, FT_Errors[error].message);
-			goto cleanup_stroker;
+				freetype_error( error, "FT_Error (0x%02x) : %s\n",
+					FT_Errors[error].code, FT_Errors[error].message);
+				goto cleanup_stroker;
 			}
 
 			FT_Stroker_Set(stroker,
