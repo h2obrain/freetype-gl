@@ -255,6 +255,7 @@ int layout_add_text(
 		/* update pen */
 		paragraph->pen.x  = 0;
 		paragraph->pen.y += paragraph->h - paragraph->descender;
+//		paragraph->ascender = paragraph->descender = 0;
 
 		char buf[1024]; char *bp=buf; buf[0]='\0';
 		bp += strlen(strncpy(bp,"Breaking line ",sizeof(buf)-(bp-buf)));

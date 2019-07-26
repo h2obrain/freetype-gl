@@ -157,16 +157,16 @@ void texture_font_init_size(texture_font_t * self);
 void texture_font_init_size(texture_font_t * self) {
 	FT_Size_Metrics metrics;
 	
-	self->underline_position = self->face->underline_position / (float)(self->hres*self->hres) * self->pt_size;
+	self->underline_position = self->face->underline_position / self->face->units_per_EM * self->pt_size;
 	self->underline_position = roundf( self->underline_position );
 	if ( self->underline_position > -2 ) {
-		self->underline_position = -2.0;
+		self->underline_position = -2;
 	}
 
-	self->underline_thickness = self->face->underline_thickness / (float)(self->hres*self->hres) * self->pt_size;
+	self->underline_thickness = self->face->underline_thickness / self->face->units_per_EM * self->pt_size;
 	self->underline_thickness = roundf( self->underline_thickness );
 	if ( self->underline_thickness < 1 ) {
-		self->underline_thickness = 1.0;
+		self->underline_thickness = 1;
 	}
 
 	metrics = self->face->size->metrics;

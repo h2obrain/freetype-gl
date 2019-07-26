@@ -63,6 +63,8 @@ typedef struct font_manager_t {
 	 */
 	char * cache;
 
+	float dpi,hres;
+
 } font_manager_t;
 
 
@@ -80,7 +82,9 @@ typedef struct font_manager_t {
 font_manager_t *font_manager_new(
 						size_t width,
 						size_t height,
-						size_t depth
+						size_t depth,
+						const float dpi,
+						const float hres
 					);
 
 
@@ -110,6 +114,23 @@ void font_manager_delete_font(
 
 
 /**
+ *  Request for a font based on memory.
+ *
+ *  @param self     a font manager.
+ *  @param filename font data
+ *  @param size     font size
+ *
+ *  @return Requested font
+ */
+texture_font_t *
+font_manager_get_from_memory( font_manager_t *self,
+								const font_family_t font_data,
+								const float size,
+								const char *language
+		);
+
+#ifndef FT_CONFIG_OPTION_DISABLE_STREAM_SUPPORT
+/**
  *  Request for a font based on a filename.
  *
  *  @param self     a font manager.
@@ -124,7 +145,7 @@ texture_font_t *font_manager_get_from_filename(
 							const float size,
 							const char *language
 						);
-
+#endif
 
 /**
  *  Request for a font based on a description
@@ -138,13 +159,13 @@ texture_font_t *font_manager_get_from_filename(
  *  @return Requested font
  */
 texture_font_t *font_manager_get_from_description(
-								font_manager_t * self,
-								const char * family,
-								const float size,
-								const int bold,
-								const int italic,
-								const char *language
-							);
+							font_manager_t *self,
+							const font_family_t family,
+							const float size,
+							const int bold,
+							const int italic,
+							const char *language
+						);
 
 
 /**

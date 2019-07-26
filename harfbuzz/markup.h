@@ -11,7 +11,26 @@ extern "C" {
 #endif
 
 #include "texture-font.h"
+
+#include <stdbool.h>
+
+#if defined(FREETYPE_GL_COLOR_ARGB)
+#include <gfx/gfx.h>
+typedef gfx_color_t ftgl_color_t;
+#else
 #include "vec234.h"
+typedef gfx_color_t vec4;
+#endif
+
+#if defined(FREETYPE_GL_USE_MEMORY_FONTS)
+typedef struct {
+	void  *font_base;
+	size_t font_size;
+} memory_font_t;
+typedef memory_font_t font_family_t;
+#else
+typedef char* font_family_t;
+#endif
 
 #include <hb.h>
 
@@ -33,9 +52,9 @@ namespace ftgl {
  *
  * ...
  *
- * vec4 black  = {{0.0, 0.0, 0.0, 1.0}};
- * vec4 white  = {{1.0, 1.0, 1.0, 1.0}};
- * vec4 none   = {{1.0, 1.0, 1.0, 0.0}};
+ * gfx_color_t black  = {{0.0, 0.0, 0.0, 1.0}};
+ * gfx_color_t white  = {{1.0, 1.0, 1.0, 1.0}};
+ * gfx_color_t none   = {{1.0, 1.0, 1.0, 0.0}};
  *
  * markup_t normal = {
  *     .family  = "Droid Serif",
@@ -71,7 +90,7 @@ typedef struct markup_t
 	/**
 	 * A font family name such as "normal", "sans", "serif" or "monospace".
 	 */
-	char *family;
+	font_family_t family;
 
 	/**
 	 * Font size.
@@ -81,72 +100,74 @@ typedef struct markup_t
 	/**
 	 * Whether text is bold.
 	 */
-	int bold;
+	bool bold;
 
 	/**
 	 * Whether text is italic.
 	 */
-	int italic;
+	bool italic;
 
 	/**
 	 * Spacing between letters.
 	 */
 	float spacing;
 
+#ifndef FREETYPE_GL_NOGL
 	/**
 	 * Gamma correction.
 	 */
 	float gamma;
+#endif
 
 	/**
 	 * Text color.
 	 */
-	vec4 foreground_color;
+	gfx_color_t foreground_color;
 
 	/**
 	 * Background color.
 	 */
-	vec4 background_color;
+	gfx_color_t background_color;
 
 	/**
 	 * Whether outline is active.
 	 */
-	int outline;
+	bool outline;
 
 	/**
 	 * Outline color.
 	 */
-	vec4 outline_color;
+	gfx_color_t outline_color;
 
 	/**
 	 * Whether underline is active.
 	 */
-	int underline;
+	bool underline;
 
 	/**
 	 * Underline color.
 	 */
-	vec4 underline_color;
+	gfx_color_t underline_color;
 
 	/**
 	 * Whether overline is active.
 	 */
-	int overline;
+	bool overline;
 
 	/**
 	 * Overline color.
 	 */
-	vec4 overline_color;
+	gfx_color_t overline_color;
 
 	/**
 	 * Whether strikethrough is active.
 	 */
-	int strikethrough;
+	bool strikethrough;
 
 	/**
 	 * Strikethrough color.
 	 */
-	vec4 strikethrough_color;
+	gfx_color_t strikethrough_color;
 
 	/**
 	 * Pointer on the corresponding font (family/size/bold/italic)

@@ -12,7 +12,9 @@ extern "C" {
 
 #include <hb.h>
 #include <hb-ft.h>
+#if !defined(FREETYPE_GL_NOGL)
 #include "vertex-buffer.h"
+#endif
 #include "markup.h"
 #include "block-layout.h"
 
@@ -54,15 +56,19 @@ namespace ftgl {
  * Text buffer structure
  */
 typedef struct  text_buffer_t {
+#ifdef FREETYPE_GL_NOGL
+	dma2d_pixel_buffer_t *render_surface;
+#else
 	/**
 	 * Vertex buffer
 	 */
 	vertex_buffer_t *buffer;
+#endif
 
 	/**
 	 * Base color for text
 	 */
-	vec4 base_color;
+	ftgl_color_t base_color;
 
 	/**
 	 * Block layout
@@ -220,15 +226,17 @@ typedef enum Align
 	ALIGN_RIGHT
 } Align;
 
-
 /**
  * Creates a new empty text buffer.
  *
  * @return  a new empty text buffer.
  *
  */
-text_buffer_t *
-text_buffer_new(float w, float h);
+#ifdef FREETYPE_GL_NOGL
+text_buffer_t *text_buffer_new(float w, float h, dma2d_pixel_buffer_t *render_surface);
+#else
+text_buffer_t *text_buffer_new(float w, float h);
+#endif
 
 /**
  * Deletes texture buffer and its associated vertex buffer.
@@ -275,11 +283,12 @@ text_buffer_add_text( text_buffer_t * self,
   * @param current  charactr to be added
   * @param previous previous character (if any)
   */
-void
-text_buffer_add_char( text_buffer_t * self,
-					vec2 * pen, markup_t * markup,
-					hb_glyph_info_t     *glyph_info,
-					hb_glyph_position_t *glyph_pos );
+void text_buffer_add_char( text_buffer_t *self,
+					  vec2 *pen,
+					  const markup_t *markup,
+					  const hb_glyph_info_t     *glyph_info,
+					  const hb_glyph_position_t *glyph_pos
+			);
 
  /**
   * Align all the lines of text already added to the buffer
