@@ -247,8 +247,8 @@ void text_buffer_add_char( text_buffer_t *self,
 //		right  = left+width-underline_thickness;
 //		left  -= underline_thickness;
 //		top   -= underline_thickness;
-		underline_thickness = (int16_t)lroundf(font->underline_thickness);
-		left  = (int16_t)lroundf(pen->x);
+		underline_thickness = 1; //(int16_t)lroundf(font->underline_thickness);
+		left  = (int16_t)lroundf(pen->x + (x_offset + glyph->offset_x));
 		width = (int16_t)glyph->tex_region.width;
 		right = left + width;
 		left -= underline_thickness;
