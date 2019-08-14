@@ -21,7 +21,7 @@
 //static void text_buffer_set_line_direction( text_buffer_t * self, hb_direction_t direction, vec2 *pen);
 
 #ifdef FREETYPE_GL_NOGL
-#include <drivers/dma2d_helper_functions.h>
+#include <ip/dma2d.h>
 #else
 #define SET_GLYPH_VERTEX(value,x0,y0,z0,s0,t0,r,g,b,a,sh,gm) { \
 	glyph_vertex_t *gv=&value;                                 \

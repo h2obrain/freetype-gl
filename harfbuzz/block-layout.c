@@ -23,7 +23,7 @@ int layout_clear(block_layout_t *self) {
 }
 
 static inline
-char *utf8_walk_forward(char *str, size_t dist, const char *limit) {
+const char *utf8_walk_forward(const char *str, size_t dist, const char *limit) {
 	while (dist--) {
 //		str += utf8_surrogate_len(str);
 		str++;
@@ -36,7 +36,7 @@ char *utf8_walk_forward(char *str, size_t dist, const char *limit) {
 	return str;
 }
 static inline
-char *utf8_walk_backward(char *str, size_t dist, const char *limit) {
+const char *utf8_walk_backward(const char *str, size_t dist, const char *limit) {
 	while (dist--) {
 		str--;
 		if (str<=limit) return limit;
