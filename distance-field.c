@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "edtaa3func.h"
+#include "distance-field.h"
 
 
 double *
